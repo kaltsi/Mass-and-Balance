@@ -78,6 +78,7 @@ table.b td
     // Some conversion constants
     var g_lbs_kg              = 0.45359237;
     var g_usg_ltr             = 3.78541178;
+    var g_usg_fuel_lb         = 6.0; // 1 usg = 6 lbs
 
     // Constant parameters
     var g_basic_weight        = 2146;
@@ -167,10 +168,10 @@ table.b td
     function update_numbers()
     {
 	g_tow = g_basic_weight + g_passenger_front + g_passenger_back + g_fuel_tot + g_baggage - g_taxi_fuel;
-	g_fuel_takeoff = g_fuel_tot / 6.0;
-	g_fuel_landing = g_fuel_takeoff - (g_fuel_flow_enroute * g_flight_time) / 60 - (g_taxi_fuel / 6);
+	g_fuel_takeoff = g_fuel_tot / g_usg_fuel_lb;
+	g_fuel_landing = g_fuel_takeoff - (g_fuel_flow_enroute * g_flight_time) / 60 - (g_taxi_fuel / g_usg_fuel_lb);
 
-	g_lw = g_fuel_landing * 6 + g_passenger_front + g_passenger_back + g_baggage + g_basic_weight;
+	g_lw = g_fuel_landing * g_usg_fuel_lb + g_passenger_front + g_passenger_back + g_baggage + g_basic_weight;
 	g_endurance = (g_fuel_takeoff / g_fuel_flow_max) * 60.0; // minutes
 
 	g_mom_pass_front_lbin = g_passenger_front * g_mom_pass_front;
@@ -185,7 +186,7 @@ table.b td
 	g_mom_takeoff = g_mom_takeoff_lbin / g_tow;
 	
 	g_mom_landing_lbin = g_mom_bw_lbin + g_mom_pass_front_lbin +
-	    g_mom_pass_back_lbin + g_mom_baggage_lbin + (g_fuel_landing * 6 * g_mom_fuel);
+	    g_mom_pass_back_lbin + g_mom_baggage_lbin + (g_fuel_landing * g_usg_fuel_lb * g_mom_fuel);
 	
 	g_mom_landing = g_mom_landing_lbin / g_lw;
     }
@@ -466,7 +467,7 @@ table.b td
 	  </tr>
 	  <tr><td>Back seat</td>
 	    <td>
-		<input type="range" min="100" max="500" value="0" onchange="update_param(this, 'g_passenger_back', 'span_pb')"/>
+		<input type="range" min="0" max="500" value="0" onchange="update_param(this, 'g_passenger_back', 'span_pb')"/>
 		<span id="span_pb"></span> lbs
 	    </td>
 	  </tr>
