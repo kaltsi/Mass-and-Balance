@@ -126,7 +126,7 @@ table.b td
     // mass and balance envelope limits
     var g_x_limits = new Array(2.083 * g_m_inch, 2.083 * g_m_inch, 2.250 * g_m_inch, 2.362 * g_m_inch, 2.362 * g_m_inch, 2.083 * g_m_inch)
     var g_y_limits = new Array(700.0 * g_kg_lbs, 930 * g_kg_lbs, 1157 * g_kg_lbs, 1157 * g_kg_lbs, 700 * g_kg_lbs, 700.0 * g_kg_lbs)
-    
+    var g_y_limits_land = g_y_limits;
     var g_min_mom = Math.min.apply(Math, g_x_limits);
     var g_max_mom = Math.max.apply(Math, g_x_limits);
     
@@ -305,7 +305,6 @@ table.b td
     }
 
     // Checks if given point (x,y) is inside the mass and balance envelope.
-    // This does not seem to work for the x values.
     //
     // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
     function warn_limits(x, y, yarray)
@@ -326,6 +325,11 @@ table.b td
 		    in_envelope = 1;
 		}
 	    }
+	}
+
+	if (y < Math.max.apply(Math, yarray) && !in_envelope) {
+	    // we're outside the x-boundary
+	    in_envelope = -1;
 	}
 	
 	return in_envelope;
@@ -394,6 +398,16 @@ table.b td
 	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) == 0) {
 	    w.setAttribute('fill', "red");
 	    var warn="TAKE-OFF OVERWEIGHT " + ((g_tow - g_mtow) * g_lbs_kg).toFixed(1) + " kg!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_mom_landing, g_lw, g_y_limits_land) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="LANDING OVERWEIGHT " + ((g_lw - g_mlw) * g_lbs_kg).toFixed(1) + " kg!!";
+	    w.textContent=warn;
+	}
+	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) < 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TOO AFT CENTER OF GRAVITY!!";
 	    w.textContent = warn;
 	}
 	else {
