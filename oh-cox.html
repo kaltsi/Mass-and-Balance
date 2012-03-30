@@ -1,0 +1,582 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+    Mass and balance calculator for OH-COX.
+
+    https://github.com/kaltsi/Mass-and-Balance
+
+    Adapted from OH-COX Weight and Balance Excel sheet by Miika Asunta (29.07.2010)
+
+    Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+
+<head>
+
+<style type="text/css">
+<!--
+table.a
+{
+    border-radius: 6%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: 3px 3px 5px gray;
+}
+
+table.a th
+{
+    border: 0px;
+    padding: 1px;
+}
+
+table.b
+{
+    border-radius: 6%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: 3px 3px 5px gray;
+}
+
+table.b td
+{
+    border: 0px;
+    padding: 1px;
+}
+
+.alignleft
+{
+    float: left;
+}
+.alignright
+{
+    float: right;
+}
+
+//-->
+</style>
+
+<script type="text/javascript">
+
+<!--
+
+    // Some conversion constants
+    var g_lbs_kg              = 0.45359237;
+    var g_kg_lbs              = 2.20462262;
+    var g_usg_ltr             = 3.78541178;
+    var g_ltr_usg             = 0.26417205;
+    var g_m_inch              = 39.3700787;
+    var g_inch_m              = 0.0254;
+    var g_usg_fuel_lb         = 6.0; // 1 usg = 6 lbs
+
+    // Constant parameters
+    var g_basic_weight        = 562 * g_kg_lbs;
+    var g_mom_bw              = 0.770 * g_m_inch;
+    var g_mom_bw_lbin         = g_basic_weight * g_mom_bw;
+    var g_mom_pass_front      = 0.990 * g_m_inch;
+    var g_mom_fuel            = 1.070 * g_m_inch;
+    var g_mom_baggage         = 1.630 * g_m_inch;
+    var g_mom_taxi_fuel       = g_mom_fuel;
+    var g_mtow                = 757 * g_kg_lbs;
+    var g_mlw                 = g_mtow;
+
+    // Default values (weights in lb, fuel in US gallons)
+    var g_passenger_front     = 85 * g_kg_lbs;
+    var g_fuel_tot            = 67 * g_kg_lbs;
+    var g_baggage             = 15 * g_kg_lbs;
+    var g_taxi_fuel           = 3.0;
+    var g_fuel_flow_max       = 8.0;
+    var g_fuel_flow_enroute   = 6.1;
+    var g_fuel_takeoff        = 47.0;
+    var g_fuel_landing        = 5.0;
+    var g_flight_time         = 60.0;
+    
+    // Variable parameters
+    var g_mom_fuel_tot_lbin   = 0.0;
+    var g_mom_baggage_lbin    = 0.0;
+    var g_mom_taxi_fuel_lbin  = 0.0;
+    var g_mom_pass_front_lbin = 0.0;
+    var g_mom_takeoff         = 0.0;
+    var g_mom_landing         = 0.0;
+    var g_mom_takeoff_lbin    = 0.0;
+    var g_mom_landing_lbin    = 0.0;
+    var g_tow                 = 0.0;
+    var g_lw                  = 0.0;
+    var g_tow_lbin            = 0.0;
+    var g_lw_lbin             = 0.0;
+    var g_endurance           = 0.0;
+
+    // mass and balance envelope limits
+    var g_x_limits = new Array(0.787 * g_m_inch, 0.787 * g_m_inch, 0.821 * g_m_inch, 0.925 * g_m_inch, 0.925 * g_m_inch)
+    var g_y_limits = new Array(450 * g_kg_lbs, 612 * g_kg_lbs, 757 * g_kg_lbs, 757 * g_kg_lbs, 450 * g_kg_lbs, 450 * g_kg_lbs)
+    var g_y_limits_land = g_y_limits;
+    var g_min_mom = Math.min.apply(Math, g_x_limits);
+    var g_max_mom = Math.max.apply(Math, g_x_limits);
+    
+    var g_min_mass = Math.min.apply(Math, g_y_limits);
+    var g_max_mass = Math.max.apply(Math, g_y_limits);
+    
+    var g_mom_range_max  = 500;
+    var g_mom_range_min  = 1;
+    var g_mass_range_max = 400;
+    var g_mass_range_min = 1;
+    
+    function new_mom(old_value)
+    {
+	var old_range = g_max_mom - g_min_mom;
+	var new_range = g_mom_range_max - g_mom_range_min;
+	return ((old_value - g_min_mom) * new_range)/old_range + g_mom_range_min;
+    }
+    
+    function new_mass(old_value)
+    {
+	var old_range = g_max_mass - g_min_mass;
+	var new_range = g_mass_range_max - g_mass_range_min;
+	return ((old_value - g_min_mass) * new_range)/old_range + g_mass_range_min;
+    }
+    
+    function pad2(num)
+    {
+	return (num < 10?'0':'') + num;
+    }
+    
+    function mins_to_hrs(mins)
+    {
+	var m, h;
+	
+	h = mins / 60.0;
+	m = mins % 60.0;
+	
+	return pad2(Math.floor(h)) + ":" + pad2(Math.floor(m));
+    }
+
+    function update_numbers()
+    {
+	g_tow = g_basic_weight + g_passenger_front + g_fuel_tot + g_baggage - g_taxi_fuel;
+	g_fuel_takeoff = g_fuel_tot / g_usg_fuel_lb;
+	g_fuel_landing = g_fuel_takeoff - (g_fuel_flow_enroute * g_flight_time) / 60 - (g_taxi_fuel / g_usg_fuel_lb);
+
+	g_lw = g_fuel_landing * g_usg_fuel_lb + g_passenger_front + g_baggage + g_basic_weight;
+	g_endurance = (g_fuel_takeoff / g_fuel_flow_max) * 60.0; // minutes
+
+	g_mom_pass_front_lbin = g_passenger_front * g_mom_pass_front;
+	g_mom_baggage_lbin = g_mom_baggage * g_baggage;
+	g_mom_taxi_fuel_lbin = g_mom_taxi_fuel * g_taxi_fuel;
+	
+	g_mom_fuel_tot_lbin = g_mom_fuel * g_fuel_tot;
+	
+	g_mom_takeoff_lbin = g_mom_bw_lbin + g_mom_pass_front_lbin + 
+	    g_mom_fuel_tot_lbin + g_mom_baggage_lbin - g_mom_taxi_fuel_lbin;
+	g_mom_takeoff = g_mom_takeoff_lbin / g_tow;
+	
+	g_mom_landing_lbin = g_mom_bw_lbin + g_mom_pass_front_lbin +
+	    g_mom_baggage_lbin + (g_fuel_landing * g_usg_fuel_lb * g_mom_fuel);
+	
+	g_mom_landing = g_mom_landing_lbin / g_lw;
+    }
+
+    function do_main_row(item_name, mass_lb, color)
+    {
+	var mass_kg;
+	var ret;
+	mass_kg = mass_lb * g_lbs_kg;
+	
+	ret = "<tr align='right'>"+
+	    "<th>" + item_name + "</th>" +
+	    "<td>" + mass_kg.toFixed(1) + "</td>" +
+	    "<td";
+	
+	if (color) {
+	    ret += " bgcolor='" + color + "'";
+	}
+	ret += ">" + mass_lb.toFixed(0) + "</td>" +
+	    "</tr>";
+	return ret;
+    }
+
+    function do_main_table()
+    {
+	return  '<table border="1" id="maintable" class="a">' +
+	    "<tr>" +
+	    "<th></th>" +
+	    "<th>Mass (kg)</th>" +
+	    "<th>Mass (lb)</th>" +
+	    "</tr>" +
+	    do_main_row("Basic weight", g_basic_weight) +
+	    do_main_row("Pilot and front passenger", g_passenger_front, "yellow") +
+	    do_main_row("Fuel (max. 148 lb)", g_fuel_tot, "yellow") +
+	    do_main_row("Baggage rear (max. 119 lb)", g_baggage, "yellow") +
+	    do_main_row("Taxi fuel (6 lb = 1 USG)", g_taxi_fuel, "yellow") +
+	    do_main_row("Take-off mass (MTOM 1669 lb)", g_tow, (g_tow > g_mtow)?"red":0) +
+	    do_main_row("Landing mass (Max 1669 lb)", g_lw, (g_lw > g_mlw)?"red":0) +
+	    "</table>";
+    }
+
+    function do_fuel_row(fuel, ff, time, color, color2)
+    {
+	var litres;
+	
+	litres = fuel * g_usg_ltr;
+	
+	ret = "<tr>" +
+	    "<td>" + litres.toFixed(1) + "</td>" +
+	    "<td>" + fuel.toFixed(1) + "</td>" +
+	    "<td";
+	
+	if (color) {
+	    ret += ' bgcolor="' + color + '"';
+	}
+	ret += ">" + ff.toFixed(1) + "</td>" +
+	    "<td";
+	if (color2) {
+	    ret += ' bgcolor="' + color2 + '"';
+	}
+	ret += ">" + mins_to_hrs(time) + "</td>" +
+	    "</tr>";
+	return ret;   
+    }
+
+    function do_fuel_table()
+    {
+	return '<table border="1" id="fueltable" class="a" style="text-align:center;">' +
+	    "<tr>" + 
+	    "<th colspan='4'>Take-off fuel</th>" +
+	    "</tr>" +
+	    "<tr>" +
+	    "<th>litres</th>" +
+	    "<th>USG</th>" +
+	    "<th>USG/h</th>" +
+	    "<th>Endurance/h</th>" +
+	    "</tr>" +
+	    do_fuel_row(g_fuel_takeoff, g_fuel_flow_max, g_endurance, "yellow") +
+	    "<tr>" + 
+	    "<th colspan='4'>Landing fuel</th>" +
+	    "</tr>" +
+	    "<tr>" +
+	    "<th>litres</th>" +
+	    "<th>USG</th>" +
+	    "<th>USG/h</th>" +
+	    "<th>Flight time/h</th>" +
+	    "</tr>" +
+	    do_fuel_row(g_fuel_landing, g_fuel_flow_enroute, g_flight_time, "yellow", "yellow") +
+	    "</table>";
+    }
+
+    function update_tables()
+    {
+	var x = document.getElementById("maintable");
+	x.innerHTML=do_main_table();
+	
+	var y = document.getElementById("fueltable");
+	y.innerHTML=do_fuel_table();
+    }
+
+    function update_param(slider, ref, span_id, fixit)
+    {
+	var value = slider.valueAsNumber;
+	eval (ref + " = value");
+	if (fixit) {
+	document.getElementById(span_id).innerHTML = eval(ref).toFixed(1);
+	} else {
+	document.getElementById(span_id).innerHTML = eval(ref);
+	}
+	update_numbers();
+	update_tables();
+	update_svg();
+    }
+
+    // Checks if given point (x,y) is inside the mass and balance envelope.
+    //
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    function warn_limits(x, y, yarray)
+    {
+	var j = g_x_limits.length - 2;
+	var in_envelope = 0;
+	var i, yi, xi, yj, xj;
+	
+	for (i=0; i < g_x_limits.length - 1; j=i++)
+	{
+	    xi = g_x_limits[i];
+	    xj = g_x_limits[j];
+	    yi = yarray[i];
+	    yj = yarray[j];
+	    
+	    if ( ((yi > y) != (yj > y)))  {
+		if (x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+		    in_envelope = 1;
+		}
+	    }
+	}
+
+	if (y < Math.max.apply(Math, yarray) && !in_envelope) {
+	    // we're outside the x-boundary
+	    in_envelope = -1;
+	}
+	
+	return in_envelope;
+    }
+    
+    // envelope limit line
+    function do_poly_points()
+    {
+	var i = 0;
+	var ret = "";
+	for (i=0; i < g_x_limits.length; i++)
+	{
+	    ret += new_mom(g_x_limits[i]) + ',' + new_mass(g_y_limits[i]) + " ";
+	}
+	
+	return ret;
+    }
+
+    function draw_limits_svg()
+    {
+	var l = document.getElementById("mb_limits");
+	l.setAttribute('points', do_poly_points());
+	
+	/*
+	var ll = document.getElementById("landing_limit");
+	// magic numbers for landing weight limit
+	ll.setAttribute('x1', new_mom(143.09));
+	ll.setAttribute('y1', new_mass(g_mlw));
+	ll.setAttribute('x2', new_mom(148.1));
+	ll.setAttribute('y2', new_mass(g_mlw));
+	*/
+
+	update_svg();
+    }
+    
+    function update_svg()
+    {
+	var lx = new_mom(g_mom_landing);
+	var ly = new_mass(g_lw);
+	var tx = new_mom(g_mom_takeoff);
+	var ty = new_mass(g_tow);
+
+	var l = document.getElementById("landing_point");
+	l.setAttribute('cy', ly);
+	l.setAttribute('cx', lx);
+
+	var t = document.getElementById("takeoff_point");
+	t.setAttribute('cy', ty);
+	t.setAttribute('cx', tx);
+
+	var svg = document.getElementById("svg_main");
+	svg.setAttribute('width', 640);
+	svg.setAttribute('height', 480);
+	
+	var rect = document.getElementById("svg_border");
+	rect.setAttribute('width', 640);
+	rect.setAttribute('height', 480);
+
+	var warning = 1;
+	var w = document.getElementById("warning_text");
+	if (g_fuel_landing < 8) {
+	    w.setAttribute('fill', "red");
+	    var warn="NOT ENOUGH LANDING FUEL!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TAKE-OFF OVERWEIGHT " + ((g_tow - g_mtow) * g_lbs_kg).toFixed(1) + " kg!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_mom_landing, g_lw, g_y_limits_land) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="LANDING OVERWEIGHT " + ((g_lw - g_mlw) * g_lbs_kg).toFixed(1) + " kg!!";
+	    w.textContent=warn;
+	}
+	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) < 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TOO AFT CENTER OF GRAVITY!!";
+	    w.textContent = warn;
+	}
+	else {
+	    w.setAttribute('fill', "green");
+	    w.textContent="Limits OK";
+	    warning = 0;
+	}
+
+	if (warning == 1) {
+	    var s = rect.getAttribute('style');
+	    rect.setAttribute('style', s + "fill:yellow;opacity:0.3;");
+	}
+	else {
+	    var s = rect.getAttribute('style');
+	    rect.setAttribute('style', s + "fill:none;opacity:0.5;");
+	}
+    }
+
+//-->
+</script>
+
+<title>OH-COX m&b</title>
+
+</head>
+<body>
+
+  <h1>Cessna A152 OH-COX</h1>
+
+  <script type="text/javascript">
+    // initialize all elements to get nice default values
+    update_numbers();
+  </script>
+
+  <table>
+    <tr>
+      <td>
+	<script type="text/javascript">
+	  document.write(do_main_table());
+	</script>
+      </td>
+
+      <td  align="center" valign="bottom">
+	<script type="text/javascript">
+	  document.write(do_fuel_table());
+	</script>
+      </td>
+
+    </tr>
+
+    <tr>
+      <td align="center" style="padding: 5px;">
+
+	<table border="1" class="b">
+	  <tr>
+	    <td>Front seat</td>
+	    <td>
+		<input type="range" min="50" max="400" value="170" onchange="update_param(this, 'g_passenger_front', 'span_pf')"/>
+		<span id="span_pf"></span> lbs
+	    </td>
+	  </tr>
+	  <tr><td>Fuel</td>
+	    <td>
+		<input type="range" min="0" max="148" value="148" onchange="update_param(this, 'g_fuel_tot', 'span_ftot')"/>
+		<span id="span_ftot"></span> lbs
+	    </td>
+	  </tr>
+	  <tr><td>Baggage rear</td>
+	    <td>
+	      <input type="range" min="0" max="119" value="20" onchange="update_param(this, 'g_baggage', 'span_bag')"/>
+	      <span id="span_bag"></span> lbs
+	    </td>
+	  </tr>
+	  <tr><td>Taxi fuel</td>
+	    <td>
+	      <input type="range" min="0" max="50" value="3" onchange="update_param(this, 'g_taxi_fuel', 'span_ftax')"/>
+	      <span id="span_ftax"></span> lbs
+	    </td>
+	  </tr>
+	</table>
+      </td>
+
+      <td>
+	<table border="1" class="b">
+	  <tr><td>Fuel flow (climb)</td>
+	    <td>
+	      <input type="range" min="3" max="15" value="8.0" step="0.1" onchange="update_param(this, 'g_fuel_flow_max', 'span_ffmx', 1)"/>
+	      <span id="span_ffmx"></span> USG/h
+	    </td>
+	  </tr>
+	  <tr><td>Fuel flow (cruise)</td>
+	    <td>
+	      <input type="range" min="3" max="15" value="6.0" step="0.1" onchange="update_param(this, 'g_fuel_flow_enroute', 'span_ffen', 1)"/>
+	      <span id="span_ffen"></span> USG/h
+	    </td>
+	  </tr>
+	  <tr><td>Flight time</td>
+	    <td>
+	      <input type="range" min="1" max="360" value="60" onchange="update_param(this, 'g_flight_time', 'span_ftim')"/>
+	      <span id="span_ftim"></span> min
+	    </td>
+	  </tr>
+	</table>
+	
+      </td>
+    </tr>
+    
+  </table>
+
+  <!-- SVG stuff here -->
+  <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" 
+       width="1" height="1" style="box-shadow: 3px 3px 5px gray;">
+    
+    <rect id="svg_border" x="0" y="0" width="1" height="1"
+	  style="fill:none;stroke:black;stroke-width:5;opacity:0.5;"/>
+    <rect id="warn_box" x="10" y="10" width="250" height="60"
+	  style="fill:red;stroke:black;stroke-width:1;opacity:0;"/>
+	  
+
+    <text id="warning_text" x="15" y="30" fill="green">Limits OK</text>
+
+    <text x="50%" y="50%" style="opacity:.15;font-size:80;text-anchor:middle;">OH-COX</text>
+
+    <circle cx="20" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
+    <text x="35" y="105">- Take-off</text>
+    <circle cx="20" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
+    <text x="35" y="130">- Landing</text>
+    
+    <g transform="scale(1,-1)">
+      <g transform="translate(100,-480)">
+	<polyline id="mb_limits"
+		  vector-effect="non-scaling-stroke"
+		  points="0,0 1,1"
+		  style="fill:none;stroke:black;stroke-width:2" />
+	
+	<!--line id="landing_limit"
+	      vector-effect="non-scaling-stroke"
+	      x1="1" y1="2" x2="3" y2="4"
+	      style="fill:none;stroke:green;stroke-width:2" /-->
+	
+	<circle id="takeoff_point" cx="1" cy="1" r="5"
+		stroke="black" stroke-width="1" fill="red"/>
+	
+	<circle id="landing_point" cx="2" cy="2" r="5"
+		stroke="black" stroke-width="1" fill="green"/>
+      </g>
+    </g>
+  </svg>
+
+  <script type="text/javascript">
+
+    document.getElementById('span_pf').innerHTML   = g_passenger_front.toFixed();
+    document.getElementById('span_bag').innerHTML  = g_baggage.toFixed();
+    document.getElementById('span_ftot').innerHTML = g_fuel_tot.toFixed();
+    document.getElementById('span_ftax').innerHTML = g_taxi_fuel.toFixed();
+    document.getElementById('span_ffmx').innerHTML = g_fuel_flow_max.toFixed(1);
+    document.getElementById('span_ffen').innerHTML = g_fuel_flow_enroute.toFixed(1);
+    document.getElementById('span_ftim').innerHTML = g_flight_time;
+
+    draw_limits_svg();
+  </script>
+
+  <p/>
+  <footer>
+    <hr>
+
+<div id="extrainfo">
+
+    <p class="alignleft">Punnitustodistus <time>15.02.2010</time></p>
+    <p class="alignright"><small><a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 30.03.2012</small></p>
+    <div style="clear:both;"></div>
+</div>
+  
+  </footer>
+  
+</body>
+</html>
