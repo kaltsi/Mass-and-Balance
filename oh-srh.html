@@ -1,11 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator for OH-ESR.
+    Mass and balance calculator for OH-SRH.
 
     https://github.com/kaltsi/Mass-and-Balance
 
-    Adapted from OH-ESR Weight and Balance Excel sheet by Martti Keskinen (18.06.2011)
+    Adapted from OH-SRH Weight and Balance Excel sheet by Miika Asunta (10.04.2009)
 
     Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
 
@@ -77,36 +77,44 @@ table.b td
 
     // Some conversion constants
     var g_lbs_kg              = 0.45359237;
+    var g_kg_lbs              = 2.20462262;
     var g_usg_ltr             = 3.78541178;
-    var g_usg_fuel_lb         = 6.0; // 1 usg = 6 lbs
+    var g_ltr_usg             = 0.26417205;
+    var g_m_inch              = 39.3700787;
+    var g_inch_m              = 0.0254;
+    var g_l_fuel_kg           = 0.84;
+    var g_usg_fuel_lb         = g_usg_ltr * g_l_fuel_kg * g_kg_lbs;
 
     // Constant parameters
-    var g_basic_weight        = 2146;
-    var g_mom_bw              = 140.4;
+    var g_basic_weight        = 811 * g_kg_lbs;
+    var g_mom_bw              = 1.115 * g_m_inch;
     var g_mom_bw_lbin         = g_basic_weight * g_mom_bw;
-    var g_mom_pass_front      = 143.5;
-    var g_mom_pass_back       = 180.0;
-    var g_mom_fuel            = 154.9;
-    var g_mom_baggage         = 208.0;
+    var g_mom_pass_front      = 0.940 * g_m_inch;
+    var g_mom_pass_back       = 1.854 * g_m_inch;
+    var g_mom_fuel            = 1.219 * g_m_inch;
+    var g_mom_baggage         = 2.413 * g_m_inch;
+    var g_mom_baggage2        = 3.124 * g_m_inch;
     var g_mom_taxi_fuel       = g_mom_fuel;
-    var g_mtow                = 3000;
-    var g_mlw                 = 2900;
+    var g_mtow                = 1111 * g_kg_lbs;
+    var g_mlw                 = g_mtow;
 
     // Default values (weights in lb, fuel in US gallons)
-    var g_passenger_front     = 400.0;
+    var g_passenger_front     = 330.0;
     var g_passenger_back      = 0.0;
-    var g_fuel_tot            = 156.0;
-    var g_baggage             = 60.0;
-    var g_taxi_fuel           = 6.0;
-    var g_fuel_flow_max       = 11.0;
-    var g_fuel_flow_enroute   = 9.0;
-    var g_fuel_takeoff        = 26.0;
-    var g_fuel_landing        = 15.0;
-    var g_flight_time         = 60.0;    
+    var g_fuel_tot            = 183.0
+    var g_baggage             = 18.0;
+    var g_baggage2            = 0.0;
+    var g_taxi_fuel           = 1.0;
+    var g_fuel_flow_max       = 8.0;
+    var g_fuel_flow_enroute   = 5.5;
+    var g_fuel_takeoff        = 26.1;
+    var g_fuel_landing        = 3;
+    var g_flight_time         = 60.0;
     
     // Variable parameters
     var g_mom_fuel_tot_lbin   = 0.0;
     var g_mom_baggage_lbin    = 0.0;
+    var g_mom_baggage2_lbin   = 0.0;
     var g_mom_taxi_fuel_lbin  = 0.0;
     var g_mom_pass_front_lbin = 0.0;
     var g_mom_pass_back_lbin  = 0.0;
@@ -121,10 +129,9 @@ table.b td
     var g_endurance           = 0.0;
 
     // mass and balance envelope limits
-    var g_x_limits = new Array(138.7, 141.0, 144.1, 148.0, 148.1, 147.4, 144.6, 138.7);
-    var g_y_limits = new Array(2110.0, 2694.0, 3000.0, 3000.0, 2900.0, 2570.0, 2110.0, 2110.0);
-    var g_y_limits_land = new Array(2110.0, 2694.0, 2900.0, 2900.0, 2900.0, 2570.0, 2110.0, 2110.0);
-    
+    var g_x_limits = new Array(0.889 * g_m_inch, 0.889 * g_m_inch, 1.041 * g_m_inch, 1.201 * g_m_inch, 1.201 * g_m_inch, 0.889 * g_m_inch)
+    var g_y_limits = new Array(681.0 * g_kg_lbs, 885.0 * g_kg_lbs, 1111.0 * g_kg_lbs, 1111.0 * g_kg_lbs, 681.0 * g_kg_lbs, 681.0 * g_kg_lbs)
+    var g_y_limits_land = g_y_limits;
     var g_min_mom = Math.min.apply(Math, g_x_limits);
     var g_max_mom = Math.max.apply(Math, g_x_limits);
     
@@ -167,26 +174,27 @@ table.b td
 
     function update_numbers()
     {
-	g_tow = g_basic_weight + g_passenger_front + g_passenger_back + g_fuel_tot + g_baggage - g_taxi_fuel;
+	g_tow = g_basic_weight + g_passenger_front + g_passenger_back + g_fuel_tot + g_baggage + g_baggage2 - g_taxi_fuel;
 	g_fuel_takeoff = g_fuel_tot / g_usg_fuel_lb;
 	g_fuel_landing = g_fuel_takeoff - (g_fuel_flow_enroute * g_flight_time) / 60 - (g_taxi_fuel / g_usg_fuel_lb);
 
-	g_lw = g_fuel_landing * g_usg_fuel_lb + g_passenger_front + g_passenger_back + g_baggage + g_basic_weight;
+	g_lw = g_fuel_landing * g_usg_fuel_lb + g_passenger_front + g_passenger_back + g_baggage + g_baggage2 + g_basic_weight;
 	g_endurance = (g_fuel_takeoff / g_fuel_flow_max) * 60.0; // minutes
 
 	g_mom_pass_front_lbin = g_passenger_front * g_mom_pass_front;
 	g_mom_pass_back_lbin = g_passenger_back * g_mom_pass_back;
 	g_mom_baggage_lbin = g_mom_baggage * g_baggage;
+	g_mom_baggage2_lbin = g_mom_baggage2 * g_baggage2;
 	g_mom_taxi_fuel_lbin = g_mom_taxi_fuel * g_taxi_fuel;
 	
 	g_mom_fuel_tot_lbin = g_mom_fuel * g_fuel_tot;
 	
 	g_mom_takeoff_lbin = g_mom_bw_lbin + g_mom_pass_front_lbin + 
-	    g_mom_pass_back_lbin + g_mom_fuel_tot_lbin + g_mom_baggage_lbin - g_mom_taxi_fuel_lbin;
+	    g_mom_pass_back_lbin + g_mom_fuel_tot_lbin + g_mom_baggage_lbin +g_mom_baggage2_lbin - g_mom_taxi_fuel_lbin;
 	g_mom_takeoff = g_mom_takeoff_lbin / g_tow;
 	
 	g_mom_landing_lbin = g_mom_bw_lbin + g_mom_pass_front_lbin +
-	    g_mom_pass_back_lbin + g_mom_baggage_lbin + (g_fuel_landing * g_usg_fuel_lb * g_mom_fuel);
+	    g_mom_pass_back_lbin + g_mom_baggage_lbin + g_mom_baggage2_lbin + (g_fuel_landing * g_usg_fuel_lb * g_mom_fuel);
 	
 	g_mom_landing = g_mom_landing_lbin / g_lw;
     }
@@ -221,11 +229,12 @@ table.b td
 	    do_main_row("Basic weight", g_basic_weight) +
 	    do_main_row("Pilot and front passenger", g_passenger_front, "yellow") +
 	    do_main_row("Rear passengers", g_passenger_back, "yellow") +
-	    do_main_row("Fuel (max. 336 lb)", g_fuel_tot, "yellow") +
-	    do_main_row("Baggage rear (max. 130 lb)", g_baggage, "yellow") +
-	    do_main_row("Taxi fuel (6 lb = 1 USG)", g_taxi_fuel, "yellow") +
-	    do_main_row("Take-off mass (MTOM 3000 lb)", g_tow, (g_tow > g_mtow)?"red":0) +
-	    do_main_row("Landing mass (Max 2900 lb)", g_lw, (g_lw > g_mlw)?"red":0) +
+	    do_main_row("Fuel (max. 313 lb)", g_fuel_tot, "yellow") +
+	    do_main_row("Baggage Area1 (max. 119 lb)", g_baggage, "yellow") +
+	    do_main_row("Baggage Area2 (max. 51 lb)", g_baggage2, "yellow") +
+	    do_main_row("Taxi fuel (7 lb = 1 USG)", g_taxi_fuel, "yellow") +
+	    do_main_row("Take-off mass (MTOM 2550 lb)", g_tow, (g_tow > g_mtow)?"red":0) +
+	    do_main_row("Landing mass (Max 2550 lb)", g_lw, (g_lw > g_mlw)?"red":0) +
 	    "</table>";
     }
 
@@ -303,7 +312,6 @@ table.b td
     }
 
     // Checks if given point (x,y) is inside the mass and balance envelope.
-    // This does not seem to work for the x values.
     //
     // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
     function warn_limits(x, y, yarray)
@@ -325,12 +333,12 @@ table.b td
 		}
 	    }
 	}
-	
+
 	if (y < Math.max.apply(Math, yarray) && !in_envelope) {
 	    // we're outside the x-boundary
 	    in_envelope = -1;
 	}
-
+	
 	return in_envelope;
     }
     
@@ -352,13 +360,15 @@ table.b td
 	var l = document.getElementById("mb_limits");
 	l.setAttribute('points', do_poly_points());
 	
+	/*
 	var ll = document.getElementById("landing_limit");
 	// magic numbers for landing weight limit
 	ll.setAttribute('x1', new_mom(143.09));
 	ll.setAttribute('y1', new_mass(g_mlw));
 	ll.setAttribute('x2', new_mom(148.1));
 	ll.setAttribute('y2', new_mass(g_mlw));
-	
+	*/
+
 	update_svg();
     }
     
@@ -387,7 +397,7 @@ table.b td
 
 	var warning = 1;
 	var w = document.getElementById("warning_text");
-	if (g_fuel_landing < 10) {
+	if (g_fuel_landing < 8) {
 	    w.setAttribute('fill', "red");
 	    var warn="NOT ENOUGH LANDING FUEL!!";
 	    w.textContent = warn;
@@ -426,12 +436,12 @@ table.b td
 //-->
 </script>
 
-<title>OH-ESR m&b</title>
+<title>OH-SRH m&b</title>
 
 </head>
 <body>
 
-  <h1>Cirrus SR20 OH-ESR</h1>
+  <h1>Cessna 172S Centurion 2.0 OH-SRH</h1>
 
   <script type="text/javascript">
     // initialize all elements to get nice default values
@@ -474,19 +484,25 @@ table.b td
 
 	  <tr><td>Fuel</td>
 	    <td>
-		<input type="range" min="0" max="336" value="156" onchange="update_param(this, 'g_fuel_tot', 'span_ftot')"/>
+		<input type="range" min="0" max="313" value="156" onchange="update_param(this, 'g_fuel_tot', 'span_ftot')"/>
 		<span id="span_ftot"></span> lbs
 	    </td>
 	  </tr>
-	  <tr><td>Baggage rear</td>
+	  <tr><td>Baggage Area1</td>
 	    <td>
-	      <input type="range" min="0" max="130" value="60" onchange="update_param(this, 'g_baggage', 'span_bag')"/>
+	      <input type="range" min="0" max="119" value="18" onchange="update_param(this, 'g_baggage', 'span_bag')"/>
 	      <span id="span_bag"></span> lbs
+	    </td>
+	  </tr>
+	  <tr><td>Baggage Area2</td>
+	    <td>
+	      <input type="range" min="0" max="50" value="0" onchange="update_param(this, 'g_baggage2', 'span_bag2')"/>
+	      <span id="span_bag2"></span> lbs
 	    </td>
 	  </tr>
 	  <tr><td>Taxi fuel</td>
 	    <td>
-	      <input type="range" min="0" max="50" value="6" onchange="update_param(this, 'g_taxi_fuel', 'span_ftax')"/>
+	      <input type="range" min="0" max="50" value="3" onchange="update_param(this, 'g_taxi_fuel', 'span_ftax')"/>
 	      <span id="span_ftax"></span> lbs
 	    </td>
 	  </tr>
@@ -497,13 +513,13 @@ table.b td
 	<table border="1" class="b">
 	  <tr><td>Fuel flow (climb)</td>
 	    <td>
-	      <input type="range" min="4" max="25" value="11.0" step="0.1" onchange="update_param(this, 'g_fuel_flow_max', 'span_ffmx', 1)"/>
+	      <input type="range" min="3" max="10" value="8.0" step="0.1" onchange="update_param(this, 'g_fuel_flow_max', 'span_ffmx', 1)"/>
 	      <span id="span_ffmx"></span> USG/h
 	    </td>
 	  </tr>
 	  <tr><td>Fuel flow (cruise)</td>
 	    <td>
-	      <input type="range" min="4" max="25" value="9.0" step="0.1" onchange="update_param(this, 'g_fuel_flow_enroute', 'span_ffen', 1)"/>
+	      <input type="range" min="3" max="10" value="5.5" step="0.1" onchange="update_param(this, 'g_fuel_flow_enroute', 'span_ffen', 1)"/>
 	      <span id="span_ffen"></span> USG/h
 	    </td>
 	  </tr>
@@ -532,7 +548,7 @@ table.b td
 
     <text id="warning_text" x="15" y="30" fill="green">Limits OK</text>
 
-    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-ESR</text>
+    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-SRH</text>
 
     <circle cx="20" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
     <text x="35" y="105">- Take-off</text>
@@ -540,16 +556,16 @@ table.b td
     <text x="35" y="130">- Landing</text>
     
     <g transform="scale(1,-1)">
-      <g transform="translate(0,-480)">
+      <g transform="translate(20,-480)">
 	<polyline id="mb_limits"
 		  vector-effect="non-scaling-stroke"
 		  points="0,0 1,1"
 		  style="fill:none;stroke:black;stroke-width:2" />
 	
-	<line id="landing_limit"
+	<!--line id="landing_limit"
 	      vector-effect="non-scaling-stroke"
 	      x1="1" y1="2" x2="3" y2="4"
-	      style="fill:none;stroke:green;stroke-width:2" />
+	      style="fill:none;stroke:green;stroke-width:2" /-->
 	
 	<circle id="takeoff_point" cx="1" cy="1" r="5"
 		stroke="black" stroke-width="1" fill="red"/>
@@ -562,11 +578,12 @@ table.b td
 
   <script type="text/javascript">
 
-    document.getElementById('span_pf').innerHTML   = g_passenger_front;
-    document.getElementById('span_pb').innerHTML   = g_passenger_back;
-    document.getElementById('span_bag').innerHTML  = g_baggage;
-    document.getElementById('span_ftot').innerHTML = g_fuel_tot;
-    document.getElementById('span_ftax').innerHTML = g_taxi_fuel;
+    document.getElementById('span_pf').innerHTML   = g_passenger_front.toFixed();
+    document.getElementById('span_pb').innerHTML   = g_passenger_back.toFixed();
+    document.getElementById('span_bag').innerHTML  = g_baggage.toFixed();
+    document.getElementById('span_bag2').innerHTML = g_baggage2.toFixed();
+    document.getElementById('span_ftot').innerHTML = g_fuel_tot.toFixed();
+    document.getElementById('span_ftax').innerHTML = g_taxi_fuel.toFixed();
     document.getElementById('span_ffmx').innerHTML = g_fuel_flow_max.toFixed(1);
     document.getElementById('span_ffen').innerHTML = g_fuel_flow_enroute.toFixed(1);
     document.getElementById('span_ftim').innerHTML = g_flight_time;
@@ -580,7 +597,7 @@ table.b td
 
 <div id="extrainfo">
 
-    <p class="alignleft">Punnituspöytäkirja <time>09.08.2005</time></p>
+    <p class="alignleft">OH-SRH excel (MIK) <time>10.04.2009</time></p>
     <p class="alignright"><small><a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 30.03.2012</small></p>
     <div style="clear:both;"></div>
 </div>
