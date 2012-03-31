@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+    Mass and balance calculator for OH-COX.
+
+    https://github.com/kaltsi/Mass-and-Balance
+
+    Adapted from OH-COX Weight and Balance Excel sheet by Miika Asunta (29.07.2010)
+
+    Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+
+<head>
+
+<style type="text/css">
+<!--
+table.a
+{
+    border-radius: 6%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: 3px 3px 5px gray;
+}
+
+table.a th
+{
+    border: 0px;
+    padding: 1px;
+}
+
+table.b
+{
+    border-radius: 6%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: 3px 3px 5px gray;
+}
+
+table.b td
+{
+    border: 0px;
+    padding: 1px;
+}
+
+.alignleft
+{
+    float: left;
+}
+.alignright
+{
+    float: right;
+}
+
+//-->
+</style>
+
+<script type="text/javascript">
+
+<!--
+
+    // Some conversion constants
+    var g_kg_lbs              = 2.20462262;
+    var g_ltr_usg             = 0.26417205;
+    var g_m_inch              = 39.3700787;
+    var g_usg_fuel_lb         = 6.0; // 1 usg = 6 lbs
+
+    var x, y;
+
+    // basic numeric value with unit and type
+    function value_unit(v, u)
+    {
+	switch (u) {
+	case "kg":
+	case "lb":
+	case "ltr":
+	case "usg":
+	    break;
+	default:
+	    // this should not happen
+	    alert("value_unit with values: " + v + " " + u + " called.");
+	}
+
+	this.value = v;
+	this.unit  = u;
+
+	this.display = v_display;
+	this.unitchg = v_unit_change;
+    }
+
+    function v_display(n)
+    {
+	if (n) {
+	    return this.value.toFixed(n) + " " + this.unit;
+	}
+	else {
+	    return this.value + " " + this.unit;
+	}
+    }
+
+    function v_unit_change()
+    {
+	switch (this.unit) {
+	case "kg":
+	    this.unit  = "lb";
+	    this.value = this.value * g_kg_lbs;
+	    break;
+	case "lb":
+	    this.unit = "kg";
+	    this.value = this.value / g_kg_lbs;
+	    break;
+	case "ltr":
+	    this.unit = "usg";
+	    this.value = this.value * g_ltr_usg;
+	    break;
+	case "usg":
+	    this.unit = "ltr";
+	    this.value = this.value / g_ltr_usg;
+	    break;
+	default:
+	    alert("Invalid v_unit_change: cannot happen!");
+	}
+    }
+
+    function make_row_text(description, max, maxval)
+    {
+	var ret = description;
+
+	if (max) {
+	    ret += "(" + max + " " + maxval +")";
+	}
+
+	return ret;
+    }
+
+    function setup()
+    {
+	x = new value_unit(10, "kg");
+	y = new value_unit(20, "ltr");
+    }
+
+    function button_clicked()
+    {
+	var z = document.getElementById("t1");
+	z.innerHTML=x.display(1) + " " + y.display(1);
+    }
+
+    function button_clicked2()
+    {
+	var z = document.getElementById("t1");
+	x.unitchg();
+	y.unitchg();
+	z.innerHTML=x.display(1) + " " + y.display(1);
+    }
+
+
+    function update_range(sldr)
+    {
+
+    }
+
+    function button_clicked3()
+    {
+	var z = document.getElementById("sld1");
+	x.unitchg();
+	if (x.unit == "kg") {
+	    sld1.min="25";
+	    sld1.max="200";
+	    sld1.value = x.value;
+	}
+	else {
+	    sld1.min="50";
+	    sld1.max="400";
+	    sld1.value = x.value;
+	}
+
+	sld1.onchange();
+    }
+
+    function update_x(ctrl, v, what)
+    {
+	var z = document.getElementById(what);
+
+	v.value = ctrl.valueAsNumber;
+	z.innerText = v.display(1);
+    }
+
+    window.onload = setup;
+//-->
+</script>
+
+<title>OH-COX m&amp;b</title>
+
+</head>
+<body>
+
+  <h1>Cessna A152 OH-COX</h1>
+
+  <button type="button" onclick="button_clicked()">Save settings</button>
+  <button type="button" onclick="button_clicked2()">Clear settings</button> <!-- localStorage.clear() -->
+  <button type="button" title="jeah" onclick="button_clicked3()">Reset settings</button> 
+
+<p>
+  <select id="units">
+    <option selected="selected">kg & litre</option>
+    <option>lbs & usg</option>
+    <option>lbs & litre</option>
+    <option>kg & usg</option>
+  </select>
+</p>
+
+<p id="t1">
+</p>
+
+<p>
+  <input type="text" onchange="check_text()">
+</p>
+
+<p/>
+
+<table border="1" class="a" width="600">
+  <tr>
+    <th>  </th>
+    <th>
+  </th>
+    <th>Mass</th>
+  <tr>
+    <th>  Basic weight  </th>
+    <td>  </td>
+    <td> 760</td>
+  </tr>
+  <tr>
+    <th>  Front seat  </th>
+    <td>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, x, 'fs')"/>   </td>
+    <td id="fs">  562.0 </td>
+  </tr>
+
+  <tr>
+    <th>  Back seat  </th>
+    <td>  <input type="range"/>  </td>
+    <td>  0.0 </td>
+  </tr>
+  <tr>
+    <th>  Fuel (max 123 ung)  </th>
+    <td>  <input id="sld2" type="range" min="0" max="200" value="85" onchange="update_x(this, y, 'fu')"/>   </td>
+    <td id="fu">  0.0 </td>
+  </tr>
+
+  <tr>
+    <th>  Baggage (max 12 ung)  </th>
+    <td>  <input type="range"/>  </td>
+    <td>  0.0 </td>
+  </tr>
+
+  <tr>
+    <th>  Taxi fuel (xyz)  </th>
+    <td>  <input type="range"/>  </td>
+    <td>  0.0 </td>
+  </tr>
+
+  <tr>
+    <th>  Take off mass (MTOM 1223 ung)  </th>
+    <td>  </td>
+    <td>  0.0 </td>
+  </tr>
+
+  <tr>
+    <th>  Landing mass (max 1223 ung)  </th>
+    <td>   </td>
+    <td>  0.0 </td>
+  </tr>
+
+
+</table>
+
+</body>
+</html>
+
+
+<!--
+
+  M            O      M   M
+  Description (max x) Val Unit
+
+  kg & l
+  kg & usg
+  lbs & l
+  lbs & usg
+
+  value properties:
+  value
+  unit
+  unittype (mass / vol)
+  min
+  max
+  round
+  color
+
+-->
