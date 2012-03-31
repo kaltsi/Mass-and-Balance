@@ -44,6 +44,7 @@ table.a th
 {
     border: 0px;
     padding: 1px;
+    text-align: right;
 }
 
 table.b
@@ -76,12 +77,15 @@ table.b td
 <!--
 
     // Some conversion constants
-    var g_kg_lbs              = 2.20462262;
-    var g_ltr_usg             = 0.26417205;
-    var g_m_inch              = 39.3700787;
-    var g_usg_fuel_lb         = 6.0; // 1 usg = 6 lbs
+    var g_kg_lbs              = 2.20462262; // 1 kg  -> lb
+    var g_ltr_usg             = 0.26417205; // 1 ltr -> USG
+    var g_m_inch              = 39.3700787; // 1 m   -> inches
+    var g_usg_fuel_lb         = 6.0;  // 1 usg = 6 lbs
+    var g_ltr_fuel_kg         = 0.72; // 1 ltr = 0.72 kg
+    var g_mass_unit           = "kg"; // default in kilos
 
     var x, y;
+    var row1;
 
     // basic numeric value with unit and type
     function value_unit(v, u)
@@ -100,10 +104,13 @@ table.b td
 	this.value = v;
 	this.unit  = u;
 
-	this.display = v_display;
-	this.unitchg = v_unit_change;
+	this.display  = v_display;
+	this.dispmass = v_display_mass;
+	this.unitchg  = v_unit_change;
     }
 
+    // display the value and unit
+    // n: num of decimals
     function v_display(n)
     {
 	if (n) {
@@ -114,6 +121,39 @@ table.b td
 	}
     }
 
+    // display the mass of the fuel volume
+    // n: num of decimals
+    // u: also show unit
+    function v_display_mass(n, u)
+    {
+	var m = this.value;
+	
+	switch (this.unit) {
+	case "ltr":
+	    if (g_mass_unit == "kg")
+		m = m * g_ltr_fuel_kg;
+	    else
+		m = m * g_ltr_fuel_kg * g_kg_lbs;
+	    break;
+	case "usg":
+	    if (g_mass_unit == "kg")
+		m = m * g_usg_fuel_lb / g_kg_lbs;
+	    else
+		m = m * g_usg_fuel_lb;
+	    break;
+	default:
+	    // fall through, display the raw value
+	}
+	
+	if (n) {
+	    return m.toFixed(n)+(u?+ " " + g_mass_unit:"");
+	}
+	else {
+	    return m + (u?" " + g_mass_unit:"");
+	}
+    }
+
+    // switch the unit and recalculate value
     function v_unit_change()
     {
 	switch (this.unit) {
@@ -138,6 +178,25 @@ table.b td
 	}
     }
 
+    function l_point(d, mass, min, max, arm, arm_x)
+    {
+	this.descr  = d;
+	this.mass   = mass;
+	this.min    = min;
+	this.max    = max;
+	this.arm    = arm;
+	this.armx   = arm_x; // positive or negative moment arm
+	this.moment = mass * arm * arm_x;
+
+	this.make_description = l_make_description;
+    }
+
+    function l_make_description()
+    {
+
+    }
+
+
     function make_row_text(description, max, maxval)
     {
 	var ret = description;
@@ -153,6 +212,11 @@ table.b td
     {
 	x = new value_unit(10, "kg");
 	y = new value_unit(20, "ltr");
+
+	row1 = new non_interactive_row("Take-off mass", 1234, "takeoff");
+	var r = document.getElementById("mytable").insertRow(-1);
+	r.innerHTML = row1.add();
+
     }
 
     function button_clicked()
@@ -172,7 +236,7 @@ table.b td
 
     function update_range(sldr)
     {
-
+	var s = document.getElementById(sldr);
     }
 
     function button_clicked3()
@@ -193,12 +257,48 @@ table.b td
 	sld1.onchange();
     }
 
-    function update_x(ctrl, v, what)
+    function update_x(ctrl, v, what, whatelse)
     {
 	var z = document.getElementById(what);
+	var zz = document.getElementById(whatelse);
 
 	v.value = ctrl.valueAsNumber;
 	z.innerText = v.display(1);
+	zz.innerText = v.dispmass(1);
+    }
+
+    function handle_unit_change(t)
+    {
+	switch (t.value) {
+	case "kg & litre":
+	    g_mass_unit = "kg";
+	    break;
+	case "lbs & usg":
+	    g_mass_unit = "lb";
+	    break;
+	default:
+	    alert("this.selectedIndex");
+	}
+
+	mass_title.innerText = "Mass (" + g_mass_unit + ")";
+	unittoggle.onclick();
+    }
+
+
+    function non_interactive_row(name, max, myid)
+    {
+	var text = name + (max?" (max "+ max + " " + g_mass_unit + ")":"");
+	this.name = name;
+	this.max  = max;
+	this.myid = myid;
+	this.content = '<th>'+ text +'</th><th> </th><th></th><td id="' + myid + '">' + 123.0 +'</td>';
+
+	this.add = ni_add;
+    }
+
+    function ni_add()
+    {
+	return this.content;
     }
 
     window.onload = setup;
@@ -209,88 +309,99 @@ table.b td
 
 </head>
 <body>
-
+  
   <h1>Cessna A152 OH-COX</h1>
-
+  
   <button type="button" onclick="button_clicked()">Save settings</button>
   <button type="button" onclick="button_clicked2()">Clear settings</button> <!-- localStorage.clear() -->
-  <button type="button" title="jeah" onclick="button_clicked3()">Reset settings</button> 
-
-<p>
-  <select id="units">
-    <option selected="selected">kg & litre</option>
-    <option>lbs & usg</option>
-    <option>lbs & litre</option>
-    <option>kg & usg</option>
-  </select>
-</p>
-
-<p id="t1">
-</p>
-
-<p>
-  <input type="text" onchange="check_text()">
-</p>
-
-<p/>
-
-<table border="1" class="a" width="600">
-  <tr>
-    <th>  </th>
-    <th>
-  </th>
-    <th>Mass</th>
-  <tr>
-    <th>  Basic weight  </th>
-    <td>  </td>
-    <td> 760</td>
-  </tr>
-  <tr>
-    <th>  Front seat  </th>
-    <td>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, x, 'fs')"/>   </td>
-    <td id="fs">  562.0 </td>
-  </tr>
-
-  <tr>
-    <th>  Back seat  </th>
-    <td>  <input type="range"/>  </td>
-    <td>  0.0 </td>
-  </tr>
-  <tr>
-    <th>  Fuel (max 123 ung)  </th>
-    <td>  <input id="sld2" type="range" min="0" max="200" value="85" onchange="update_x(this, y, 'fu')"/>   </td>
-    <td id="fu">  0.0 </td>
-  </tr>
-
-  <tr>
-    <th>  Baggage (max 12 ung)  </th>
-    <td>  <input type="range"/>  </td>
-    <td>  0.0 </td>
-  </tr>
-
-  <tr>
-    <th>  Taxi fuel (xyz)  </th>
-    <td>  <input type="range"/>  </td>
-    <td>  0.0 </td>
-  </tr>
-
-  <tr>
-    <th>  Take off mass (MTOM 1223 ung)  </th>
-    <td>  </td>
-    <td>  0.0 </td>
-  </tr>
-
-  <tr>
-    <th>  Landing mass (max 1223 ung)  </th>
-    <td>   </td>
-    <td>  0.0 </td>
-  </tr>
-
-
-</table>
+  <button type="button" id="unittoggle" title="jeah" onclick="button_clicked3()">Reset settings</button> 
+  
+  <p>
+    <select id="units" onchange="handle_unit_change(this)">
+      <option selected="selected">kg & litre</option>
+      <option>lbs & usg</option>
+    </select>
+  </p>
+  
+  <p id="t1">
+  </p>
+  
+  <p>
+    <input type="text" onchange="check_text()">
+  </p>
+  
+  <p/>
+  
+  <table border="1" class="a" width="600" id="mytable">
+    <tbody>
+      <tr>
+	<th> </th>
+	<th> </th>
+	<th style="text-align:center;">Input</th>
+	<th style="text-align:center;" id="mass_title">Mass</th>
+      </tr>
+      <tr>
+	<th>  Basic weight  </th>
+	<th>  </th>
+	<td> 760</td>
+	<td> 760</td>
+      </tr>
+      <tr>
+	<th>  Front seat  </th>
+	<th>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, x, 'fs', 'fs2')"/>   </th>
+	<td id="fs">  562.0 </td>
+	<td id="fs2">  562.0 </td>
+      </tr>
+      
+      <tr>
+	<th>  Back seat  </th>
+	<th>  <input type="range"/>  </th>
+	<td>  0.0 </td>
+	<td>  0.0 </td>
+      </tr>
+      <tr>
+	<th>  Fuel (max 123 ung)  </th>
+	<th>  <input id="sld2" type="range" min="0" max="200" value="85" onchange="update_x(this, y, 'fu', 'fu2')"/>   </th>
+	<td id="fu">  0.0 </td>
+	<td id="fu2">  0.0 </td>
+      </tr>
+      
+      <tr>
+	<th>  Baggage (max 12 ung)  </th>
+	<th>  <input type="range"/>  </th>
+	<td>  0.0 </td>
+	<td>  0.0 </td>
+      </tr>
+      
+      <tr>
+	<th>  Taxi fuel (xyz)  </th>
+	<th>  <input type="range"/>  </th>
+	<td>  0.0 </td>
+	<td>  0.0 </td>
+      </tr>
+      
+      <tr>
+	<th>  Take off mass (MTOM 1223 ung)  </th>
+	<th>  </th>
+	<td>  0.0 </td>
+	<td>  0.0 </td>
+      </tr>
+      
+      <tr>
+	<th>  Landing mass (max 1223 ung)  </th>
+	<th>   </th>
+	<td>  0.0 </td>
+	<td>  0.0 </td>
+      </tr>
+      
+    </tbody>
+  </table>
 
 </body>
 </html>
+
+
+<!--make_interactive_row("Front seat", min, max, arm, arm_x, myid);-->
 
 
 <!--
