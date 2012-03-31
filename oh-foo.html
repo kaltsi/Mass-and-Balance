@@ -212,19 +212,25 @@ table.b td
     {
 	x = new value_unit(10, "kg");
 	y = new value_unit(20, "ltr");
-
-	row1 = new non_interactive_row("Take-off mass", 1234, "takeoff");
+	
+	row1 = new non_interactive_row("Take-off mass", 737, 1.234, 1, 1234, "takeoff");
 	var r = document.getElementById("mytable").insertRow(-1);
-	r.innerHTML = row1.add();
+	r.innerHTML = row1.content();
 
+	var r2 = document.getElementById("mytable").insertRow(-1);
+
+
+	row2 = new interactive_row("Front seat", 25, 200, 85, 1.23, 1, "x", "fss1", "fss2", "fssldr");
+	r2.innerHTML = row2.content();
+	
     }
-
+    
     function button_clicked()
     {
 	var z = document.getElementById("t1");
 	z.innerHTML=x.display(1) + " " + y.display(1);
     }
-
+    
     function button_clicked2()
     {
 	var z = document.getElementById("t1");
@@ -233,12 +239,12 @@ table.b td
 	z.innerHTML=x.display(1) + " " + y.display(1);
     }
 
-
+    
     function update_range(sldr)
     {
 	var s = document.getElementById(sldr);
     }
-
+    
     function button_clicked3()
     {
 	var z = document.getElementById("sld1");
@@ -253,18 +259,24 @@ table.b td
 	    sld1.max="400";
 	    sld1.value = x.value;
 	}
-
+	
 	sld1.onchange();
     }
-
+    
     function update_x(ctrl, v, what, whatelse)
     {
 	var z = document.getElementById(what);
 	var zz = document.getElementById(whatelse);
 
+	eval(v).value = ctrl.valueAsNumber;
+	z.innerText = eval(v).display(1);
+	zz.innerText = eval(v).dispmass(1);
+
+	/*
 	v.value = ctrl.valueAsNumber;
 	z.innerText = v.display(1);
 	zz.innerText = v.dispmass(1);
+*/
     }
 
     function handle_unit_change(t)
@@ -284,21 +296,66 @@ table.b td
 	unittoggle.onclick();
     }
 
+    // name: basic text for the row
+    // max:  if the text needs a max value
+    // myid: id of the cell where the value is printed
 
     function non_interactive_row(name, max, myid)
     {
-	var text = name + (max?" (max "+ max + " " + g_mass_unit + ")":"");
-	this.name = name;
-	this.max  = max;
-	this.myid = myid;
-	this.content = '<th>'+ text +'</th><th> </th><th></th><td id="' + myid + '">' + 123.0 +'</td>';
-
-	this.add = ni_add;
+	this.name  = name;
+	this.max   = max;
+	this.myid  = myid;
+	this.mom   = 0.0;
+	this.mass  = new value_unit(0.0, "kg");
+	this.content = ni_content;
     }
 
-    function ni_add()
+    function ni_content()
     {
-	return this.content;
+	return '<th>'+ this.name + (this.max?" (max "+ this.max + " " + g_mass_unit + ")":"") +
+	    '</th><th> </th><th></th><td id="' + this.myid + '">' + this.mass.display(1) +'</td>';
+    }
+
+    // name:  basic text for the row
+    // min:   minimum value
+    // max:   max value
+    // dflt:  default value
+    // arm:   moment arm
+    // arm_x: set to -1 if moment arm is negative
+    // param: slider updates this parameter
+    // val1:  cell id of the input value
+    // val2:  cell id of the output mass value
+    // sldr:  input range element id
+    function interactive_row(name, min, max, dflt, arm, arm_x, param, val1, val2, sldr)
+    {
+	this.name  = name;
+	this.min   = min;
+	this.max   = max;
+	this.dflt  = dflt;
+	this.arm   = arm;
+	this.arm_x = arm_x;
+	this.param = param;
+	this.val1  = val1;
+	this.val2  = val2;
+	this.sldr  = sldr;
+	this.mom   = 0.0;
+	this.mass  = new value_unit(0.0, "kg");
+	this.content = i_content;
+    }
+    
+    function i_content()
+    {
+	var a = '<th>' + this.name + (this.max?' (max ' + this.max + ' ' + g_mass_unit +')':'') + '</th>';
+	var b = '<th> <input id="' + this.sldr + '" ';
+	var c = 'type="range" ';
+	var d = 'min="' + this.min + '" ';
+	var e = 'max="' + this.max + '" ';
+	var f = 'value="' + this.dflt +'" ';
+	var g = 'onchange="update_x(this, \'' + this.param + '\', \'' + this.val1 + '\', \'' + this.val2 + '\')"/></th>';
+	var h = '<td id="' + this.val1 + '">' + this.mass.display(1) + '</td>';
+	var i = '<td id="' + this.val2 + '">' + this.mass.display(1) +'</td>';
+	
+	return a + b + c + d + e + f + g + h + i;
     }
 
     window.onload = setup;
@@ -348,7 +405,7 @@ table.b td
       </tr>
       <tr>
 	<th>  Front seat  </th>
-	<th>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, x, 'fs', 'fs2')"/>   </th>
+	<th>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, 'x', 'fs', 'fs2')"/>   </th>
 	<td id="fs">  562.0 </td>
 	<td id="fs2">  562.0 </td>
       </tr>
@@ -381,13 +438,6 @@ table.b td
       </tr>
       
       <tr>
-	<th>  Take off mass (MTOM 1223 ung)  </th>
-	<th>  </th>
-	<td>  0.0 </td>
-	<td>  0.0 </td>
-      </tr>
-      
-      <tr>
 	<th>  Landing mass (max 1223 ung)  </th>
 	<th>   </th>
 	<td>  0.0 </td>
@@ -401,26 +451,4 @@ table.b td
 </html>
 
 
-<!--make_interactive_row("Front seat", min, max, arm, arm_x, myid);-->
 
-
-<!--
-
-  M            O      M   M
-  Description (max x) Val Unit
-
-  kg & l
-  kg & usg
-  lbs & l
-  lbs & usg
-
-  value properties:
-  value
-  unit
-  unittype (mass / vol)
-  min
-  max
-  round
-  color
-
--->
