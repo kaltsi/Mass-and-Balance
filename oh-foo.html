@@ -1,11 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator for OH-FOO.
+    Mass and balance calculator for nothing
 
     https://github.com/kaltsi/Mass-and-Balance
 
-    Adapted from OH-FOO Weight and Balance Excel sheet by Miika Asunta (29.07.2010)
 
     Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
 
@@ -47,6 +46,12 @@ table.a th
     text-align: right;
 }
 
+table.a td
+{
+    text-align: right;
+    padding: 3px;
+}
+
 table.b
 {
     border-radius: 6%;
@@ -76,7 +81,8 @@ table.b td
 
 <!--
 
-    // Some conversion constants
+    /*  Some conversion constants */
+
     var g_kg_lbs              = 2.20462262; // 1 kg  -> lb
     var g_ltr_usg             = 0.26417205; // 1 ltr -> USG
     var g_m_inch              = 39.3700787; // 1 m   -> inches
@@ -84,11 +90,12 @@ table.b td
     var g_ltr_fuel_kg         = 0.72; // 1 ltr = 0.72 kg
     var g_mass_unit           = "kg"; // default in kilos
 
-    var row1, row2, row3, row4, row5, row6, row7, row8;
-    var lp1, lp2, lp3, lp4, lp5, lp6, lp7, lp8;
+    var row1, row2, row3, row4, row5, row6, row7, row8, row9;
+    var lp1, lp2, lp3, lp4, lp5, lp6, lp7, lp8, lp9;
     var load_points, rows;
 
-    // basic numeric value object with unit and type
+    /* basic numeric value object with unit and type */
+
     function value_unit(v, u)
     {
 	switch (u) {
@@ -106,9 +113,10 @@ table.b td
 	this.unit  = u;
     }
 
-    // display the value and unit
-    // n: num of decimals
-
+    /* 
+       display the value and unit
+       n: num of decimals              */
+       
     value_unit.prototype.display = function v_display(n)
     {
 	if (n) {
@@ -119,9 +127,12 @@ table.b td
 	}
     }
 
-    // display the mass of the fuel volume
-    // n: num of decimals
-    // u: also show unit
+    /* 
+       display the mass of the fuel volume
+       n: num of decimals
+       u: also show unit
+    */
+
     value_unit.prototype.dispmass = function v_display_mass(n, u)
     {
 	var m = this.value;
@@ -150,76 +161,103 @@ table.b td
 	    return m + (u?" " + g_mass_unit:"");
 	}
     }
-
-    // switch the unit and recalculate the value
+    
+    /* switch the unit and recalculate the value */
+    
     value_unit.prototype.unitchg = function v_unit_change()
     {
+	var that = this; // inner function trick
+	var update_min_max = function(m) {
+ 	    if (that.lp) {
+		that.lp.min = that.lp.min * m;
+		that.lp.max = that.lp.max * m;
+	    }
+	}
+
 	switch (this.unit) {
 	case "kg":
 	    this.unit  = "lb";
 	    this.value = this.value * g_kg_lbs;
+	    update_min_max(g_kg_lbs);
 	    break;
 	case "lb":
 	    this.unit = "kg";
 	    this.value = this.value / g_kg_lbs;
+	    update_min_max(1/g_kg_lbs);
 	    break;
 	case "ltr":
 	    this.unit = "usg";
 	    this.value = this.value * g_ltr_usg;
+	    update_min_max(g_ltr_usg);
 	    break;
 	case "usg":
 	    this.unit = "ltr";
 	    this.value = this.value / g_ltr_usg;
+	    update_min_max(1/g_ltr_usg);
 	    break;
 	default:
 	    alert("Invalid v_unit_change: cannot happen!");
 	}
     }
 
-    // id:     name of the global variable this is assigned to
-    // descr:  basic text for the row
-    // dflt:   mass of the load point (default value when constructed)
-    // unit:   kg or ltr
-    // min:    minimum value
-    // max:    max value (negative means do-not-print)
-    // arm:    moment arm
-    function l_point(id, descr, dflt, unit, min, max, arm)
+    /*
+       l_point - a load point object
+
+       id:     name of the global variable this is assigned to
+       descr:  basic text for the row
+       dflt:   mass of the load point (default value when constructed)
+       unit:   kg or ltr
+       min:    minimum value
+       max:    max value (negative means do-not-print)
+       arm:    moment arm
+    */
+
+    function l_point(id, descr, dflt, unit, min, max, arm, parent)
     {
+	this.id      = id;
 	this.descr   = descr;
 	this.mass    = new value_unit(dflt, unit);
 	this.min     = min;
 	this.max     = Math.abs(max);
 	this.dispmax = (max > 0 ?1:0);
 	this.arm     = arm;
-	this.moment  = this.mass.value * this.arm;
-	this.id      = id;
-    }
 
-    // val1:  cell id of the input value
-    // val2:  cell id of the output mass value
-    // sldr:  input range element id
-    function interactive_row(lp, val1, val2, sldr)
-    {
-	this.lp    = lp;
-	this.val1  = val1;
-	this.val2  = val2;
-	this.sldr  = sldr;
+	this.mass.lp = this; // associate the mass object with this
     }
     
-    interactive_row.prototype.content = function i_content()
+    /*
+       lp:    load point object
+    */
+
+    function interactive_row(lp)
+    {
+	this.lp    = lp;
+	this.id    = this.lp.id;
+	this.val1  = this.lp.id + "c1";
+	this.val2  = this.lp.id + "c2";
+	this.sldr  = this.lp.id + "s";
+    }
+    
+    interactive_row.prototype.description = function i_descr()
     {
 	var a = '<th>' + this.lp.descr;
-	if (this.lp.dispmax) 
-	    a += ' (max ' + this.lp.max + ' ' + this.lp.mass.unit +')';
-	a += '</th>';
 
-	a += '<th> <input id="' + this.sldr + '" ';
-	a += 'type="range" ';
-	a += 'min="' + this.lp.min + '" ';
-	a += 'max="' + this.lp.max + '" ';
-	a += 'value="' + this.lp.mass.value +'" ';
+	if (this.lp.dispmax) 
+	    a += ' (max ' + this.lp.max.toFixed() + ' ' + this.lp.mass.unit +')';
+
+	a += '</th>';
+	return a;
+    }
+
+    interactive_row.prototype.content = function i_content()
+    {
+	var a = this.description();
+
+	a += '<td bgcolor="yellow" id="' + this.val1 + '">' + this.lp.mass.display(1) + '</td>';
+	
+	a += '<th> <input id="' + this.sldr + '" type="range" min="' + this.lp.min + '" ';
+	a += 'max="' + this.lp.max + '" value="' + this.lp.mass.value +'" ';
 	a += 'onchange="update_x(this,\'' + this.lp.id + '\', \'' + this.val1 + '\', \'' + this.val2 + '\')"/></th>';
-	a += '<td id="' + this.val1 + '">' + this.lp.mass.display(1) + '</td>';
 	a += '<td id="' + this.val2 + '">' + this.lp.mass.dispmass(1) +'</td>';
 	
 	return a;
@@ -227,27 +265,46 @@ table.b td
 
     interactive_row.prototype.update = function i_update()
     {
+	var x = document.getElementById(this.sldr);
 
+	this.lp.mass.unitchg();
+	x.min = this.lp.min;
+	x.max = this.lp.max;
+	x.value = this.lp.mass.value;
+	x.onchange();
     }
 
-    // lp: the load point for this row
+    /* lp: the load point for this row */
 
     function non_interactive_row(lp)
     {
 	this.lp = lp;
+	this.id = this.lp.id;
     }
 
-    
+    non_interactive_row.prototype.description = function ni_content()
+    {
+	var a = '<th>'+ this.lp.descr;
+	if (this.lp.dispmax)
+	    a += " (max "+ this.lp.max.toFixed() + " " + this.lp.mass.unit + ")";
+	a += '</th>';
+	return a;
+    }
+
     non_interactive_row.prototype.content = function ni_content()
     {
-	return '<th>'+ this.lp.descr + 
-	    (this.lp.dispmax?" (max "+ this.lp.max + " " + this.lp.mass.unit + ")":"") +
-	    '</th><th> </th><th></th><td>' + this.lp.mass.dispmass(1) +'</td>';
+	var a = this.description();
+
+	a += '<th></th>';
+	a += '<th></th>';
+	a += '<td>' + this.lp.mass.dispmass(1) +'</td>';
+
+	return a;
     }
 
     non_interactive_row.prototype.update = function ni_update()
     {
-
+	this.lp.mass.unitchg();
     }
     
 
@@ -265,70 +322,28 @@ table.b td
 	lp8 = new l_point("lp8", "Landing mass",  1000, "kg",  0,  1000,  1)
 
 	row1 = new non_interactive_row(lp1);
-	row2 = new interactive_row(lp2, "a1", "a2", "s1");
-	row3 = new interactive_row(lp3, "b1", "b2", "s2");
-	row4 = new interactive_row(lp4, "c1", "c2", "s3");
-	row5 = new interactive_row(lp5, "d1", "d2", "s4");
-	row6 = new interactive_row(lp6, "e1", "e2", "s5");
+	row2 = new interactive_row(lp2);
+	row3 = new interactive_row(lp3);
+	row4 = new interactive_row(lp4);
+	row5 = new interactive_row(lp5);
+	row6 = new interactive_row(lp6);
 	row7 = new non_interactive_row(lp7);
 	row8 = new non_interactive_row(lp8);
 
-	load_points = new Array(lp1, lp2, lp3, lp4, lp5, lp6, lp7, lp8);
-	rows = new Array(row1, row2, row3, row4, row5, row6, row7, row8);
+	load_points = [lp1, lp2, lp3, lp4, lp5, lp6, lp7, lp8];
+	rows = [row1, row2, row3, row4, row5, row6, row7, row8];
 	
 	for (i = 0; i < rows.length; i++) {
-	    document.getElementById("table1").insertRow(-1).innerHTML = rows[i].content();
+	    var row = document.getElementById("table1").insertRow(-1);
+	    row.id = rows[i].id;
+	    row.innerHTML = rows[i].content();
 	}
-    }
-
-
-    function button_clicked()
-    {
-	var z = document.getElementById("t1");
-	z.innerHTML=x.display(1) + " " + y.display(1);
-    }
-    
-    function button_clicked2()
-    {
-	var z = document.getElementById("t1");
-	x.unitchg();
-	y.unitchg();
-	z.innerHTML=x.display(1) + " " + y.display(1);
-    }
-
-        
-    function button_clicked3()
-    {
-	var z = document.getElementById("sld1");
-	x.unitchg();
-	if (x.unit == "kg") {
-	    sld1.min="25";
-	    sld1.max="200";
-	    sld1.value = x.value;
-	}
-	else {
-	    sld1.min="50";
-	    sld1.max="400";
-	    sld1.value = x.value;
-	}
-	
-	sld1.onchange();
-    }
-
-    // update the value displays in the table
-
-    function update_x(ctrl, v, cell1, cell2)
-    {
-	var c1 = document.getElementById(cell1);
-	var c2 = document.getElementById(cell2);
-
-	eval(v).mass.value = ctrl.valueAsNumber;
-	c1.innerText = eval(v).mass.display(1);
-	c2.innerText = eval(v).mass.dispmass(1);
     }
 
     function handle_unit_change(t)
     {
+	var i = 0;
+
 	switch (t.value) {
 	case "kg & litre":
 	    g_mass_unit = "kg";
@@ -340,10 +355,39 @@ table.b td
 	    alert("this.selectedIndex");
 	}
 
-	mass_title.innerText = "Mass (" + g_mass_unit + ")";
-	unittoggle.onclick();
+ 	mass_title.innerText = "Mass (" + g_mass_unit + ")";
+
+	for (i = 0; i < rows.length; i++) {
+	    rows[i].update();
+	    var r = document.getElementById(rows[i].id);
+	    r.cells[0].innerHTML = rows[i].description();
+
+	}
     }
 
+    /*
+       update the value displays in the table
+
+       ctrl:  input range element reference
+       lp:    global load point variable
+       cell1: id of the 1st output cell
+       cell2: id of the 2nd output cell
+    */
+
+    function update_x(ctrl, lp, cell1, cell2)
+    {
+	var c1 = document.getElementById(cell1);
+	var c2 = document.getElementById(cell2);
+
+	eval(lp).mass.value = ctrl.valueAsNumber;
+	c1.innerText = eval(lp).mass.display(1);
+	c2.innerText = eval(lp).mass.dispmass(1);
+    }
+
+    function calc()
+    {
+	tom = lp1.mass.value + lp2.mass.value + lp3.mass.value + lp4.mass.value + lp5.mass.value - lp6.mass.value;
+    }
 
     window.onload = setup;
 //-->
@@ -356,7 +400,7 @@ table.b td
   
   <h1>Blah OH-FOO</h1>
   
-  <button type="button" onclick="button_clicked()">Save settings</button>
+  <button type="button" onclick="calc()">Calculate</button>
   <button type="button" onclick="button_clicked2()">Clear settings</button> <!-- localStorage.clear() -->
   <button type="button" id="unittoggle" title="jeah" onclick="button_clicked3()">Reset settings</button> 
   
@@ -379,10 +423,10 @@ table.b td
   <table border="1" class="a" id="table1">
     <tbody>
       <tr>
-	<th> </th>
-	<th> </th>
-	<th style="text-align:center;">Input</th>
-	<th style="text-align:center;" id="mass_title">Mass</th>
+	<th width="250px"> </th>
+	<th width="75px"style="text-align:center;">Input</th>
+	<th></th>
+	<th width="75px" style="text-align:center;" id="mass_title">Mass</th>
       </tr>
     </tbody>
   </table>
