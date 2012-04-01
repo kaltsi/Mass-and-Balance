@@ -1,11 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator for OH-COX.
+    Mass and balance calculator for OH-FOO.
 
     https://github.com/kaltsi/Mass-and-Balance
 
-    Adapted from OH-COX Weight and Balance Excel sheet by Miika Asunta (29.07.2010)
+    Adapted from OH-FOO Weight and Balance Excel sheet by Miika Asunta (29.07.2010)
 
     Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
 
@@ -85,7 +85,9 @@ table.b td
     var g_mass_unit           = "kg"; // default in kilos
 
     var x, y;
-    var row1;
+    var row1, row2, row3, row4, row5, row6, row7, row8;
+
+    var lp1, lp2, lp3, lp4, lp5, lp6, lp7, lp8;
 
     // basic numeric value with unit and type
     function value_unit(v, u)
@@ -104,14 +106,16 @@ table.b td
 	this.value = v;
 	this.unit  = u;
 
-	this.display  = v_display;
-	this.dispmass = v_display_mass;
-	this.unitchg  = v_unit_change;
+	// this.display  = v_display;
+	// this.dispmass = v_display_mass;
+	// this.unitchg  = v_unit_change;
     }
+
 
     // display the value and unit
     // n: num of decimals
-    function v_display(n)
+
+    value_unit.prototype.display = function v_display(n)
     {
 	if (n) {
 	    return this.value.toFixed(n) + " " + this.unit;
@@ -124,7 +128,7 @@ table.b td
     // display the mass of the fuel volume
     // n: num of decimals
     // u: also show unit
-    function v_display_mass(n, u)
+    value_unit.prototype.dispmass = function v_display_mass(n, u)
     {
 	var m = this.value;
 	
@@ -146,7 +150,7 @@ table.b td
 	}
 	
 	if (n) {
-	    return m.toFixed(n)+(u?+ " " + g_mass_unit:"");
+	    return m.toFixed(n) + (u?" " + g_mass_unit:"");
 	}
 	else {
 	    return m + (u?" " + g_mass_unit:"");
@@ -154,7 +158,7 @@ table.b td
     }
 
     // switch the unit and recalculate value
-    function v_unit_change()
+    value_unit.prototype.unitchg = function v_unit_change()
     {
 	switch (this.unit) {
 	case "kg":
@@ -178,52 +182,82 @@ table.b td
 	}
     }
 
-    function l_point(d, mass, min, max, arm, arm_x)
+
+    function setup()
     {
-	this.descr  = d;
-	this.mass   = mass;
+	row1 = new non_interactive_row("Basic weight", 737, 1.234, 1, 1234, "bw");
+	lp2  = new l_point("lp2", "Front seat", 85, "kg", 25, 200, 1.23, 1);
+	lp3  = new l_point("lp3", "Back seat", 0, "kg", 0, 200, 1,33, 1);
+	lp4  = new l_point("lp4", "Fuel", 100, "ltr", 0, 143, 1,25, 1);
+	lp5  = new l_point("lp5", "Baggage", 10, "kg", 0, 54, 1,44, 1);
+	lp6  = new l_point("lp6", "Taxi fuel", 2, "kg", 0, 20, 1,25, 1);
+
+	row2 = new interactive_row(lp2, "a1", "a2", "s1");
+	row3 = new interactive_row(lp3, "b1", "b2", "s2");
+	row4 = new interactive_row(lp4, "c1", "c2", "s3");
+	row5 = new interactive_row(lp5, "d1", "d2", "s4");
+	row6 = new interactive_row(lp6, "e1", "e2", "s5");
+
+	row7 = new non_interactive_row("Take-off mass", 1100, 1.234, 1, 1234, "tkof");
+	row8 = new non_interactive_row("Landing mass", 1000, 1.234, 1, 1234, "land");
+
+	document.getElementById("mytable").insertRow(-1).innerHTML = row1.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row2.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row3.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row4.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row5.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row6.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row7.content();
+	document.getElementById("mytable").insertRow(-1).innerHTML = row8.content();
+    }
+
+
+    // id:     name of the global variable this is assigned to
+    // descr:  basic text for the row
+    // dflt:   mass of the load point (default value when constructed)
+    // unit:   kg or ltr
+    // min:    minimum value
+    // max:    max value
+    // arm:    moment arm
+    // arm_x: set to -1 if moment arm is negative
+    function l_point(id, descr, dflt, unit, min, max, arm, arm_x)
+    {
+	this.descr  = descr;
+	this.mass   = new value_unit(dflt, unit);
 	this.min    = min;
 	this.max    = max;
 	this.arm    = arm;
 	this.armx   = arm_x; // positive or negative moment arm
-	this.moment = mass * arm * arm_x;
-
-	this.make_description = l_make_description;
+	this.moment = this.mass.value * this.arm * this.armx;
+	this.id     = id;
     }
 
-    function l_make_description()
+    // val1:  cell id of the input value
+    // val2:  cell id of the output mass value
+    // sldr:  input range element id
+    function interactive_row(lp, val1, val2, sldr)
     {
-
+	this.lp    = lp;
+	this.val1  = val1;
+	this.val2  = val2;
+	this.sldr  = sldr;
     }
-
-
-    function make_row_text(description, max, maxval)
+    
+    interactive_row.prototype.content = function i_content()
     {
-	var ret = description;
-
-	if (max) {
-	    ret += "(" + max + " " + maxval +")";
-	}
-
-	return ret;
-    }
-
-    function setup()
-    {
-	x = new value_unit(10, "kg");
-	y = new value_unit(20, "ltr");
+	var a = '<th>' + this.lp.descr + (this.lp.max?' (max ' + this.lp.max + ' ' + g_mass_unit +')':'') + '</th>';
+	var b = '<th> <input id="' + this.sldr + '" ';
+	var c = 'type="range" ';
+	var d = 'min="' + this.lp.min + '" ';
+	var e = 'max="' + this.lp.max + '" ';
+	var f = 'value="' + this.lp.mass.value +'" ';
+	var g = 'onchange="update_x(this,\'' + this.lp.id + '\', \'' + this.val1 + '\', \'' + this.val2 + '\')"/></th>';
+	var h = '<td id="' + this.val1 + '">' + this.lp.mass.display(1) + '</td>';
+	var i = '<td id="' + this.val2 + '">' + this.lp.mass.dispmass(1) +'</td>';
 	
-	row1 = new non_interactive_row("Take-off mass", 737, 1.234, 1, 1234, "takeoff");
-	var r = document.getElementById("mytable").insertRow(-1);
-	r.innerHTML = row1.content();
-
-	var r2 = document.getElementById("mytable").insertRow(-1);
-
-
-	row2 = new interactive_row("Front seat", 25, 200, 85, 1.23, 1, "x", "fss1", "fss2", "fssldr");
-	r2.innerHTML = row2.content();
-	
+	return a + b + c + d + e + f + g + h + i;
     }
+
     
     function button_clicked()
     {
@@ -268,15 +302,10 @@ table.b td
 	var z = document.getElementById(what);
 	var zz = document.getElementById(whatelse);
 
-	eval(v).value = ctrl.valueAsNumber;
-	z.innerText = eval(v).display(1);
-	zz.innerText = eval(v).dispmass(1);
+	eval(v).mass.value = ctrl.valueAsNumber;
+	z.innerText = eval(v).mass.display(1);
+	zz.innerText = eval(v).mass.dispmass(1);
 
-	/*
-	v.value = ctrl.valueAsNumber;
-	z.innerText = v.display(1);
-	zz.innerText = v.dispmass(1);
-*/
     }
 
     function handle_unit_change(t)
@@ -307,67 +336,25 @@ table.b td
 	this.myid  = myid;
 	this.mom   = 0.0;
 	this.mass  = new value_unit(0.0, "kg");
-	this.content = ni_content;
     }
 
-    function ni_content()
+    non_interactive_row.prototype.content = function ni_content()
     {
 	return '<th>'+ this.name + (this.max?" (max "+ this.max + " " + g_mass_unit + ")":"") +
 	    '</th><th> </th><th></th><td id="' + this.myid + '">' + this.mass.display(1) +'</td>';
     }
 
-    // name:  basic text for the row
-    // min:   minimum value
-    // max:   max value
-    // dflt:  default value
-    // arm:   moment arm
-    // arm_x: set to -1 if moment arm is negative
-    // param: slider updates this parameter
-    // val1:  cell id of the input value
-    // val2:  cell id of the output mass value
-    // sldr:  input range element id
-    function interactive_row(name, min, max, dflt, arm, arm_x, param, val1, val2, sldr)
-    {
-	this.name  = name;
-	this.min   = min;
-	this.max   = max;
-	this.dflt  = dflt;
-	this.arm   = arm;
-	this.arm_x = arm_x;
-	this.param = param;
-	this.val1  = val1;
-	this.val2  = val2;
-	this.sldr  = sldr;
-	this.mom   = 0.0;
-	this.mass  = new value_unit(0.0, "kg");
-	this.content = i_content;
-    }
-    
-    function i_content()
-    {
-	var a = '<th>' + this.name + (this.max?' (max ' + this.max + ' ' + g_mass_unit +')':'') + '</th>';
-	var b = '<th> <input id="' + this.sldr + '" ';
-	var c = 'type="range" ';
-	var d = 'min="' + this.min + '" ';
-	var e = 'max="' + this.max + '" ';
-	var f = 'value="' + this.dflt +'" ';
-	var g = 'onchange="update_x(this, \'' + this.param + '\', \'' + this.val1 + '\', \'' + this.val2 + '\')"/></th>';
-	var h = '<td id="' + this.val1 + '">' + this.mass.display(1) + '</td>';
-	var i = '<td id="' + this.val2 + '">' + this.mass.display(1) +'</td>';
-	
-	return a + b + c + d + e + f + g + h + i;
-    }
 
     window.onload = setup;
 //-->
 </script>
 
-<title>OH-COX m&amp;b</title>
+<title>OH-FOO m&amp;b</title>
 
 </head>
 <body>
   
-  <h1>Cessna A152 OH-COX</h1>
+  <h1>Blah OH-FOO</h1>
   
   <button type="button" onclick="button_clicked()">Save settings</button>
   <button type="button" onclick="button_clicked2()">Clear settings</button> <!-- localStorage.clear() -->
@@ -397,7 +384,7 @@ table.b td
 	<th style="text-align:center;">Input</th>
 	<th style="text-align:center;" id="mass_title">Mass</th>
       </tr>
-      <tr>
+      <!--tr>
 	<th>  Basic weight  </th>
 	<th>  </th>
 	<td> 760</td>
@@ -405,7 +392,7 @@ table.b td
       </tr>
       <tr>
 	<th>  Front seat  </th>
-	<th>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, 'x', 'fs', 'fs2')"/>   </th>
+	<th>  <input id="sld1" type="range" min="25" max="200" value="85" onchange="update_x(this, x, 'fs', 'fs2')"/>   </th>
 	<td id="fs">  562.0 </td>
 	<td id="fs2">  562.0 </td>
       </tr>
@@ -442,7 +429,7 @@ table.b td
 	<th>   </th>
 	<td>  0.0 </td>
 	<td>  0.0 </td>
-      </tr>
+      </tr-->
       
     </tbody>
   </table>
