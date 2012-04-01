@@ -458,7 +458,6 @@ table.b td
 
 	g_ftme = new l_point("g_ftme", "Flight time",   "min", 60,   1,  -300,  0);
 
-	g_fu_takeoff = new l_point("g_fu_takeoff", "Take-off Fuel", "ltr", 0, 0, 1000, 0);
 	g_fu_landing = new l_point("g_fu_landing", "Landing Fuel",  "ltr", 0, 0, 1000, 0);
 
 	row01 = new non_interactive_row(g_bw);
@@ -577,9 +576,6 @@ table.b td
 	g_tow.vu.num = calc_mass(g_bw, g_fs, g_bs, g_fuel, g_bagg);
 	g_tow.vu.num -= g_taxi.vu.num;
 
-	// take-off fuel weight
-	g_fu_takeoff.vu.num = g_fuel.vu.getmass();
-	
 	// landing fuel volume
 	g_fu_landing.vu.num = g_fuel.vu.num - (g_ff.vu.num * g_ftme.vu.num) / 60 - (g_taxi.vu.num);
 	
@@ -605,7 +601,6 @@ table.b td
 	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + (g_fu_landing.vu.getmass() * g_fuel.arm);
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
-	var x;
 	debug.innerText = g_bw.moment.toFixed(3);
 	debug.innerText += (" " + g_fs.moment.toFixed(3));
 	debug.innerText += (" " + g_bs.moment.toFixed(3));
@@ -614,7 +609,7 @@ table.b td
 	debug.innerText += (" " + g_fuel.moment.toFixed(3));
 	debug.innerText += (" tow: " + g_tow.arm.toFixed(3));
 	debug.innerText += (" lnd: " + g_lw.arm.toFixed(3));
-
+	debug.innerText += (" lnd fuel: " + g_fu_landing.vu.display(1));
 
 	update_cells();
     }
