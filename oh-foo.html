@@ -263,7 +263,7 @@ table.b td
 	return a;
     }
 
-    interactive_row.prototype.update = function i_update()
+    interactive_row.prototype.unitchg = function i_update()
     {
 	var x = document.getElementById(this.sldr);
 
@@ -271,7 +271,9 @@ table.b td
 	x.min = this.lp.min;
 	x.max = this.lp.max;
 	x.value = this.lp.mass.value;
-	x.onchange();
+
+	var r = document.getElementById(this.id);
+	r.innerHTML = this.content();
     }
 
     /* lp: the load point for this row */
@@ -282,7 +284,7 @@ table.b td
 	this.id = this.lp.id;
     }
 
-    non_interactive_row.prototype.description = function ni_content()
+    non_interactive_row.prototype.description = function ni_descr()
     {
 	var a = '<th>'+ this.lp.descr;
 	if (this.lp.dispmax)
@@ -302,9 +304,11 @@ table.b td
 	return a;
     }
 
-    non_interactive_row.prototype.update = function ni_update()
+    non_interactive_row.prototype.unitchg = function ni_update()
     {
 	this.lp.mass.unitchg();
+	var r = document.getElementById(this.id);
+	r.innerHTML = this.content();
     }
     
 
@@ -358,10 +362,9 @@ table.b td
  	mass_title.innerText = "Mass (" + g_mass_unit + ")";
 
 	for (i = 0; i < rows.length; i++) {
-	    rows[i].update();
-	    var r = document.getElementById(rows[i].id);
-	    r.cells[0].innerHTML = rows[i].description();
-
+	    rows[i].unitchg();
+	    //var r = document.getElementById(rows[i].id);
+	    //r.innerHTML = rows[i].content();
 	}
     }
 
@@ -404,15 +407,6 @@ table.b td
   <button type="button" onclick="button_clicked2()">Clear settings</button> <!-- localStorage.clear() -->
   <button type="button" id="unittoggle" title="jeah" onclick="button_clicked3()">Reset settings</button> 
   
-  <p>
-    <select id="units" onchange="handle_unit_change(this)">
-      <option selected="selected">kg & litre</option>
-      <option>lbs & usg</option>
-    </select>
-  </p>
-  
-  <p id="t1">
-  </p>
   
   <p>
     <input type="text" onchange="check_text()">
@@ -424,8 +418,13 @@ table.b td
     <tbody>
       <tr>
 	<th width="250px"> </th>
-	<th width="75px"style="text-align:center;">Input</th>
-	<th></th>
+	<th width="75px" style="text-align:center;">Input</th>
+	<th style="text-align:center;">
+	  <select id="units" onchange="handle_unit_change(this)">
+	    <option selected="selected">kg & litre</option>
+	    <option>lbs & usg</option>
+	  </select>
+	</th>
 	<th width="75px" style="text-align:center;" id="mass_title">Mass</th>
       </tr>
     </tbody>
