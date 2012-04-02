@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator for nothing
+    Mass and balance calculator scratchpad
 
     https://github.com/kaltsi/Mass-and-Balance
 
@@ -88,6 +88,8 @@ table.b td
     var g_usg_fuel_lb   = 6.0;        // 1 usg = 6 lbs
     var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
     var g_mass_unit     = "kg";       // default in kilos
+
+    var g_debug         = false;      // global debug switch
 
     // mass and balance envelope limits
     var g_x_limits = new Array(0.890, 0.890, 0.977, 1.202, 1.202, 0.890)
@@ -642,15 +644,17 @@ table.b td
 	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + (g_fu_landing.vu.getmass() * g_fuel.arm);
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
-	debug.innerText = g_bw.moment.toFixed(3);
-	debug.innerText += (" " + g_fs.moment.toFixed(3));
-	debug.innerText += (" " + g_bs.moment.toFixed(3));
-	debug.innerText += (" " + g_bagg.moment.toFixed(3));
-	debug.innerText += (" " + g_taxi.moment.toFixed(3));
-	debug.innerText += (" " + g_fuel.moment.toFixed(3));
-	debug.innerText += (" tow: " + g_tow.arm.toFixed(3));
-	debug.innerText += (" lnd: " + g_lw.arm.toFixed(3));
-	debug.innerText += (" lnd fuel: " + g_fu_landing.vu.display(1));
+	if (g_debug) {
+	    debug.innerText = g_bw.moment.toFixed(3);
+	    debug.innerText += (" " + g_fs.moment.toFixed(3));
+	    debug.innerText += (" " + g_bs.moment.toFixed(3));
+	    debug.innerText += (" " + g_bagg.moment.toFixed(3));
+	    debug.innerText += (" " + g_taxi.moment.toFixed(3));
+	    debug.innerText += (" " + g_fuel.moment.toFixed(3));
+	    debug.innerText += (" tow: " + g_tow.arm.toFixed(3));
+	    debug.innerText += (" lnd: " + g_lw.arm.toFixed(3));
+	    debug.innerText += (" lnd fuel: " + g_fu_landing.vu.display(1));
+	}
 
 	update_cells();
 	update_svg();
@@ -783,6 +787,14 @@ table.b td
 
     }
 
+    /* global debug toggle handler */
+
+    function toggle_debug()
+    {
+	g_debug = !g_debug;
+	calculate();
+    }
+
     window.onload = setup;
 //-->
 </script>
@@ -798,6 +810,7 @@ table.b td
   <button type="button" title="Saves the current numbers as default values in your browser." 
 	  onclick="save_settings()">Save settings</button> <!-- localStorage.clear() -->
   <button type="button" title="Clears the saved default settings from your browser." onclick="clear_settings()">Clear settings</button>
+  <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
   
   <p/>
   
@@ -832,7 +845,7 @@ table.b td
 
     <text id="warning_text" x="15" y="30" fill="green">Limits OK</text>
 
-    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-CTL</text>
+    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-FOO</text>
 
     <circle cx="20" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
     <text x="35" y="105">- Take-off</text>
