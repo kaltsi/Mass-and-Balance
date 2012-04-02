@@ -98,7 +98,7 @@ table.b td
     var g_min_mass = Math.min.apply(Math, g_y_limits);
     var g_max_mass = Math.max.apply(Math, g_y_limits);
     
-    var g_mom_range_max  = 500;
+    var g_mom_range_max  = 475;
     var g_mom_range_min  = 1;
     var g_mass_range_max = 375;
     var g_mass_range_min = 1;
@@ -736,11 +736,11 @@ table.b td
 	t.setAttribute('cx', tx);
 
 	var svg = document.getElementById("svg_main");
-	svg.setAttribute('width', 640);
+	svg.setAttribute('width', 600);
 	svg.setAttribute('height', 480);
 	
 	var rect = document.getElementById("svg_border");
-	rect.setAttribute('width', 600);
+	rect.setAttribute('width', 550);
 	rect.setAttribute('height', 450);
 
 	var warning = 1;
@@ -777,7 +777,7 @@ table.b td
 	}
 	else {
 	    var s = rect.getAttribute('style');
-	    rect.setAttribute('style', s + "fill:none;opacity:0.5;");
+	    rect.setAttribute('style', s + "fill:white;opacity:0.3;");
 	}
     }
 
@@ -827,13 +827,18 @@ table.b td
 
   <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
 
+    <filter id = "i2" width = "150%" height = "150%">
+      <feOffset result = "offOut" in = "SourceAlpha" dx = "5" dy = "5"/>
+      <feGaussianBlur result = "blurOut" in = "offOut" stdDeviation = "5"/>
+      <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
+    </filter>
 
     <rect id="svg_border" x="5" y="10" width="1" height="1" rx="20" ry="20"
-	  style="fill:none;stroke:black;stroke-width:3;opacity:1;"/>
+	  style="fill:white;stroke:black;stroke-width:3;opacity:1;"
+	  filter = "url(#i2)" />
 
     <rect id="warn_box" x="10" y="10" width="250" height="60"
 	  style="fill:red;stroke:black;stroke-width:1;opacity:0;"/>
-	  
 
     <text id="warning_text" x="20" y="50" fill="green">Limits OK</text>
 
@@ -862,6 +867,11 @@ table.b td
 		stroke="black" stroke-width="1" fill="green"/>
       </g>
     </g>
+
+
+
+
+
   </svg>
 
 </body>
