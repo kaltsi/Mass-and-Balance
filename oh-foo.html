@@ -496,7 +496,7 @@ table.a td {
 	g_ftme = new l_point("g_ftme", "Flight time",   "min", 60,   1,  -300,  0);
 
 	// This does not necessarily get a row, but acts just as a calculation object.
-	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 0, 0, 0);
+	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 8, 0, 0);
 
 	rows = [ ];
 	rows.push(new non_interactive_row(g_bw, "reverse"));
@@ -750,7 +750,7 @@ table.a td {
 
 	var warning = 1;
 	var w = document.getElementById("warning_text");
-	if (g_ful.vu.num < 8) {
+	if (g_ful.vu.num < g_ful.min) {
 	    w.setAttribute('fill', "red");
 	    w.textContent = "NOT ENOUGH LANDING FUEL!!";
 	}
@@ -775,12 +775,10 @@ table.a td {
 	}
 
 	if (warning == 1) {
-	    var s = rect.getAttribute('style');
-	    rect.setAttribute('style', s + "fill:yellow;opacity:0.3;");
+	    document.getElementById("mb_limits").setAttribute('fill', 'url(#alert_stripes)');
 	}
 	else {
-	    var s = rect.getAttribute('style');
-	    rect.setAttribute('style', s + "fill:white;opacity:0.3;");
+	    document.getElementById("mb_limits").setAttribute('fill', 'white');
 	}
     }
 
@@ -829,11 +827,36 @@ table.a td {
   <!-- SVG stuff here -->
 
   <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
+    <defs>
+      <pattern id="alert_stripes" patternUnits="userSpaceOnUse"
+	       x="0" y="0" width="100" height="100">
+	<!--
+               The pattern ids
+               +--+--+
+               |\2|\6|
+               |1\|5\|
+               +--+--+
+               |\4|\8|
+               |3\|7\|
+               +--+--+
+	  -->
+	<path id="p1" d="M 0 0 L 0 50 L 50 50 z" fill="black" style="opacity:0.5;"/>
+	<path id="p2" d="M 0 0 L 50 50 L 50 0 z" fill="yellow" style="opacity:0.5;"/>
+	<path id="p3" d="M 0 50 L 0 100 L 50 100 z" fill="yellow" style="opacity:0.5;"/>
+	<path id="p4" d="M 0 50 L 50 50 L 50 100 z" fill="black" style="opacity:0.5;"/>
+	<path id="p5" d="M 50 0 L 50 50 L 100 50 z" fill="yellow" style="opacity:0.5;"/>
+	<path id="p6" d="M 50 0 L 100 50 L 100 0 z" fill="black" style="opacity:0.5;"/>
+	<path id="p7" d="M 50 50 L 50 100 L 100 100 z" fill="black" style="opacity:0.5;"/>
+	<path id="p8" d="M 50 50 L 100 100 L 100 50 z" fill="yellow" style="opacity:0.5;"/>
+      </pattern>
+    </defs>
 
     <rect id="svg_border" x="5" y="10" width="1" height="1" rx="20" ry="20"
-	  style="fill:white;stroke:black;stroke-width:3;opacity:1;"/>
+	  fill="white"
+	  style="stroke:black;stroke-width:3;opacity:1;"/>
 
-    <text id="warning_text" x="20" y="50" fill="green">Limits OK</text>
+    <text id="warning_text" x="20" y="50"
+	  fill="green" style="font-weight:bold;">Limits OK</text>
 
     <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
     <text x="35" y="105">- Take-off</text>
@@ -844,8 +867,9 @@ table.a td {
     <g transform="scale(1,-1)">
       <g transform="translate(50,-450)">
 	<polygon id="mb_limits"
-		  points="0,0 1,1"
-		  style="fill:white;stroke:black;stroke-width:2" />
+		 points="0,0 1,1"
+		 fill="white"
+		 style="stroke:black;stroke-width:2" />
 	
 	<line id="landing_limit"
 	      x1="1" y1="1" x2="1" y2="1"
