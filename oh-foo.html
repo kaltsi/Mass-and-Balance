@@ -28,9 +28,9 @@
 -->
 
 <head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 <style type="text/css">
-<!--
 table.a
 {
     border-radius: 6%;
@@ -73,12 +73,9 @@ table.b td
     float: right;
 }
 
-//-->
 </style>
 
 <script type="text/javascript">
-
-<!--
 
     /*  Some conversion constants */
 
@@ -792,7 +789,6 @@ table.b td
     }
 
     window.onload = setup;
-//-->
 </script>
 
 <title>OH-FOO m&amp;b</title>
@@ -807,25 +803,22 @@ table.b td
 	  onclick="save_settings()">Save settings</button> <!-- localStorage.clear() -->
   <button type="button" title="Clears the saved default settings from your browser." onclick="clear_settings()">Clear settings</button>
   <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
-  
-  <p/>
-  
-  <table border="1" class="a" id="table1">
+  <p> </p>
+   <table border="1" class="a" id="table1">
     <tbody>
       <tr>
-    <th width="225px" id="reminder" style="color:red;" ></th>
-	<th width="75px" style="text-align:center;">Input</th>
+    <th style="width:225px;color:red;" id="reminder"></th>
+    <th style="width:75px;text-align:center;">Input</th>
 	<th style="text-align:center;">
 	  <select id="units" onchange="handle_unit_change(this)">
 	    <option selected="selected">kg & litre</option>
 	    <option>lbs & usg</option>
 	  </select>
 	</th>
-	<th width="75px" style="text-align:center;" id="mass_title">Mass</th>
+	<th style="width:75px;text-align:center;" id="mass_title">Mass</th>
       </tr>
     </tbody>
   </table>
-<p/>
 
 <p id="debug"></p>
 
@@ -851,7 +844,6 @@ table.b td
     <g transform="scale(1,-1)">
       <g transform="translate(50,-480)">
 	<polyline id="mb_limits"
-		  vector-effect="non-scaling-stroke"
 		  points="0,0 1,1"
 		  style="fill:none;stroke:black;stroke-width:2" />
 	
