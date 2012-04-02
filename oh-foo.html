@@ -64,6 +64,7 @@ table.a td {
 
     var g_kg_lbs        = 2.20462262; // 1 kg  -> lb
     var g_ltr_usg       = 0.26417205; // 1 ltr -> USG
+    var g_m_inch        = 39.3700787; // 1 m   -> inches
     var g_usg_fuel_lb   = 6.0;        // 1 usg = 6 lbs
     var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
     var g_mass_unit     = "kg";       // default in kilos
@@ -88,7 +89,39 @@ table.a td {
     g_lim.max_arm  = Math.max.apply(Math, g_lim.x);
     g_lim.min_mass = Math.min.apply(Math, g_lim.y);
     g_lim.max_mass = Math.max.apply(Math, g_lim.y);
-    
+
+    /* change the unit values for the limits */
+
+    g_lim.unitchg = function lim_unit_change()
+    {
+	function convert(a, m) {
+	    var i;
+	    for (i = 0; i < a.length; i++) {
+		a[i] = a[i] * m;
+	    }
+	}
+
+	switch (g_mass_unit) {
+	case "kg":
+	    convert(this.x, 1/g_m_inch);
+	    convert(this.y, 1/g_kg_lbs);
+	    convert(this.y_land, 1/g_kg_lbs);
+	    break;
+	case "lb":
+	    convert(this.x, g_m_inch);
+	    convert(this.y, g_kg_lbs);
+	    convert(this.y_land, g_kg_lbs);
+	    break;
+	default:
+	    alert("Invalid lim_unit_change: cannot happen!");
+	}
+
+	this.min_arm  = Math.min.apply(Math, this.x);
+	this.max_arm  = Math.max.apply(Math, this.x);
+	this.min_mass = Math.min.apply(Math, this.y);
+	this.max_mass = Math.max.apply(Math, this.y);
+    }
+
 
     /* convert given moment arm value to the new range fitting the svg drawing area */
 
@@ -210,10 +243,11 @@ table.a td {
     value_unit.prototype.unitchg = function v_unit_change()
     {
 	var that = this; // inner function trick
-	var update_min_max = function(m) {
+	var update_min_max = function(m, a) {
  	    if (that.lp) {
 		that.lp.min = that.lp.min * m;
 		that.lp.max = that.lp.max * m;
+		that.lp.arm = that.lp.arm * a;
 	    }
 	}
 
@@ -221,22 +255,22 @@ table.a td {
 	case "kg":
 	    this.unit  = "lb";
 	    this.num = this.num * g_kg_lbs;
-	    update_min_max(g_kg_lbs);
+	    update_min_max(g_kg_lbs, g_m_inch);
 	    break;
 	case "lb":
 	    this.unit = "kg";
 	    this.num = this.num / g_kg_lbs;
-	    update_min_max(1/g_kg_lbs);
+	    update_min_max(1/g_kg_lbs, 1/g_m_inch);
 	    break;
 	case "ltr":
 	    this.unit = "usg";
 	    this.num = this.num * g_ltr_usg;
-	    update_min_max(g_ltr_usg);
+	    update_min_max(g_ltr_usg, g_m_inch);
 	    break;
 	case "usg":
 	    this.unit = "ltr";
 	    this.num = this.num / g_ltr_usg;
-	    update_min_max(1/g_ltr_usg);
+	    update_min_max(1/g_ltr_usg, 1/g_m_inch);
 	    break;
 	case "qrt":
 	    // TODO XXX implement this
@@ -415,9 +449,12 @@ table.a td {
     {
 	var a = '<td id="' + this.cellr + '"';
 
+	/*
 	if (this.lp.vu.getmass() > this.lp.max) {
 	    a += ' style="background-color:red;"';
 	}
+        */
+
 	a += '>';
 
 	switch (this.lp.vu.unit) {
@@ -562,6 +599,12 @@ table.a td {
 	for (i = 0; i < rows.length; i++) {
 	    rows[i].unitchg();
 	}
+
+	// no-one owns this object
+	g_ful.vu.unitchg();
+	g_lim.unitchg();
+
+	calculate();
     }
 
     /*
@@ -812,7 +855,8 @@ table.a td {
   <button type="button" onclick="calculate()">Calculate</button>
   <button type="button" title="Saves the current numbers as default values in your browser." 
 	  onclick="save_settings()">Save settings</button> <!-- localStorage.clear() -->
-  <button type="button" title="Clears the saved default settings from your browser." onclick="clear_settings()">Clear settings</button>
+  <button type="button" title="Clears the saved default settings from your browser."
+	  onclick="clear_settings()">Clear settings</button>
   <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
   <p> </p>
    <table border="1" class="a" id="table1">
