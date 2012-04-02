@@ -527,7 +527,7 @@ table.a td {
 	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,    0,  -200,    1.850);
 	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", 143,    0,   143,    1.170, 0.1);
 	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  54,     0,   54,     2.440);
-	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", 2,      0,  -10,     1.170, 0.1);
+	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", 5,      0,  -20,     1.170, 0.1);
 	g_tow  = new l_point("g_tow",  "Take-off mass", "kg",  0,      0,   1156,   1);
 	g_lw   = new l_point("g_lw",   "Landing mass",  "kg",  0,      0,   1156,   1);
 	g_endr = new l_point("g_endr", "Endurance",     "min", 0,      1,  -800,    0);
@@ -708,8 +708,9 @@ table.a td {
 	    debug.innerText += (" lnd.arm=" + g_lw.arm.toFixed(3));
 	    debug.innerText += (" lnd fuel=" + g_ful.vu.display(1));
 	}
-	else
+	else {
 	    debug.innerText = "";
+	}
 
 	update_cells();
 	update_svg();
@@ -752,12 +753,20 @@ table.a td {
     }
     
 
-    /* draw the line around the load envelope */
+    /* draw the svg boxes and the line around the m&b envelope */
 
     function draw_limits_svg()
     {
 	var i;
 	var polygon = "";
+
+	var svg = document.getElementById("svg_main");
+	svg.setAttribute('width',  600);
+	svg.setAttribute('height', 480);
+	
+	var rct = document.getElementById("svg_border");
+	rct.setAttribute('width',  550);
+	rct.setAttribute('height', 450);
 
 	for (i = 0; i < g_lim.x.length; i++) {
 	    polygon += new_mom(g_lim.x[i]) + ',' + new_mass(g_lim.y[i]) + " ";
@@ -767,7 +776,6 @@ table.a td {
 
 	if (g_lw.max < g_tow.max) {
 	    var ll = document.getElementById("landing_limit");
-	    // magic numbers for landing weight limit
 	    ll.setAttribute('x1', new_mom(g_lim.lim_lnd1));
 	    ll.setAttribute('y1', new_mass(g_lw.max));
 	    ll.setAttribute('x2', new_mom(g_lim.lim_lnd2));
@@ -777,7 +785,7 @@ table.a td {
 	update_svg();
     }
 
-    /* draw the dynamic elements on the svg canvas */
+    /* draw the dynamic elements on the svg object */
 
     function update_svg()
     {
@@ -793,14 +801,6 @@ table.a td {
 	var t = document.getElementById("takeoff_point");
 	t.setAttribute('cy', ty);
 	t.setAttribute('cx', tx);
-
-	var svg = document.getElementById("svg_main");
-	svg.setAttribute('width', 600);
-	svg.setAttribute('height', 480);
-	
-	var rect = document.getElementById("svg_border");
-	rect.setAttribute('width', 550);
-	rect.setAttribute('height', 450);
 
 	var warning = 1;
 	var w = document.getElementById("warning_text");
@@ -850,7 +850,9 @@ table.a td {
 	calculate();
     }
 
+    // initialize everything when the document has been loaded
     window.onload = setup;
+
 </script>
 
 <title>OH-FOO m&amp;b</title>
@@ -866,12 +868,14 @@ table.a td {
   <button type="button" title="Clears the saved default settings from your browser."
 	  onclick="clear_settings()">Clear settings</button>
   <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
+
   <p> </p>
-   <table border="1" class="a" id="table1">
+
+  <table border="1" class="a" id="table1">
     <tbody>
       <tr>
-    <th style="width:225px;color:red;" id="reminder"></th>
-    <th style="width:75px;text-align:center;">Input</th>
+	<th style="width:225px;color:red;" id="reminder"></th>
+	<th style="width:75px;text-align:center;">Input</th>
 	<th style="text-align:center;">
 	  <select id="units" onchange="handle_unit_change(this)">
 	    <option selected="selected">kg & litre</option>
@@ -883,7 +887,7 @@ table.a td {
     </tbody>
   </table>
 
-<p id="debug"></p>
+  <p id="debug"></p>
 
   <!-- SVG stuff here -->
 
@@ -894,10 +898,10 @@ table.a td {
 
     <text id="warning_text" x="20" y="50"
 	  fill="green" style="font-weight:bold;">Limits OK</text>
-
+    
     <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
     <text x="35" y="105">- Take-off</text>
-
+    
     <circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
     <text x="35" y="130">- Landing</text>
     
@@ -925,8 +929,18 @@ table.a td {
 
   </svg>
 
+  <footer>
+    <hr/>
+    
+    <div id="extrainfo">
+      
+      <p class="alignleft">Punnituspöytäkirja <time>01.01.1970</time></p>
+      <p class="alignright"><small><a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 03.04.2012</small></p>
+      <div style="clear:both;"></div>
+    </div>
+    
+  </footer>
+  
 </body>
 </html>
-
-
 
