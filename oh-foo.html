@@ -481,7 +481,7 @@ table.b td
          The variable name must be the same as the id.
 
         */
-	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  697.5,  0,   697.5,  0.970);
+	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  697.5,  0,  -697.5,  0.970);
 	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  150,    25, -200,    0.940);
 	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,    0,  -200,    1.850);
 	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", 143,    0,   143,    1.170, 0.1);
@@ -640,6 +640,7 @@ table.b td
 	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + (g_fu_landing.vu.getmass() * g_fuel.arm);
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
+	debug.innerText = "";
 	if (g_debug) {
 	    debug.innerText = g_bw.moment.toFixed(3);
 	    debug.innerText += (" " + g_fs.moment.toFixed(3));
