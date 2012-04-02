@@ -71,7 +71,7 @@ table.a td {
 
     var g_debug         = false;      // global debug switch
 
-    // mass and balance envelope limits
+    // mass and balance envelope limits (metres and kilos)
     var g_x_limits = [0.890, 0.890, 0.977, 1.202, 1.202, 0.890];
     var g_y_limits = [680, 885, 1156, 1156, 680, 680];
     var g_y_limits_land = g_y_limits;
@@ -188,7 +188,7 @@ table.a td {
 	
 	// if no unit is wanted, try to return a number
 	if (n) {
-	    if (u) 
+	    if (u)
 		return m.toFixed(n) + (u?" " + g_mass_unit:"");
 	    else
 		return m.toFixed(n);
@@ -715,9 +715,9 @@ table.a td {
 	    var ll = document.getElementById("landing_limit");
 	    // magic numbers for landing weight limit
 	    ll.setAttribute('x1', new_mom(143.09));
-	    ll.setAttribute('y1', new_mass(g_mlw));
+	    ll.setAttribute('y1', new_mass(g_lw.max));
 	    ll.setAttribute('x2', new_mom(148.1));
-	    ll.setAttribute('y2', new_mass(g_mlw));
+	    ll.setAttribute('y2', new_mass(g_lw.max));
 	}
 
 	update_svg();
