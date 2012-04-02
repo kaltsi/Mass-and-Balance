@@ -101,7 +101,7 @@ table.b td
     var g_min_mass = Math.min.apply(Math, g_y_limits);
     var g_max_mass = Math.max.apply(Math, g_y_limits);
     
-    var g_mom_range_max  = 600;
+    var g_mom_range_max  = 550;
     var g_mom_range_min  = 1;
     var g_mass_range_max = 450;
     var g_mass_range_min = 1;
@@ -265,9 +265,9 @@ table.b td
        l_point - a load point object
 
        id:     name of the global variable this is assigned to
-       descr:  basic text for the row
+       descr:  basic descriptive text for the row
+       unit:   kg, ltr, min
        dflt:   mass of the load point (default value when constructed)
-       unit:   kg or ltr
        min:    minimum value
        max:    max value (negative means do-not-print)
        arm:    moment arm
@@ -282,7 +282,7 @@ table.b td
 	this.max     = Math.abs(max);
 	this.dispmax = (max > 0 ?1:0);
 	this.arm     = arm;
-	this.step    = step;
+	this.step    = step; // how big steps should the input range advance
 
 	this.vu.lp   = this; // associate the mass object with this
     }
@@ -423,7 +423,12 @@ table.b td
 
     non_interactive_row.prototype.result = function ni_result()
     {
-	var a = '<td id="' + this.cellr + '">';
+	var a = '<td id="' + this.cellr + '"';
+
+	if (this.lp.vu.getmass() > this.lp.max) {
+	    a += ' style="background-color:red;"';
+	}
+	a += '>';
 
 	switch (this.lp.vu.unit) {
 	case "min":
@@ -478,19 +483,17 @@ table.b td
          All these are created global, since I'm not using 'var'.
          The variable name must be the same as the id.
 
-        name                  id        row name         unit   def   min max    momarm steps
-
         */
-	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  698,  0,  0,     0.970);
-	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  150,  25, -200,  0.940);
-	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,  0,  -200,  1.850);
-	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", 143,  0,  143,   1.170, 0.1);
-	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  54,   0,  54,    2.440);
-	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", 2,    0,  -10,   1.170, 0.1);
-	g_tow  = new l_point("g_tow",  "Take-off mass", "kg",  0,    0,  1156,  1);
-	g_lw   = new l_point("g_lw",   "Landing mass",  "kg",  0,    0,  1156,  1);
-	g_endr = new l_point("g_endr", "Endurance",     "min", 0,    1,  -800,  0);
-	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", 25,   5,  -50,   1, 0.1);
+	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  697.5,  0,   697.5,  0.970);
+	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  150,    25, -200,    0.940);
+	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,    0,  -200,    1.850);
+	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", 143,    0,   143,    1.170, 0.1);
+	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  54,     0,   54,     2.440);
+	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", 2,      0,  -10,     1.170, 0.1);
+	g_tow  = new l_point("g_tow",  "Take-off mass", "kg",  0,      0,   1156,   1);
+	g_lw   = new l_point("g_lw",   "Landing mass",  "kg",  0,      0,   1156,   1);
+	g_endr = new l_point("g_endr", "Endurance",     "min", 0,      1,  -800,    0);
+	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", 25,     5,  -50,     1, 0.1);
 
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
@@ -581,12 +584,9 @@ table.b td
     {
 	for (i = 0; i < rows.length; i++) {
 	    if (rows[i].celli !== null) {
-		var c1 = document.getElementById(rows[i].celli);
-		c1.innerHTML = rows[i].icell();
+		document.getElementById(rows[i].celli).innerHTML = rows[i].icell();
 	    }
-
-	    var c2 = document.getElementById(rows[i].cellr)
-	    c2.innerHTML = rows[i].result();
+	    document.getElementById(rows[i].cellr).innerHTML = rows[i].result();
 	}
     }
 
@@ -746,7 +746,7 @@ table.b td
 	var rect = document.getElementById("svg_border");
 	rect.setAttribute('width', 640);
 	rect.setAttribute('height', 480);
-/*
+
 	var warning = 1;
 	var w = document.getElementById("warning_text");
 	if (g_fu_landing.vu.num < 8) {
@@ -754,17 +754,17 @@ table.b td
 	    var warn="NOT ENOUGH LANDING FUEL!!";
 	    w.textContent = warn;
 	}
-	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) == 0) {
+	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_y_limits) == 0) {
 	    w.setAttribute('fill', "red");
-	    var warn="TAKE-OFF OVERWEIGHT " + ((g_tow - g_mtow) * g_lbs_kg).toFixed(1) + " kg!!";
+	    var warn="TAKE-OFF OVERWEIGHT " + (g_tow.vu.getmass() - g_tow.max).toFixed(1) + " " + g_mass_unit + "!!";
 	    w.textContent = warn;
 	}
-	else if (warn_limits(g_mom_landing, g_lw, g_y_limits_land) == 0) {
+	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_y_limits_land) == 0) {
 	    w.setAttribute('fill', "red");
-	    var warn="LANDING OVERWEIGHT " + ((g_lw - g_mlw) * g_lbs_kg).toFixed(1) + " kg!!";
+	    var warn="LANDING OVERWEIGHT " + (g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " + g_mass_unit + "!!";
 	    w.textContent=warn;
 	}
-	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) < 0) {
+	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_y_limits) < 0) {
 	    w.setAttribute('fill', "red");
 	    var warn="TOO AFT CENTER OF GRAVITY!!";
 	    w.textContent = warn;
@@ -783,7 +783,7 @@ table.b td
 	    var s = rect.getAttribute('style');
 	    rect.setAttribute('style', s + "fill:none;opacity:0.5;");
 	}
-*/
+
 
     }
 
@@ -853,7 +853,7 @@ table.b td
     <text x="35" y="130">- Landing</text>
     
     <g transform="scale(1,-1)">
-      <g transform="translate(20,-480)">
+      <g transform="translate(50,-480)">
 	<polyline id="mb_limits"
 		  vector-effect="non-scaling-stroke"
 		  points="0,0 1,1"
