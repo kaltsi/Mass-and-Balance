@@ -271,6 +271,7 @@ table.b td
        min:    minimum value
        max:    max value (negative means do-not-print)
        arm:    moment arm
+       step:   step size for input range element
     */
 
     function l_point(id, descr, unit, dflt, min, max, arm, step)
@@ -282,7 +283,7 @@ table.b td
 	this.max     = Math.abs(max);
 	this.dispmax = (max > 0 ?1:0);
 	this.arm     = arm;
-	this.step    = step; // how big steps should the input range advance
+	this.step    = step;
 
 	this.vu.lp   = this; // associate the mass object with this
     }
@@ -390,8 +391,7 @@ table.b td
 	x.max = this.lp.max;
 	x.value = this.lp.vu.num;
 
-	var r = document.getElementById(this.id);
-	r.innerHTML = this.content();
+	document.getElementById(this.id).innerHTML = this.content();
     }
 
     /* 
@@ -529,9 +529,8 @@ table.b td
 
     function load_reminder()
     {
-	var x = document.getElementById("reminder");
-	x.innerText="Loaded your default settings.";
-	var t = setTimeout("remove_reminder()", 5000);
+	document.getElementById("reminder").innerText="Loaded your default settings.";
+	setTimeout("remove_reminder()", 5000);
     }
 
     /* remove the settings reminder */
@@ -709,8 +708,7 @@ table.b td
 
     function draw_limits_svg()
     {
-	var l = document.getElementById("mb_limits");
-	l.setAttribute('points', do_poly_points());
+	document.getElementById("mb_limits").setAttribute('points', do_poly_points());
 	
 	/*
 	var ll = document.getElementById("landing_limit");
@@ -783,8 +781,6 @@ table.b td
 	    var s = rect.getAttribute('style');
 	    rect.setAttribute('style', s + "fill:none;opacity:0.5;");
 	}
-
-
     }
 
     /* global debug toggle handler */
