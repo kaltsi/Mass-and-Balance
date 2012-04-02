@@ -39,7 +39,7 @@ table.a {
 
 table.a th {
     border: 0px;
-    padding: 1px 5px 1px 1px;
+    padding: 5px 5px 5px 0px;
     text-align: right;
 }
 
@@ -72,11 +72,11 @@ table.a td {
     var g_debug         = false;      // global debug switch
 
     // mass and balance envelope limits
-    var g_x_limits = new Array(0.890, 0.890, 0.977, 1.202, 1.202, 0.890)
-    var g_y_limits = new Array(680, 885, 1156, 1156, 680, 680)
+    var g_x_limits = [0.890, 0.890, 0.977, 1.202, 1.202, 0.890];
+    var g_y_limits = [680, 885, 1156, 1156, 680, 680];
     var g_y_limits_land = g_y_limits;
-    var g_min_mom = Math.min.apply(Math, g_x_limits);
-    var g_max_mom = Math.max.apply(Math, g_x_limits);
+    var g_min_arm = Math.min.apply(Math, g_x_limits);
+    var g_max_arm = Math.max.apply(Math, g_x_limits);
     
     var g_min_mass = Math.min.apply(Math, g_y_limits);
     var g_max_mass = Math.max.apply(Math, g_y_limits);
@@ -86,13 +86,17 @@ table.a td {
     var g_mass_range_max = 375;
     var g_mass_range_min = 1;
     
+    /* convert given moment arm value to the new range fitting the svg drawing area */
+
     function new_mom(old_value)
     {
-	var old_range = g_max_mom - g_min_mom;
+	var old_range = g_max_arm - g_min_arm;
 	var new_range = g_mom_range_max - g_mom_range_min;
-	return ((old_value - g_min_mom) * new_range)/old_range + g_mom_range_min;
+	return ((old_value - g_min_arm) * new_range)/old_range + g_mom_range_min;
     }
-    
+
+    /* convert given mass value to the new range fitting the svg drawing area */
+
     function new_mass(old_value)
     {
 	var old_range = g_max_mass - g_min_mass;
@@ -594,7 +598,7 @@ table.a td {
 	return mass;
     }
 
-    /* calculate and add moment to the object */
+    /* calculate and add moment to given the object */
 
     function calc_moment(o)
     {
@@ -627,11 +631,13 @@ table.a td {
 	calc_moment(g_fuel);
 
 	// take-off moment arm
-	g_tow.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + g_fuel.moment - g_taxi.moment;
+	g_tow.moment = g_bw.moment + g_fs.moment + g_bs.moment +
+	    g_bagg.moment + g_fuel.moment - g_taxi.moment;
 	g_tow.arm = g_tow.moment / g_tow.vu.getmass();
 
 	// landing moment arm
-	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + (g_ful.vu.getmass() * g_fuel.arm);
+	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment +
+	    g_bagg.moment + (g_ful.vu.getmass() * g_fuel.arm);
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
 
@@ -656,9 +662,12 @@ table.a td {
 
 
 
-    // Checks if given point (x,y) is inside the mass and balance envelope.
-    //
-    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    /*
+      Checks if given point (x,y) is inside the mass and balance envelope.
+    
+      http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    */
+
     function warn_limits(x, y, yarray)
     {
 	var j = g_x_limits.length - 2;
@@ -688,35 +697,33 @@ table.a td {
     }
     
 
-    // envelope limit line
-    function do_poly_points()
-    {
-	var i = 0;
-	var ret = "";
-	for (i=0; i < g_x_limits.length; i++)
-	{
-	    ret += new_mom(g_x_limits[i]) + ',' + new_mass(g_y_limits[i]) + " ";
-	}
-	
-	return ret;
-    }
+    /* draw the line around the load envelope */
 
     function draw_limits_svg()
     {
-	document.getElementById("mb_limits").setAttribute('points', do_poly_points());
+	var i;
+	var polygon = "";
+
+	for (i = 0; i < g_x_limits.length; i++) {
+	    polygon += new_mom(g_x_limits[i]) + ',' + new_mass(g_y_limits[i]) + " ";
+	}
 	
-	/*
-	var ll = document.getElementById("landing_limit");
-	// magic numbers for landing weight limit
-	ll.setAttribute('x1', new_mom(143.09));
-	ll.setAttribute('y1', new_mass(g_mlw));
-	ll.setAttribute('x2', new_mom(148.1));
-	ll.setAttribute('y2', new_mass(g_mlw));
-	*/
+	document.getElementById("mb_limits").setAttribute('points', polygon);
+
+	if (g_lw.max < g_tow.max) {
+	    var ll = document.getElementById("landing_limit");
+	    // magic numbers for landing weight limit
+	    ll.setAttribute('x1', new_mom(143.09));
+	    ll.setAttribute('y1', new_mass(g_mlw));
+	    ll.setAttribute('x2', new_mom(148.1));
+	    ll.setAttribute('y2', new_mass(g_mlw));
+	}
 
 	update_svg();
     }
-    
+
+    /* draw the dynamic elements on the svg canvas */
+
     function update_svg()
     {
 	var lx = new_mom(g_lw.arm);
@@ -744,27 +751,25 @@ table.a td {
 	var w = document.getElementById("warning_text");
 	if (g_ful.vu.num < 8) {
 	    w.setAttribute('fill', "red");
-	    var warn="NOT ENOUGH LANDING FUEL!!";
-	    w.textContent = warn;
+	    w.textContent = "NOT ENOUGH LANDING FUEL!!";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_y_limits) == 0) {
 	    w.setAttribute('fill', "red");
-	    var warn="TAKE-OFF OVERWEIGHT " + (g_tow.vu.getmass() - g_tow.max).toFixed(1) + " " + g_mass_unit + "!!";
-	    w.textContent = warn;
+	    w.textContent = "TAKE-OFF OVERWEIGHT " + (g_tow.vu.getmass() - g_tow.max).toFixed(1) +
+		" " + g_mass_unit + "!!";
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_y_limits_land) == 0) {
 	    w.setAttribute('fill', "red");
-	    var warn="LANDING OVERWEIGHT " + (g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " + g_mass_unit + "!!";
-	    w.textContent=warn;
+	    w.textContent="LANDING OVERWEIGHT " + (g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
+		g_mass_unit + "!!";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_y_limits) < 0) {
 	    w.setAttribute('fill', "red");
-	    var warn="TOO AFT CENTER OF GRAVITY!!";
-	    w.textContent = warn;
+	    w.textContent = "TOO AFT CENTER OF GRAVITY!!";
 	}
 	else {
 	    w.setAttribute('fill', "green");
-	    w.textContent="Limits OK";
+	    w.textContent = "Limits OK";
 	    warning = 0;
 	}
 
@@ -825,31 +830,25 @@ table.a td {
   <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
 
     <rect id="svg_border" x="5" y="10" width="1" height="1" rx="20" ry="20"
-	  style="fill:white;stroke:black;stroke-width:3;opacity:1;"
-	  />
-
-    <rect id="warn_box" x="10" y="10" width="250" height="60"
-	  style="fill:red;stroke:black;stroke-width:1;opacity:0;"/>
+	  style="fill:white;stroke:black;stroke-width:3;opacity:1;"/>
 
     <text id="warning_text" x="20" y="50" fill="green">Limits OK</text>
 
-    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-FOO</text>
-
     <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
     <text x="35" y="105">- Take-off</text>
+
     <circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
     <text x="35" y="130">- Landing</text>
     
     <g transform="scale(1,-1)">
       <g transform="translate(50,-450)">
-	<polyline id="mb_limits"
+	<polygon id="mb_limits"
 		  points="0,0 1,1"
-		  style="fill:none;stroke:black;stroke-width:2" />
+		  style="fill:white;stroke:black;stroke-width:2" />
 	
-	<!--line id="landing_limit"
-	      vector-effect="non-scaling-stroke"
-	      x1="1" y1="2" x2="3" y2="4"
-	      style="fill:none;stroke:green;stroke-width:2" /-->
+	<line id="landing_limit"
+	      x1="1" y1="1" x2="1" y2="1"
+	      style="fill:none;stroke:green;stroke-width:2" />
 	
 	<circle id="takeoff_point" cx="1" cy="1" r="5"
 		stroke="black" stroke-width="1" fill="red"/>
@@ -858,6 +857,8 @@ table.a td {
 		stroke="black" stroke-width="1" fill="green"/>
       </g>
     </g>
+
+    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-FOO</text>
 
   </svg>
 
