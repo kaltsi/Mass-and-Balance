@@ -64,23 +64,24 @@ table.a td {
 
     var g_kg_lbs        = 2.20462262; // 1 kg  -> lb
     var g_ltr_usg       = 0.26417205; // 1 ltr -> USG
-    var g_m_inch        = 39.3700787; // 1 m   -> inches
     var g_usg_fuel_lb   = 6.0;        // 1 usg = 6 lbs
     var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
     var g_mass_unit     = "kg";       // default in kilos
 
     var g_debug         = false;      // global debug switch
 
-    // mass and balance envelope limits (metres and kilos)
+    /* mass and balance envelope limits (metres and kilos) */
     
     var g_lim = {
-	x :      [0.890, 0.890, 0.977, 1.202, 1.202, 0.890],
-	y :      [680, 885, 1156, 1156, 680, 680],
-	y_land : [680, 885, 1156, 1156, 680, 680],
+	x          : [0.890, 0.890, 0.977, 1.202, 1.202, 0.890],
+	y          : [680, 885, 1156, 1156, 680, 680],
+	y_land     : [680, 885, 1156, 1156, 680, 680],
 	x_draw_max : 475,
 	y_draw_max : 375,
 	x_draw_min : 1,
-	y_draw_min : 1
+	y_draw_min : 1,
+	lim_lnd1   : 143.09,  // landing limit x-coord 1
+	lim_lnd2   : 148.1    // landing limit x-coord 2
     };
 
     g_lim.min_arm  = Math.min.apply(Math, g_lim.x);
@@ -88,6 +89,7 @@ table.a td {
     g_lim.min_mass = Math.min.apply(Math, g_lim.y);
     g_lim.max_mass = Math.max.apply(Math, g_lim.y);
     
+
     /* convert given moment arm value to the new range fitting the svg drawing area */
 
     function new_mom(old_value)
@@ -716,9 +718,9 @@ table.a td {
 	if (g_lw.max < g_tow.max) {
 	    var ll = document.getElementById("landing_limit");
 	    // magic numbers for landing weight limit
-	    ll.setAttribute('x1', new_mom(143.09));
+	    ll.setAttribute('x1', new_mom(g_lim.lim_lnd1));
 	    ll.setAttribute('y1', new_mass(g_lw.max));
-	    ll.setAttribute('x2', new_mom(148.1));
+	    ll.setAttribute('x2', new_mom(g_lim.lim_lnd2));
 	    ll.setAttribute('y2', new_mass(g_lw.max));
 	}
 
