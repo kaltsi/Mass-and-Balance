@@ -98,9 +98,9 @@ table.b td
     var g_min_mass = Math.min.apply(Math, g_y_limits);
     var g_max_mass = Math.max.apply(Math, g_y_limits);
     
-    var g_mom_range_max  = 550;
+    var g_mom_range_max  = 500;
     var g_mom_range_min  = 1;
-    var g_mass_range_max = 450;
+    var g_mass_range_max = 375;
     var g_mass_range_min = 1;
     
     function new_mom(old_value)
@@ -740,8 +740,8 @@ table.b td
 	svg.setAttribute('height', 480);
 	
 	var rect = document.getElementById("svg_border");
-	rect.setAttribute('width', 640);
-	rect.setAttribute('height', 480);
+	rect.setAttribute('width', 600);
+	rect.setAttribute('height', 450);
 
 	var warning = 1;
 	var w = document.getElementById("warning_text");
@@ -824,26 +824,28 @@ table.b td
 <p id="debug"></p>
 
   <!-- SVG stuff here -->
-  <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" 
-       width="1" height="1" style="box-shadow: 3px 3px 5px gray;">
-    
-    <rect id="svg_border" x="0" y="0" width="1" height="1"
-	  style="fill:none;stroke:black;stroke-width:5;opacity:0.5;"/>
+
+  <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
+
+
+    <rect id="svg_border" x="5" y="10" width="1" height="1" rx="20" ry="20"
+	  style="fill:none;stroke:black;stroke-width:3;opacity:1;"/>
+
     <rect id="warn_box" x="10" y="10" width="250" height="60"
 	  style="fill:red;stroke:black;stroke-width:1;opacity:0;"/>
 	  
 
-    <text id="warning_text" x="15" y="30" fill="green">Limits OK</text>
+    <text id="warning_text" x="20" y="50" fill="green">Limits OK</text>
 
     <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-FOO</text>
 
-    <circle cx="20" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
+    <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
     <text x="35" y="105">- Take-off</text>
-    <circle cx="20" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
+    <circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
     <text x="35" y="130">- Landing</text>
     
     <g transform="scale(1,-1)">
-      <g transform="translate(50,-480)">
+      <g transform="translate(50,-450)">
 	<polyline id="mb_limits"
 		  points="0,0 1,1"
 		  style="fill:none;stroke:black;stroke-width:2" />
