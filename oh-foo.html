@@ -338,9 +338,9 @@ table.a td {
 	return a;
     }
 
-    /* return the interactive value of this row (second cell) */
+    /* return the interactive result value of this row (second cell) */
 
-    interactive_row.prototype.icell = function i_icell()
+    interactive_row.prototype.iresult = function i_iresult()
     {
 	var a = '<td style="background-color:yellow;" id="' + this.celli + '">';
 
@@ -390,7 +390,7 @@ table.a td {
     {
 	var a = this.description();
 
-	a += this.icell();
+	a += this.iresult();
 
 	a += '<th> <input id="' + this.sldr + '" type="range" min="' + this.lp.min + '" ';
 	a += 'max="' + this.lp.max + '" value="' + this.lp.vu.num +'" ';
@@ -539,7 +539,7 @@ table.a td {
 	g_ftme = new l_point("g_ftme", "Flight time",   "min", 60,   1,  -300,  0);
 
 	// This does not necessarily get a row, but acts just as a calculation object.
-	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 8, 0, 0);
+	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 0, 0, 0);
 
 	rows = [ ];
 	rows.push(new non_interactive_row(g_bw, "reverse"));
@@ -604,6 +604,8 @@ table.a td {
 
 	// no-one owns this object
 	g_ful.vu.unitchg();
+
+	// update the limits
 	g_lim.unitchg();
 
 	calculate();
@@ -628,7 +630,7 @@ table.a td {
     {
 	for (i = 0; i < rows.length; i++) {
 	    if (rows[i].celli !== null) {
-		document.getElementById(rows[i].celli).innerHTML = rows[i].icell();
+		document.getElementById(rows[i].celli).innerHTML = rows[i].iresult();
 	    }
 	    document.getElementById(rows[i].cellr).innerHTML = rows[i].result();
 	}
@@ -637,7 +639,7 @@ table.a td {
 
     /* take in an arbitrary number of value_unit objects and calculate their mass */
 
-    function calc_mass()
+    function calc_mass(args)
     {
 	var i, mass = 0;
 
@@ -664,7 +666,10 @@ table.a td {
 	g_tow.vu.num -= g_taxi.vu.getmass();
 
 	// landing fuel volume
-	g_ful.vu.num = g_fuel.vu.num - (g_ff.vu.num * g_ftme.vu.num) / 60 - g_taxi.vu.num;
+	g_ful.vu.num = g_fuel.vu.num - (g_ff.vu.num * g_ftme.vu.num) / 60.0 - g_taxi.vu.num;
+
+	// minimum landing fuel (45 mins reserve)
+	g_ful.min = (g_ff.vu.num * 45.0) / 60.0;
 	
 	// landing weight
 	g_lw.vu.num = calc_mass(g_ful, g_fs, g_bs, g_bagg, g_bw);
@@ -801,7 +806,8 @@ table.a td {
 	var w = document.getElementById("warning_text");
 	if (g_ful.vu.num < g_ful.min) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = "NOT ENOUGH LANDING FUEL!!";
+	    w.textContent = "NOT ENOUGH LANDING FUEL!! " + 
+		(g_ful.vu.num < 0?"0":g_ful.vu.display(1)) + " remaining.";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) == 0) {
 	    w.setAttribute('fill', "red");
