@@ -89,6 +89,35 @@ table.b td
     var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
     var g_mass_unit     = "kg";       // default in kilos
 
+    // mass and balance envelope limits
+    var g_x_limits = new Array(0.890, 0.890, 0.977, 1.202, 1.202, 0.890)
+    var g_y_limits = new Array(680, 885, 1156, 1156, 680, 680)
+    var g_y_limits_land = g_y_limits;
+    var g_min_mom = Math.min.apply(Math, g_x_limits);
+    var g_max_mom = Math.max.apply(Math, g_x_limits);
+    
+    var g_min_mass = Math.min.apply(Math, g_y_limits);
+    var g_max_mass = Math.max.apply(Math, g_y_limits);
+    
+    var g_mom_range_max  = 600;
+    var g_mom_range_min  = 1;
+    var g_mass_range_max = 450;
+    var g_mass_range_min = 1;
+    
+    function new_mom(old_value)
+    {
+	var old_range = g_max_mom - g_min_mom;
+	var new_range = g_mom_range_max - g_mom_range_min;
+	return ((old_value - g_min_mom) * new_range)/old_range + g_mom_range_min;
+    }
+    
+    function new_mass(old_value)
+    {
+	var old_range = g_max_mass - g_min_mass;
+	var new_range = g_mass_range_max - g_mass_range_min;
+	return ((old_value - g_min_mass) * new_range)/old_range + g_mass_range_min;
+    }
+
     /* basic numeric value object with unit and type */
 
     function value_unit(v, u)
@@ -404,7 +433,6 @@ table.b td
 	}
 
 	a += '</td>';
-
 	return a;
     }
     
@@ -416,6 +444,7 @@ table.b td
 
 	a += '<th style="font-weight:normal; text-align:center;">. . .</th>';
 	a += '<th style="font-weight:normal; text-align:center;">. . . . .</th>';
+
 	a += this.result();
 	return a;
     }
@@ -425,16 +454,17 @@ table.b td
     non_interactive_row.prototype.unitchg = function ni_update()
     {
 	this.lp.vu.unitchg();
-	var r = document.getElementById(this.id);
-	r.innerHTML = this.content();
+	document.getElementById(this.id).innerHTML = this.content();
     }
-    
+
+    /* initialize everything when the page is loaded */
 
     function setup()
     {
-	var i;
+	var i = 0;
 
- 	mass_title.innerText = "Mass (" + g_mass_unit + ")";
+	// set the unit name correctly
+ 	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
 
 	/* TODO implement this stuff
 	if (typeof(Storage) !== "undefined") {
@@ -442,6 +472,13 @@ table.b td
 	}
         */
 
+	/*
+         All these are created global, since I'm not using 'var'.
+         The variable name must be the same as the id.
+
+        name                  id        row name         unit   def   min max    momarm steps
+
+        */
 	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  698,  0,  0,     0.970);
 	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  150,  25, -200,  0.940);
 	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,  0,  -200,  1.850);
@@ -453,34 +490,37 @@ table.b td
 	g_endr = new l_point("g_endr", "Endurance",     "min", 0,    1,  -800,  0);
 	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", 25,   5,  -50,   1, 0.1);
 
-	// indicate that this is a fuel flow row - special handling for result cell
+	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
 
 	g_ftme = new l_point("g_ftme", "Flight time",   "min", 60,   1,  -300,  0);
 
-	g_fu_landing = new l_point("g_fu_landing", "Landing Fuel",  "ltr", 0, 0, 1000, 0);
+	// This does not necessarily get a row, but acts just as a calculation object.
+	g_fu_landing = new l_point("g_fu_landing", "Landing fuel",  "ltr", 0, 0, 1000, 0);
 
-	row01 = new non_interactive_row(g_bw);
-	row02 = new interactive_row(g_fs);
-	row03 = new interactive_row(g_bs);
-	row04 = new interactive_row(g_fuel);
-	row05 = new interactive_row(g_bagg);
-	row06 = new interactive_row(g_taxi);
-	row07 = new non_interactive_row(g_tow);
-	row08 = new non_interactive_row(g_lw);
-	row09 = new non_interactive_row(g_endr);
-	row10 = new interactive_row(g_ff);
-	row11 = new interactive_row(g_ftme);
+	rows = [ ];
+	rows.push(new non_interactive_row(g_bw));
+	rows.push(new interactive_row(g_fs));
+	rows.push(new interactive_row(g_bs));
+	rows.push(new interactive_row(g_fuel));
+	rows.push(new interactive_row(g_bagg));
+	rows.push(new interactive_row(g_taxi));
+	rows.push(new non_interactive_row(g_tow));
+	rows.push(new non_interactive_row(g_lw));
+	rows.push(new non_interactive_row(g_endr));
+	rows.push(new interactive_row(g_ff));
+	rows.push(new interactive_row(g_ftme));
 
-	load_points = [g_bw, g_fs, g_bs, g_fuel, g_bagg, g_taxi, g_tow, g_lw, g_endr, g_ff, g_ftme]
-	rows = [row01, row02, row03, row04, row05, row06, row07, row08, row09, row10, row11]
-	
 	for (i = 0; i < rows.length; i++) {
 	    var row = document.getElementById("table1").insertRow(-1);
 	    row.id = rows[i].id;
 	    row.innerHTML = rows[i].content();
 	}
+
+	draw_limits_svg();
     }
+
+    /* show a reminder if the user has saved settings */
 
     function load_reminder()
     {
@@ -489,10 +529,11 @@ table.b td
 	var t = setTimeout("remove_reminder()", 5000);
     }
 
+    /* remove the settings reminder */
+
     function remove_reminder()
     {
-	var x = document.getElementById("reminder");
-	x.innerText="";
+	document.getElementById("reminder").innerText="";
     }
 
     /* change all numbers and their units */
@@ -512,7 +553,7 @@ table.b td
 	    alert("this.selectedIndex");
 	}
 
- 	mass_title.innerText = "Mass (" + g_mass_unit + ")";
+ 	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
 
 	for (i = 0; i < rows.length; i++) {
 	    rows[i].unitchg();
@@ -612,6 +653,134 @@ table.b td
 	debug.innerText += (" lnd fuel: " + g_fu_landing.vu.display(1));
 
 	update_cells();
+	update_svg();
+    }
+
+
+
+    // Checks if given point (x,y) is inside the mass and balance envelope.
+    //
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    function warn_limits(x, y, yarray)
+    {
+	var j = g_x_limits.length - 2;
+	var in_envelope = 0;
+	var i, yi, xi, yj, xj;
+	
+	for (i=0; i < g_x_limits.length - 1; j=i++)
+	{
+	    xi = g_x_limits[i];
+	    xj = g_x_limits[j];
+	    yi = yarray[i];
+	    yj = yarray[j];
+	    
+	    if ( ((yi > y) != (yj > y)))  {
+		if (x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+		    in_envelope = 1;
+		}
+	    }
+	}
+
+	if (y < Math.max.apply(Math, yarray) && !in_envelope) {
+	    // we're outside the x-boundary
+	    in_envelope = -1;
+	}
+	
+	return in_envelope;
+    }
+    
+
+    // envelope limit line
+    function do_poly_points()
+    {
+	var i = 0;
+	var ret = "";
+	for (i=0; i < g_x_limits.length; i++)
+	{
+	    ret += new_mom(g_x_limits[i]) + ',' + new_mass(g_y_limits[i]) + " ";
+	}
+	
+	return ret;
+    }
+
+    function draw_limits_svg()
+    {
+	var l = document.getElementById("mb_limits");
+	l.setAttribute('points', do_poly_points());
+	
+	/*
+	var ll = document.getElementById("landing_limit");
+	// magic numbers for landing weight limit
+	ll.setAttribute('x1', new_mom(143.09));
+	ll.setAttribute('y1', new_mass(g_mlw));
+	ll.setAttribute('x2', new_mom(148.1));
+	ll.setAttribute('y2', new_mass(g_mlw));
+	*/
+
+	update_svg();
+    }
+    
+    function update_svg()
+    {
+	var lx = new_mom(g_lw.arm);
+	var ly = new_mass(g_lw.vu.getmass());
+	var tx = new_mom(g_tow.arm);
+	var ty = new_mass(g_tow.vu.getmass());
+
+	var l = document.getElementById("landing_point");
+	l.setAttribute('cy', ly);
+	l.setAttribute('cx', lx);
+
+	var t = document.getElementById("takeoff_point");
+	t.setAttribute('cy', ty);
+	t.setAttribute('cx', tx);
+
+	var svg = document.getElementById("svg_main");
+	svg.setAttribute('width', 640);
+	svg.setAttribute('height', 480);
+	
+	var rect = document.getElementById("svg_border");
+	rect.setAttribute('width', 640);
+	rect.setAttribute('height', 480);
+/*
+	var warning = 1;
+	var w = document.getElementById("warning_text");
+	if (g_fu_landing.vu.num < 8) {
+	    w.setAttribute('fill', "red");
+	    var warn="NOT ENOUGH LANDING FUEL!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TAKE-OFF OVERWEIGHT " + ((g_tow - g_mtow) * g_lbs_kg).toFixed(1) + " kg!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_mom_landing, g_lw, g_y_limits_land) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="LANDING OVERWEIGHT " + ((g_lw - g_mlw) * g_lbs_kg).toFixed(1) + " kg!!";
+	    w.textContent=warn;
+	}
+	else if (warn_limits(g_mom_takeoff, g_tow, g_y_limits) < 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TOO AFT CENTER OF GRAVITY!!";
+	    w.textContent = warn;
+	}
+	else {
+	    w.setAttribute('fill', "green");
+	    w.textContent="Limits OK";
+	    warning = 0;
+	}
+
+	if (warning == 1) {
+	    var s = rect.getAttribute('style');
+	    rect.setAttribute('style', s + "fill:yellow;opacity:0.3;");
+	}
+	else {
+	    var s = rect.getAttribute('style');
+	    rect.setAttribute('style', s + "fill:none;opacity:0.5;");
+	}
+*/
+
     }
 
     window.onload = setup;
@@ -650,6 +819,46 @@ table.b td
 <p/>
 
 <p id="debug"></p>
+
+  <!-- SVG stuff here -->
+  <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" 
+       width="1" height="1" style="box-shadow: 3px 3px 5px gray;">
+    
+    <rect id="svg_border" x="0" y="0" width="1" height="1"
+	  style="fill:none;stroke:black;stroke-width:5;opacity:0.5;"/>
+    <rect id="warn_box" x="10" y="10" width="250" height="60"
+	  style="fill:red;stroke:black;stroke-width:1;opacity:0;"/>
+	  
+
+    <text id="warning_text" x="15" y="30" fill="green">Limits OK</text>
+
+    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-CTL</text>
+
+    <circle cx="20" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
+    <text x="35" y="105">- Take-off</text>
+    <circle cx="20" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
+    <text x="35" y="130">- Landing</text>
+    
+    <g transform="scale(1,-1)">
+      <g transform="translate(20,-480)">
+	<polyline id="mb_limits"
+		  vector-effect="non-scaling-stroke"
+		  points="0,0 1,1"
+		  style="fill:none;stroke:black;stroke-width:2" />
+	
+	<!--line id="landing_limit"
+	      vector-effect="non-scaling-stroke"
+	      x1="1" y1="2" x2="3" y2="4"
+	      style="fill:none;stroke:green;stroke-width:2" /-->
+	
+	<circle id="takeoff_point" cx="1" cy="1" r="5"
+		stroke="black" stroke-width="1" fill="red"/>
+	
+	<circle id="landing_point" cx="2" cy="2" r="5"
+		stroke="black" stroke-width="1" fill="green"/>
+      </g>
+    </g>
+  </svg>
 
 </body>
 </html>
