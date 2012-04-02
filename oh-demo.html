@@ -1,0 +1,868 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+    Mass and balance calculator scratchpad
+
+    https://github.com/kaltsi/Mass-and-Balance
+
+    Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<style type="text/css">
+table.a {
+    border-radius: 6%;
+    padding: 10px 10px 10px 10px;
+    box-shadow: 3px 3px 5px gray;
+}
+
+table.a th {
+    border: 0px;
+    padding: 1px 5px 1px 1px;
+    text-align: right;
+}
+
+table.a td {
+    text-align: right;
+    padding: 3px;
+}
+
+.alignleft {
+    float: left;
+}
+
+.alignright {
+    float: right;
+}
+
+</style>
+
+<script type="text/javascript">
+
+    /*  Some conversion constants */
+
+    var g_kg_lbs        = 2.20462262; // 1 kg  -> lb
+    var g_ltr_usg       = 0.26417205; // 1 ltr -> USG
+    var g_m_inch        = 39.3700787; // 1 m   -> inches
+    var g_usg_fuel_lb   = 6.0;        // 1 usg = 6 lbs
+    var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
+    var g_mass_unit     = "kg";       // default in kilos
+
+    var g_debug         = false;      // global debug switch
+
+    // mass and balance envelope limits
+    var g_x_limits = new Array(0.890, 0.890, 0.977, 1.202, 1.202, 0.890)
+    var g_y_limits = new Array(680, 885, 1156, 1156, 680, 680)
+    var g_y_limits_land = g_y_limits;
+    var g_min_mom = Math.min.apply(Math, g_x_limits);
+    var g_max_mom = Math.max.apply(Math, g_x_limits);
+    
+    var g_min_mass = Math.min.apply(Math, g_y_limits);
+    var g_max_mass = Math.max.apply(Math, g_y_limits);
+    
+    var g_mom_range_max  = 475;
+    var g_mom_range_min  = 1;
+    var g_mass_range_max = 375;
+    var g_mass_range_min = 1;
+    
+    function new_mom(old_value)
+    {
+	var old_range = g_max_mom - g_min_mom;
+	var new_range = g_mom_range_max - g_mom_range_min;
+	return ((old_value - g_min_mom) * new_range)/old_range + g_mom_range_min;
+    }
+    
+    function new_mass(old_value)
+    {
+	var old_range = g_max_mass - g_min_mass;
+	var new_range = g_mass_range_max - g_mass_range_min;
+	return ((old_value - g_min_mass) * new_range)/old_range + g_mass_range_min;
+    }
+
+    /* basic numeric value object with unit and type */
+
+    function value_unit(v, u)
+    {
+	switch (u) {
+	case "kg":
+	case "lb":
+	case "ltr":
+	case "usg":
+	case "min":
+	case "qrt":
+	    break;
+	default:
+	    // this should not happen
+	    alert("value_unit with values: " + v + " " + u + " called.");
+	}
+
+	this.num  = v;
+	this.unit = u;
+    }
+
+    /* convert minutes to hours */
+
+    value_unit.prototype.time = function m2hrs()
+    {
+	var m, h;
+
+	function pad2(n) {
+	    return (n < 10?'0':'') + n;
+	}
+	
+	h = this.num / 60.0;
+	m = this.num % 60.0;
+	
+	return pad2(Math.floor(h)) + ":" + pad2(Math.floor(m)) + " h";
+    }
+
+    /* 
+       display the value and unit
+       n: num of decimals
+    */
+       
+    value_unit.prototype.display = function v_display(n)
+    {
+	if (n) {
+	    return this.num.toFixed(n) + " " + this.unit;
+	}
+	else {
+	    return this.num + " " + this.unit;
+	}
+    }
+
+    /* 
+       return the mass of value unit - calculates it for the volume units
+       n: num of decimals
+       u: also show unit
+    */
+
+    value_unit.prototype.getmass = function v_mass(n, u)
+    {
+	var m = this.num;
+	
+	switch (this.unit) {
+	case "ltr":
+	    if (g_mass_unit == "kg")
+		m = m * g_ltr_fuel_kg;
+	    else
+		m = m * g_ltr_fuel_kg * g_kg_lbs;
+	    break;
+	case "usg":
+	    if (g_mass_unit == "kg")
+		m = m * g_usg_fuel_lb / g_kg_lbs;
+	    else
+		m = m * g_usg_fuel_lb;
+	    break;
+	case "qrt":
+	    // TODO XXX implement this
+	    break;
+	default:
+	    // fall through, display the raw value
+	}
+	
+	// if no unit is wanted, try to return a number
+	if (n) {
+	    if (u) 
+		return m.toFixed(n) + (u?" " + g_mass_unit:"");
+	    else
+		return m.toFixed(n);
+	}
+	else {
+	    if (u)
+		return m + " " + g_mass_unit;
+	    else
+		return m;
+	}
+    }
+    
+    /* switch the unit and recalculate the value */
+    
+    value_unit.prototype.unitchg = function v_unit_change()
+    {
+	var that = this; // inner function trick
+	var update_min_max = function(m) {
+ 	    if (that.lp) {
+		that.lp.min = that.lp.min * m;
+		that.lp.max = that.lp.max * m;
+	    }
+	}
+
+	switch (this.unit) {
+	case "kg":
+	    this.unit  = "lb";
+	    this.num = this.num * g_kg_lbs;
+	    update_min_max(g_kg_lbs);
+	    break;
+	case "lb":
+	    this.unit = "kg";
+	    this.num = this.num / g_kg_lbs;
+	    update_min_max(1/g_kg_lbs);
+	    break;
+	case "ltr":
+	    this.unit = "usg";
+	    this.num = this.num * g_ltr_usg;
+	    update_min_max(g_ltr_usg);
+	    break;
+	case "usg":
+	    this.unit = "ltr";
+	    this.num = this.num / g_ltr_usg;
+	    update_min_max(1/g_ltr_usg);
+	    break;
+	case "qrt":
+	    // TODO XXX implement this
+	    break;
+	case "min":
+	    // do nothing
+	    break;
+	default:
+	    alert("Invalid v_unit_change: cannot happen!");
+	}
+    }
+
+    /*
+       l_point - a load point object
+
+       id:     name of the global variable this is assigned to
+       descr:  basic descriptive text for the row
+       unit:   kg, ltr, min
+       dflt:   mass of the load point (default value when constructed)
+       min:    minimum value
+       max:    max value (negative means do-not-print)
+       arm:    moment arm
+       step:   step size for input range element
+    */
+
+    function l_point(id, descr, unit, dflt, min, max, arm, step)
+    {
+	this.id      = id;
+	this.descr   = descr;
+	this.vu      = new value_unit(dflt, unit);
+	this.min     = min;
+	this.max     = Math.abs(max);
+	this.dispmax = (max > 0 ?1:0);
+	this.arm     = arm;
+	this.step    = step;
+
+	this.vu.lp   = this; // associate the mass object with this
+    }
+
+    /* 
+      a table row with interactive elements
+
+      lp:    load point object
+     */
+
+    function interactive_row(lp)
+    {
+	this.lp    = lp;
+	this.id    = this.lp.id;
+	this.celli = this.lp.id + "c1";  // interactive cell id
+	this.cellr = this.lp.id + "c2";  // result cell id
+	this.sldr  = this.lp.id + "s";   // slider element id
+    }
+    
+    /* return the descriptive name for the row (first cell) */
+
+    interactive_row.prototype.description = function i_descr()
+    {
+	var a = '<th>' + this.lp.descr;
+
+	if (this.lp.dispmax) 
+	    a += ' (max ' + this.lp.max.toFixed() + ' ' + this.lp.vu.unit +')';
+
+	a += '</th>';
+	return a;
+    }
+
+    /* return the interactive value of this row (second cell) */
+
+    interactive_row.prototype.icell = function i_icell()
+    {
+	var a = '<td style="background-color:yellow;" id="' + this.celli + '">';
+
+	switch (this.lp.vu.unit) {
+	case "min":
+	    a += this.lp.vu.display();
+	    break;
+	default:
+	    a += this.lp.vu.display(1);
+	    break;
+	}
+	a += '</td>';
+	return a;
+    }
+
+    /* return the result value of this row (last cell) */
+
+    interactive_row.prototype.result = function i_result()
+    {
+	var a = '<td id="' + this.cellr + '">';
+
+	if (this.lp.fuel_flow !== true) {
+
+	    switch (this.lp.vu.unit) {
+	    case "min":
+		a += this.lp.vu.time();
+		break;
+	    default:
+		a += this.lp.vu.getmass(1);
+		break;
+	    }
+	}
+	else {
+	    // this is a fuel flow row
+	    var b = new value_unit(this.lp.vu.num, this.lp.vu.unit);
+	    b.unitchg();
+	    a += b.display(1);
+	}
+
+	a += '</td>';
+	return a;
+    }
+
+    /* generate content for the whole row */
+
+    interactive_row.prototype.content = function i_content()
+    {
+	var a = this.description();
+
+	a += this.icell();
+
+	a += '<th> <input id="' + this.sldr + '" type="range" min="' + this.lp.min + '" ';
+	a += 'max="' + this.lp.max + '" value="' + this.lp.vu.num +'" ';
+	if (this.lp.step)
+	    a += 'step="' + this.lp.step +'" ';
+	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
+	a += this.result();
+	
+	return a;
+    }
+
+    /* actions to do when the units change */
+
+    interactive_row.prototype.unitchg = function i_update()
+    {
+	var x = document.getElementById(this.sldr);
+
+	this.lp.vu.unitchg();
+	x.min = this.lp.min;
+	x.max = this.lp.max;
+	x.value = this.lp.vu.num;
+
+	document.getElementById(this.id).innerHTML = this.content();
+    }
+
+    /* 
+       a table row with no interactive elements
+
+       lp: the load point for this row
+       op: special handling according to op
+    */
+
+    function non_interactive_row(lp, op)
+    {
+	this.lp    = lp;
+	this.id    = this.lp.id;
+	this.op    = op;
+	this.celli = null; // no interactive cell here
+	this.cellr = this.lp.id+"c1"; // result cell id
+    }
+
+    /* return the descriptive name for the row (first cell) */
+
+    non_interactive_row.prototype.description = function ni_descr()
+    {
+	var a = '<th>'+ this.lp.descr;
+	if (this.lp.dispmax)
+	    a += " (max "+ this.lp.max.toFixed() + " " + this.lp.vu.unit + ")";
+	a += '</th>';
+	return a;
+    }
+
+    /* return the result value for this row (last cell) */
+
+    non_interactive_row.prototype.result = function ni_result()
+    {
+	var a = '<td id="' + this.cellr + '"';
+
+	if (this.lp.vu.getmass() > this.lp.max) {
+	    a += ' style="background-color:red;"';
+	}
+	a += '>';
+
+	switch (this.lp.vu.unit) {
+	case "min":
+	    a += this.lp.vu.time();
+	    break;
+	default:
+	    a +=  this.lp.vu.getmass(1);
+	    break;
+	}
+
+	a += '</td>';
+	return a;
+    }
+    
+    /* generate content for the whole row */
+
+    non_interactive_row.prototype.content = function ni_content()
+    {
+	var a = this.description();
+
+	switch (this.op) {
+	case "reverse":
+	    a += '<th style="font-weight:normal; text-align:center;">. . .</th>';
+	    a += '<th style="font-weight:normal; text-align:center;">. . . . .</th>';
+	    a += this.result();
+	    break;
+	default:
+	    a += this.result();
+	    a += '<th style="font-weight:normal; text-align:center;">. . . . .</th>';
+	    a += '<th style="font-weight:normal; text-align:center;">. . .</th>';
+	    break;
+	}
+
+	return a;
+    }
+
+    /* actions to do when the units change */
+
+    non_interactive_row.prototype.unitchg = function ni_update()
+    {
+	this.lp.vu.unitchg();
+	document.getElementById(this.id).innerHTML = this.content();
+    }
+
+    /* initialize everything when the page is loaded */
+
+    function setup()
+    {
+	var i = 0;
+
+	// set the unit name correctly
+ 	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
+
+	/* TODO implement this stuff
+	if (typeof(Storage) !== "undefined") {
+	    var t = setTimeout("load_reminder()", 1000);
+	}
+        */
+
+	/*
+         All these are created global, since I'm not using 'var'.
+         The variable name must be the same as the id.
+
+        */
+	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  697.5,  0,  -697.5,  0.970);
+	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  150,    25, -200,    0.940);
+	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,    0,  -200,    1.850);
+	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", 143,    0,   143,    1.170, 0.1);
+	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  54,     0,   54,     2.440);
+	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", 2,      0,  -10,     1.170, 0.1);
+	g_tow  = new l_point("g_tow",  "Take-off mass", "kg",  0,      0,   1156,   1);
+	g_lw   = new l_point("g_lw",   "Landing mass",  "kg",  0,      0,   1156,   1);
+	g_endr = new l_point("g_endr", "Endurance",     "min", 0,      1,  -800,    0);
+	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", 25,     5,  -50,     1, 0.1);
+
+	// Mark this a fuel flow row - special handling for result cell
+	g_ff.fuel_flow = true;
+
+	g_ftme = new l_point("g_ftme", "Flight time",   "min", 60,   1,  -300,  0);
+
+	// This does not necessarily get a row, but acts just as a calculation object.
+	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 0, 0, 0);
+
+	rows = [ ];
+	rows.push(new non_interactive_row(g_bw, "reverse"));
+	rows.push(new interactive_row(g_fs));
+	rows.push(new interactive_row(g_bs));
+	rows.push(new interactive_row(g_fuel));
+	rows.push(new interactive_row(g_bagg));
+	rows.push(new interactive_row(g_taxi));
+	rows.push(new non_interactive_row(g_tow));
+	rows.push(new non_interactive_row(g_lw));
+	rows.push(new non_interactive_row(g_endr));
+	rows.push(new interactive_row(g_ff));
+	rows.push(new interactive_row(g_ftme));
+
+	for (i = 0; i < rows.length; i++) {
+	    var row = document.getElementById("table1").insertRow(-1);
+	    row.id = rows[i].id;
+	    row.innerHTML = rows[i].content();
+	}
+
+	draw_limits_svg();
+    }
+
+    /* show a reminder if the user has saved settings */
+
+    function load_reminder()
+    {
+	document.getElementById("reminder").innerText="Loaded your default settings.";
+	setTimeout("remove_reminder()", 5000);
+    }
+
+    /* remove the settings reminder */
+
+    function remove_reminder()
+    {
+	document.getElementById("reminder").innerText="";
+    }
+
+    /* change all numbers and their units */
+
+    function handle_unit_change(t)
+    {
+	var i = 0;
+
+	switch (t.value) {
+	case "kg & litre":
+	    g_mass_unit = "kg";
+	    break;
+	case "lbs & usg":
+	    g_mass_unit = "lb";
+	    break;
+	default:
+	    alert("this.selectedIndex");
+	}
+
+ 	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
+
+	for (i = 0; i < rows.length; i++) {
+	    rows[i].unitchg();
+	}
+    }
+
+    /*
+       actions to do when user manipulates an input range element
+
+       ir:  input range element reference
+       lp:  global load point variable
+    */
+
+    function user_input_range(ir, lp)
+    {
+	eval(lp).vu.num = ir.valueAsNumber;
+	calculate();
+    }
+
+    /* update the value cells in the table */
+
+    function update_cells()
+    {
+	for (i = 0; i < rows.length; i++) {
+	    if (rows[i].celli !== null) {
+		document.getElementById(rows[i].celli).innerHTML = rows[i].icell();
+	    }
+	    document.getElementById(rows[i].cellr).innerHTML = rows[i].result();
+	}
+    }
+
+
+    /* take in an arbitrary number of value_unit objects and calculate their mass */
+
+    function calc_mass()
+    {
+	var i, mass = 0;
+
+	for (i = 0; i < arguments.length; i++) {
+	    mass += arguments[i].vu.getmass();
+	}
+
+	return mass;
+    }
+
+    /* calculate and add moment to the object */
+
+    function calc_moment(o)
+    {
+	o.moment = o.arm * o.vu.getmass();
+    }
+
+    /* crunch the numbers */
+
+    function calculate()
+    {
+	// take-off weight
+	g_tow.vu.num = calc_mass(g_bw, g_fs, g_bs, g_fuel, g_bagg);
+	g_tow.vu.num -= g_taxi.vu.getmass();
+
+	// landing fuel volume
+	g_ful.vu.num = g_fuel.vu.num - (g_ff.vu.num * g_ftme.vu.num) / 60 - g_taxi.vu.num;
+	
+	// landing weight
+	g_lw.vu.num = calc_mass(g_ful, g_fs, g_bs, g_bagg, g_bw);
+
+	// endurance
+	g_endr.vu.num = (g_fuel.vu.num / g_ff.vu.num) * 60.0; // minutes
+
+	// compute the moment values for each load point
+	calc_moment(g_bw);
+	calc_moment(g_fs);
+	calc_moment(g_bs);
+	calc_moment(g_bagg);
+	calc_moment(g_taxi);
+	calc_moment(g_fuel);
+
+	// take-off moment arm
+	g_tow.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + g_fuel.moment - g_taxi.moment;
+	g_tow.arm = g_tow.moment / g_tow.vu.getmass();
+
+	// landing moment arm
+	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment + g_bagg.moment + (g_ful.vu.getmass() * g_fuel.arm);
+	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
+
+
+	if (g_debug) {
+	    debug.innerText = g_bw.moment.toFixed(3);
+	    debug.innerText += (" " + g_fs.moment.toFixed(3));
+	    debug.innerText += (" " + g_bs.moment.toFixed(3));
+	    debug.innerText += (" " + g_bagg.moment.toFixed(3));
+	    debug.innerText += (" " + g_taxi.moment.toFixed(3));
+	    debug.innerText += (" " + g_fuel.moment.toFixed(3));
+
+	    debug.innerText += ("\n tow.arm=" + g_tow.arm.toFixed(3));
+	    debug.innerText += (" lnd.arm=" + g_lw.arm.toFixed(3));
+	    debug.innerText += (" lnd fuel=" + g_ful.vu.display(1));
+	}
+	else
+	    debug.innerText = "";
+
+	update_cells();
+	update_svg();
+    }
+
+
+
+    // Checks if given point (x,y) is inside the mass and balance envelope.
+    //
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    function warn_limits(x, y, yarray)
+    {
+	var j = g_x_limits.length - 2;
+	var in_envelope = 0;
+	var i, yi, xi, yj, xj;
+	
+	for (i=0; i < g_x_limits.length - 1; j=i++)
+	{
+	    xi = g_x_limits[i];
+	    xj = g_x_limits[j];
+	    yi = yarray[i];
+	    yj = yarray[j];
+	    
+	    if ( ((yi > y) != (yj > y)))  {
+		if (x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+		    in_envelope = 1;
+		}
+	    }
+	}
+
+	if (y < Math.max.apply(Math, yarray) && !in_envelope) {
+	    // we're outside the x-boundary
+	    in_envelope = -1;
+	}
+	
+	return in_envelope;
+    }
+    
+
+    // envelope limit line
+    function do_poly_points()
+    {
+	var i = 0;
+	var ret = "";
+	for (i=0; i < g_x_limits.length; i++)
+	{
+	    ret += new_mom(g_x_limits[i]) + ',' + new_mass(g_y_limits[i]) + " ";
+	}
+	
+	return ret;
+    }
+
+    function draw_limits_svg()
+    {
+	document.getElementById("mb_limits").setAttribute('points', do_poly_points());
+	
+	/*
+	var ll = document.getElementById("landing_limit");
+	// magic numbers for landing weight limit
+	ll.setAttribute('x1', new_mom(143.09));
+	ll.setAttribute('y1', new_mass(g_mlw));
+	ll.setAttribute('x2', new_mom(148.1));
+	ll.setAttribute('y2', new_mass(g_mlw));
+	*/
+
+	update_svg();
+    }
+    
+    function update_svg()
+    {
+	var lx = new_mom(g_lw.arm);
+	var ly = new_mass(g_lw.vu.getmass());
+	var tx = new_mom(g_tow.arm);
+	var ty = new_mass(g_tow.vu.getmass());
+
+	var l = document.getElementById("landing_point");
+	l.setAttribute('cy', ly);
+	l.setAttribute('cx', lx);
+
+	var t = document.getElementById("takeoff_point");
+	t.setAttribute('cy', ty);
+	t.setAttribute('cx', tx);
+
+	var svg = document.getElementById("svg_main");
+	svg.setAttribute('width', 600);
+	svg.setAttribute('height', 480);
+	
+	var rect = document.getElementById("svg_border");
+	rect.setAttribute('width', 550);
+	rect.setAttribute('height', 450);
+
+	var warning = 1;
+	var w = document.getElementById("warning_text");
+	if (g_ful.vu.num < 8) {
+	    w.setAttribute('fill', "red");
+	    var warn="NOT ENOUGH LANDING FUEL!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_y_limits) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TAKE-OFF OVERWEIGHT " + (g_tow.vu.getmass() - g_tow.max).toFixed(1) + " " + g_mass_unit + "!!";
+	    w.textContent = warn;
+	}
+	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_y_limits_land) == 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="LANDING OVERWEIGHT " + (g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " + g_mass_unit + "!!";
+	    w.textContent=warn;
+	}
+	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_y_limits) < 0) {
+	    w.setAttribute('fill', "red");
+	    var warn="TOO AFT CENTER OF GRAVITY!!";
+	    w.textContent = warn;
+	}
+	else {
+	    w.setAttribute('fill', "green");
+	    w.textContent="Limits OK";
+	    warning = 0;
+	}
+
+	if (warning == 1) {
+	    var s = rect.getAttribute('style');
+	    rect.setAttribute('style', s + "fill:yellow;opacity:0.3;");
+	}
+	else {
+	    var s = rect.getAttribute('style');
+	    rect.setAttribute('style', s + "fill:white;opacity:0.3;");
+	}
+    }
+
+    /* global debug toggle handler */
+
+    function toggle_debug()
+    {
+	g_debug = !g_debug;
+	calculate();
+    }
+
+    window.onload = setup;
+</script>
+
+<title>OH-FOO m&amp;b</title>
+
+</head>
+<body>
+  
+  <h1>Blah OH-FOO</h1>
+  
+  <button type="button" onclick="calculate()">Calculate</button>
+  <button type="button" title="Saves the current numbers as default values in your browser." 
+	  onclick="save_settings()">Save settings</button> <!-- localStorage.clear() -->
+  <button type="button" title="Clears the saved default settings from your browser." onclick="clear_settings()">Clear settings</button>
+  <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
+  <p> </p>
+   <table border="1" class="a" id="table1">
+    <tbody>
+      <tr>
+    <th style="width:225px;color:red;" id="reminder"></th>
+    <th style="width:75px;text-align:center;">Input</th>
+	<th style="text-align:center;">
+	  <select id="units" onchange="handle_unit_change(this)">
+	    <option selected="selected">kg & litre</option>
+	    <option>lbs & usg</option>
+	  </select>
+	</th>
+	<th style="width:75px;text-align:center;" id="mass_title">Mass</th>
+      </tr>
+    </tbody>
+  </table>
+
+<p id="debug"></p>
+
+  <!-- SVG stuff here -->
+
+  <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
+
+    <rect id="svg_border" x="5" y="10" width="1" height="1" rx="20" ry="20"
+	  style="fill:white;stroke:black;stroke-width:3;opacity:1;"
+	  />
+
+    <rect id="warn_box" x="10" y="10" width="250" height="60"
+	  style="fill:red;stroke:black;stroke-width:1;opacity:0;"/>
+
+    <text id="warning_text" x="20" y="50" fill="green">Limits OK</text>
+
+    <text x="50%" y="50%" font-size="80" style="opacity:.15;text-anchor:middle;">OH-FOO</text>
+
+    <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
+    <text x="35" y="105">- Take-off</text>
+    <circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
+    <text x="35" y="130">- Landing</text>
+    
+    <g transform="scale(1,-1)">
+      <g transform="translate(50,-450)">
+	<polyline id="mb_limits"
+		  points="0,0 1,1"
+		  style="fill:none;stroke:black;stroke-width:2" />
+	
+	<!--line id="landing_limit"
+	      vector-effect="non-scaling-stroke"
+	      x1="1" y1="2" x2="3" y2="4"
+	      style="fill:none;stroke:green;stroke-width:2" /-->
+	
+	<circle id="takeoff_point" cx="1" cy="1" r="5"
+		stroke="black" stroke-width="1" fill="red"/>
+	
+	<circle id="landing_point" cx="2" cy="2" r="5"
+		stroke="black" stroke-width="1" fill="green"/>
+      </g>
+    </g>
+
+  </svg>
+
+</body>
+</html>
+
+
+
