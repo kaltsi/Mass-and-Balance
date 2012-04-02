@@ -287,7 +287,7 @@ table.a td {
        l_point - a load point object
 
        id:     name of the global variable this is assigned to
-       descr:  basic descriptive text for the row
+       descr:  basic descriptive text for the item
        unit:   kg, ltr, min
        dflt:   mass of the load point (default value when constructed)
        min:    minimum value
@@ -406,12 +406,12 @@ table.a td {
 
     interactive_row.prototype.unitchg = function i_update()
     {
-	var x = document.getElementById(this.sldr);
+	var slider = document.getElementById(this.sldr);
 
 	this.lp.vu.unitchg();
-	x.min = this.lp.min;
-	x.max = this.lp.max;
-	x.value = this.lp.vu.num;
+	slider.min = this.lp.min;
+	slider.max = this.lp.max;
+	slider.value = this.lp.vu.num;
 
 	document.getElementById(this.id).innerHTML = this.content();
     }
@@ -437,13 +437,15 @@ table.a td {
     non_interactive_row.prototype.description = function ni_descr()
     {
 	var a = '<th>'+ this.lp.descr;
+
 	if (this.lp.dispmax)
 	    a += " (max "+ this.lp.max.toFixed() + " " + this.lp.vu.unit + ")";
+
 	a += '</th>';
 	return a;
     }
 
-    /* return the result value for this row (last cell) */
+    /* return the result value for this row */
 
     non_interactive_row.prototype.result = function ni_result()
     {
