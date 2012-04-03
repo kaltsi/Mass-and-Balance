@@ -572,7 +572,7 @@ table.a td {
 
     function reset_settings()
     {
-
+	// TODO XXX
     }
 
     /* initialize everything when the page is loaded */
@@ -628,6 +628,10 @@ table.a td {
 	    row.id = rows[i].id;
 	    row.innerHTML = rows[i].content();
 	}
+
+
+	// make sure the select element shows the first option
+	document.getElementById("settings_select").selectedIndex = 0;
 
 	draw_limits_svg();
 	calculate();
@@ -705,6 +709,13 @@ table.a td {
     function remove_reminder()
     {
 	document.getElementById("reminder").innerText="";
+    }
+
+    /* change all the language strings */
+
+    function handle_lang_change(t)
+    {
+	// TODO XXX
     }
 
     /* change all numbers and their units */
@@ -953,10 +964,15 @@ table.a td {
   <h1>Blah OH-FOO</h1>
   
   <select id="settings_select" onchange="handle_settings_change(this)">
-    <option value="title">Settings</option>
+    <option value="title" disabled>Settings</option>
     <option value="save" >Save</option>
     <option value="reset">Reset</option>
     <option value="clear">Clear</option>
+  </select>
+
+  <select id="lang_select" onchange="handle_lang_change(this)">
+    <option value="English">English</option>
+    <option value="Suomi">Suomi</option>
   </select>
 
   <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
