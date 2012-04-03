@@ -72,6 +72,7 @@ table.a td {
     var g_defs = {
 	acft      : "OH-FOO",         // aircraft registration
 	acft_type : "Generic A000-Z", // aircraft type
+	origin    : "Mass and balance sheet for OH-FOO 01.01.1970",
 	bew       : 697.5,            // basic empty weight
 	ltr2kg    : 0.721,            // 1 ltr -> kg
 	usg2lb    : 6,                // 1 usg -> lb
@@ -475,6 +476,7 @@ table.a td {
 	this.lp    = lp;
 	this.id    = this.lp.id;
 	this.op    = op;
+	this.lp.up = this; // callback for the load point
 	this.celli = null; // no interactive cell here
 	this.cellr = this.lp.id+"c1"; // result cell id
     }
@@ -497,13 +499,6 @@ table.a td {
     non_interactive_row.prototype.result = function ni_result()
     {
 	var a = '<td id="' + this.cellr + '"';
-
-	/*
-	if (this.lp.vu.getmass() > this.lp.max) {
-	    a += ' style="background-color:red;"';
-	}
-        */
-
 	a += '>';
 
 	switch (this.lp.vu.unit) {
@@ -665,6 +660,7 @@ table.a td {
 	document.getElementById("doc_title").textContent=g_defs.acft + " M&B";
 	document.getElementById("ac_type_hdr").textContent=g_defs.acft_type + " " + g_defs.acft;
 	document.getElementById("ac_reg").textContent=g_defs.acft;
+	document.getElementById("origin_text").textContent=g_defs.origin;
 
 	/*
          All these are created global, since I'm not using 'var'.
@@ -760,7 +756,6 @@ table.a td {
 	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment +
 	    g_bagg.moment + (g_ful.vu.getmass() * g_fuel.arm);
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
-
 
 	debug = document.getElementById("debug");
 	if (g_defs.debug) {
@@ -1049,12 +1044,18 @@ table.a td {
 	    w.textContent = lang["mtow"][g_defs.s.lang] + " " +
 		(g_tow.vu.getmass() - g_tow.max).toFixed(1) +
 		" " + g_mass_unit + "!!";
+
+	    document.getElementById(g_tow.up.cellr).
+	    setAttribute('style', 'color:white; background-color:red;');
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
 	    w.textContent = lang["mlm"][g_defs.s.lang] + 
 		(g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
+
+	    document.getElementById(g_lw.up.cellr).
+	    setAttribute('style', 'color:white; background-color:red;');
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
@@ -1063,6 +1064,11 @@ table.a td {
 	else {
 	    w.setAttribute('fill', "green");
 	    w.textContent = lang["ok"][g_defs.s.lang];
+
+	    document.getElementById(g_tow.up.cellr).
+	    setAttribute('style', 'background-color:none;');
+	    document.getElementById(g_lw.up.cellr).
+	    setAttribute('style', 'background-color:none;');
 	    warning = 0;
 	}
 
@@ -1196,7 +1202,7 @@ table.a td {
     <hr/>
     
     <div id="extrainfo">
-      <p class="alignleft">Punnituspöytäkirja <time>01.01.1970</time></p>
+      <p class="alignleft" id="origin_text">No origin</p>
       <p class="alignright"><small><a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 03.04.2012</small></p>
       <div style="clear:both;"></div>
     </div>
