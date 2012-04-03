@@ -522,17 +522,17 @@ table.a td {
     {
 
 	if (typeof(Storage) !== "undefined") {
-	    var ac = g_defs.acft;
-	    var i;
-
-	    if (localStorage.getItem("kaltsi.mb." + ac + ".saved") == 1) {
-		setTimeout("load_reminder()", 100);
-	    }
+	    var i, t = null;
 
 	    for (var n in g_defs.s) {
-		i = localStorage.getItem("kaltsi.mb." + ac + "." + n);
-		if (i !== null)
+		i = localStorage.getItem("kaltsi.mb." + g_defs.acft + "." + n);
+		if (i !== null) {
+		    if (t === null) {
+			t = setTimeout("load_reminder()", 100);
+		    }
+
 		    g_defs.s[n] = Number(i);
+		}
 	    }
 	}
     }
@@ -542,13 +542,12 @@ table.a td {
     function save_settings()
     {
 	if (typeof(Storage) !== "undefined") {
-	    var ac = g_defs.acft;
 	    var saveables = [g_fs.vu.num, g_bs.vu.num, g_fuel.vu.num, g_bagg.vu.num,
 		g_taxi.vu.num, g_ff.vu.num, g_ftme.vu.num, true];
 
 	    var i = 0;
 	    for (var n in g_defs.s) {
-		localStorage.setItem("kaltsi.mb." + ac + "." + n, Number(saveables[i]));
+		localStorage.setItem("kaltsi.mb." + g_defs.acft + "." + n, Number(saveables[i]));
 		i++;
 	    }
 	    document.getElementById("reminder").innerText="Saved these settings as default";
@@ -560,7 +559,9 @@ table.a td {
     function clear_settings()
     {
 	if (typeof(Storage) !== "undefined") {
-	    localStorage.clear();
+	    for (var n in g_defs.s) {
+		localStorage.removeItem("kaltsi.mb." + g_defs.acft + "." + n);
+	    }
 
 	    document.getElementById("reminder").innerText="Cleared your default settings";
 	    setTimeout("remove_reminder()", 3000);
