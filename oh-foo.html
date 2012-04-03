@@ -73,6 +73,7 @@ table.a td {
     g_defs = {
 	bew   : 697.5,
 	acft  : "OH-FOO",
+	lang  : 0, // 0 = English
 	s : {
 	    fseat : 150,
 	    bseat : 75,
@@ -343,7 +344,7 @@ table.a td {
 
     interactive_row.prototype.description = function i_descr()
     {
-	var a = '<th>' + this.lp.descr;
+	var a = '<th>' + this.lp.descr[g_defs.lang];
 
 	if (this.lp.dispmax) 
 	    a += ' (max ' + this.lp.max.toFixed() + ' ' + this.lp.vu.unit +')';
@@ -450,7 +451,7 @@ table.a td {
 
     non_interactive_row.prototype.description = function ni_descr()
     {
-	var a = '<th>'+ this.lp.descr;
+	var a = '<th>'+ this.lp.descr[g_defs.lang];
 
 	if (this.lp.dispmax)
 	    a += " (max "+ this.lp.max.toFixed() + " " + this.lp.vu.unit + ")";
@@ -591,24 +592,24 @@ table.a td {
          The variable name must be the same as the id.
 
         */
-	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  g_defs.bew,    0,  -1,  0.970);
-	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  g_defs.s.fseat, 25, -200, 0.940);
-	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  g_defs.s.bseat, 0,  -200, 1.850);
-	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", g_defs.s.fuel,  0,   143, 1.170, 0.1);
-	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  g_defs.s.bagg,  0,   54,  2.440);
-	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", g_defs.s.taxi,  0,  -20,  1.170, 0.1);
-	g_tow  = new l_point("g_tow",  "Take-off mass", "kg",  0,      0,   1156,   1);
-	g_lw   = new l_point("g_lw",   "Landing mass",  "kg",  0,      0,   1156,   1);
-	g_endr = new l_point("g_endr", "Endurance",     "min", 0,      1,  -800,    0);
-	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", g_defs.s.fflow,  5,  -50, 1, 0.1);
+	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],          "kg",  g_defs.bew,    0,  -1,  0.970);
+	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],             "kg",  g_defs.s.fseat, 25, -200, 0.940);
+	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],             "kg",  g_defs.s.bseat, 0,  -200, 1.850);
+	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],                  "ltr", g_defs.s.fuel,  0,   143, 1.170, 0.1);
+	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],          "kg",  g_defs.s.bagg,  0,   54,  2.440);
+	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"],      "ltr", g_defs.s.taxi,  0,  -20,  1.170, 0.1);
+	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lentoonlähtömassa"],  "kg",  0,      0,   1156,   1);
+	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskeutumismassa"],    "kg",  0,      0,   1156,   1);
+	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],          "min", 0,      1,  -800,    0);
+	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"], "ltr", g_defs.s.fflow,  5,  -50, 1, 0.1);
 
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
 
-	g_ftme = new l_point("g_ftme", "Flight time",   "min", g_defs.s.time,   1,  -300,  0);
+	g_ftme = new l_point("g_ftme", ["Flight time", "Lentoaika"], "min", g_defs.s.time,   1,  -300,  0);
 
 	// This does not necessarily get a row, but acts just as a calculation object.
-	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 0, 0, 0);
+	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"],  "ltr", 0, 0, 0, 0);
 
 	rows = [ ];
 	rows.push(new non_interactive_row(g_bw, "reverse"));
@@ -676,6 +677,7 @@ table.a td {
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
 
+	debug = document.getElementById("debug");
 	if (g_defs.debug) {
 	    debug.innerText = g_bw.moment.toFixed(3);
 	    debug.innerText += (" " + g_fs.moment.toFixed(3));
@@ -711,12 +713,47 @@ table.a td {
 	document.getElementById("reminder").innerText="";
     }
 
+
     /* change all the language strings */
 
-    function handle_lang_change(t)
-    {
-	// TODO XXX
+function handle_lang_change()
+{
+    // TODO XXX
+    var lang = {
+	"select_settings_title" : ["Settings",
+				   "Asetukset" ],
+	"select_settings_save" : ["Save",
+				   "Tallenna" ],
+	"select_settings_reset" : ["Reset",
+				   "Alusta" ],
+	"select_settings_clear" : ["Clear",
+				   "Poista" ]
+    };
+
+    var val = document.getElementById("lang_select").value;
+    
+    var x = null;
+    switch (val) {
+    case "Suomi":
+	for (var n in lang) {
+	    x = document.getElementById(n);
+	    if (x !== null)
+		x.text = lang[n][1];
+	}
+	g_defs.lang = 1;
+	break;
+    case "English":
+	for (var n in lang) {
+	    x = document.getElementById(n);
+	    if (x !== null)
+		x.text = lang[n][0];
+	}
+	g_defs.lang = 0;
+	break;
+    default:
+	break;
     }
+}
 
     /* change all numbers and their units */
 
@@ -881,30 +918,46 @@ table.a td {
 	t.setAttribute('cy', ty);
 	t.setAttribute('cx', tx);
 
+	var lang = {
+	    "nofuel" : ["NOT ENOUGH LANDING FUEL",
+		      "EI TARPEEKSI POLTTOAINETTA"],
+	    "remain" : ["remaining", "jäljellä"],
+	    "mtow"   : ["TAKE-OFF OVERWEIGHT",
+		      "YLIPAINOA LENTOONLÄHDÖSSÄ"],
+	    "mlm"    : ["LANDING OVERWEIGHT",
+		      "YLIPAINOA LASKUSSA"],
+	    "cgaft"  : ["TOO AFT CENTER OF GRAVITY",
+		      "MASSAKESKIPISTE LIIAN TAKANA"],
+	    "ok"     : ["Limits OK", "Kaikki OK"]
+	};
+
+
 	var warning = 1;
 	var w = document.getElementById("warning_text");
 	if (g_ful.vu.num < g_ful.min) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = "NOT ENOUGH LANDING FUEL!! " + 
-		(g_ful.vu.num < 0?"0":g_ful.vu.display(1)) + " remaining.";
+	    w.textContent = lang["nofuel"][g_defs.lang] + "! " +
+		(g_ful.vu.num < 0?"0":g_ful.vu.display(1)) + " " + lang["remain"][g_defs.lang] + "!";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) == 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = "TAKE-OFF OVERWEIGHT " + (g_tow.vu.getmass() - g_tow.max).toFixed(1) +
+	    w.textContent = lang["mtow"][g_defs.lang] + " " +
+		(g_tow.vu.getmass() - g_tow.max).toFixed(1) +
 		" " + g_mass_unit + "!!";
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent="LANDING OVERWEIGHT " + (g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
+	    w.textContent = lang["mlm"][g_defs.lang] + 
+		(g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = "TOO AFT CENTER OF GRAVITY!!";
+	    w.textContent = lang["cgaft"][g_defs.lang] + "!!";
 	}
 	else {
 	    w.setAttribute('fill', "green");
-	    w.textContent = "Limits OK";
+	    w.textContent = lang["ok"][g_defs.lang];
 	    warning = 0;
 	}
 
@@ -964,13 +1017,13 @@ table.a td {
   <h1>Blah OH-FOO</h1>
   
   <select id="settings_select" onchange="handle_settings_change(this)">
-    <option value="title" disabled>Settings</option>
-    <option value="save" >Save</option>
-    <option value="reset">Reset</option>
-    <option value="clear">Clear</option>
+    <option id="select_settings_title" value="title" disabled>Settings</option>
+    <option id="select_settings_save"  value="save" >Save</option>
+    <option id="select_settings_reset" value="reset">Reset</option>
+    <option id="select_settings_clear" value="clear">Clear</option>
   </select>
 
-  <select id="lang_select" onchange="handle_lang_change(this)">
+  <select id="lang_select" onchange="handle_lang_change()">
     <option value="English">English</option>
     <option value="Suomi">Suomi</option>
   </select>
@@ -1041,7 +1094,6 @@ table.a td {
     <hr/>
     
     <div id="extrainfo">
-      
       <p class="alignleft">Punnituspöytäkirja <time>01.01.1970</time></p>
       <p class="alignright"><small><a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 03.04.2012</small></p>
       <div style="clear:both;"></div>
