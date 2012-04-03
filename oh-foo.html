@@ -72,7 +72,7 @@ table.a td {
     /* defaults and storage object */
     g_defs = {
 	bew   : 697.5,
-	acft  : "oh-foo",
+	acft  : "OH-FOO",
 	s : {
 	    fseat : 150,
 	    bseat : 75,
@@ -568,6 +568,13 @@ table.a td {
 	}
     }
 
+    /* reset the settings to their default values */
+
+    function reset_settings()
+    {
+
+    }
+
     /* initialize everything when the page is loaded */
 
     function setup()
@@ -624,99 +631,6 @@ table.a td {
 
 	draw_limits_svg();
 	calculate();
-    }
-
-    /* show a reminder if the user has saved settings */
-
-    function load_reminder()
-    {
-	document.getElementById("reminder").innerText="Loaded your default settings";
-	setTimeout("remove_reminder()", 5000);
-    }
-
-    /* remove the settings reminder */
-
-    function remove_reminder()
-    {
-	document.getElementById("reminder").innerText="";
-    }
-
-    /* change all numbers and their units */
-
-    function handle_unit_change(t)
-    {
-	var i = 0;
-
-	switch (t.value) {
-	case "kg & litre":
-	    g_mass_unit = "kg";
-	    break;
-	case "lbs & usg":
-	    g_mass_unit = "lb";
-	    break;
-	default:
-	    alert("this.selectedIndex");
-	}
-
- 	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
-
-	for (i = 0; i < rows.length; i++) {
-	    rows[i].unitchg();
-	}
-
-	// no-one owns this object
-	g_ful.vu.unitchg();
-
-	// update the limits
-	g_lim.unitchg();
-
-	calculate();
-    }
-
-    /*
-       actions to do when user manipulates an input range element
-
-       ir:  input range element reference
-       lp:  global load point variable
-    */
-
-    function user_input_range(ir, lp)
-    {
-	eval(lp).vu.num = ir.valueAsNumber;
-	calculate();
-    }
-
-    /* update the value cells in the table */
-
-    function update_cells()
-    {
-	for (i = 0; i < rows.length; i++) {
-	    if (rows[i].celli !== null) {
-		document.getElementById(rows[i].celli).innerHTML = rows[i].iresult();
-	    }
-	    document.getElementById(rows[i].cellr).innerHTML = rows[i].result();
-	}
-    }
-
-
-    /* take in an arbitrary number of value_unit objects and calculate their mass */
-
-    function calc_mass(args)
-    {
-	var i, mass = 0;
-
-	for (i = 0; i < arguments.length; i++) {
-	    mass += arguments[i].vu.getmass();
-	}
-
-	return mass;
-    }
-
-    /* calculate and add moment to given the object */
-
-    function calc_moment(o)
-    {
-	o.moment = o.arm * o.vu.getmass();
     }
 
     /* crunch the numbers */
@@ -778,7 +692,99 @@ table.a td {
 	update_svg();
     }
 
+    /* show a reminder if the user has saved settings */
 
+    function load_reminder()
+    {
+	document.getElementById("reminder").innerText="Loaded your default settings";
+	setTimeout("remove_reminder()", 5000);
+    }
+
+    /* remove the settings reminder */
+
+    function remove_reminder()
+    {
+	document.getElementById("reminder").innerText="";
+    }
+
+    /* change all numbers and their units */
+
+    function handle_unit_change(t)
+    {
+	var i = 0;
+
+	switch (t.value) {
+	case "kg_litre":
+	    g_mass_unit = "kg";
+	    break;
+	case "lb_usg":
+	    g_mass_unit = "lb";
+	    break;
+	default:
+	    alert("this.selectedIndex");
+	}
+
+ 	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
+
+	// request unit change from all rows
+	for (i = 0; i < rows.length; i++) {
+	    rows[i].unitchg();
+	}
+
+	// no row owns this object
+	g_ful.vu.unitchg();
+
+	// update the limits
+	g_lim.unitchg();
+
+	calculate();
+    }
+
+    /*
+       actions to do when user manipulates an input range element
+
+       ir:  input range element reference
+       lp:  global load point variable
+    */
+
+    function user_input_range(ir, lp)
+    {
+	eval(lp).vu.num = ir.valueAsNumber;
+	calculate();
+    }
+
+    /* update the value cells in the table */
+
+    function update_cells()
+    {
+	for (i = 0; i < rows.length; i++) {
+	    if (rows[i].celli !== null) {
+		document.getElementById(rows[i].celli).innerHTML = rows[i].iresult();
+	    }
+	    document.getElementById(rows[i].cellr).innerHTML = rows[i].result();
+	}
+    }
+
+
+    /* take in an arbitrary number of value_unit objects and calculate their mass */
+
+    function calc_mass(args)
+    {
+	var i, mass = 0;
+
+	for (i = 0; i < arguments.length; i++) {
+	    mass += arguments[i].vu.getmass();
+	}
+
+	return mass;
+    }
+
+    /* calculate and add moment to given the object */
+
+    function calc_moment(o)
+    {
+	o.moment = o.arm * o.vu.getmass();
+    }
 
     /*
       Checks if given point (x,y) is inside the mass and balance envelope.
@@ -912,7 +918,29 @@ table.a td {
 	calculate();
     }
 
-    // initialize everything when the document has been loaded
+
+    function handle_settings_change(t)
+    {
+	switch(t.value) {
+	case "save":
+	    save_settings();
+	    break;
+	case "reset":
+	    reset_settings();
+	    break;
+	case "clear":
+	    clear_settings();
+	    break;
+	default:
+	    return;
+	    break;
+	}
+
+	// return the selector to default index
+	t.selectedIndex = 0;
+    }
+
+   // initialize everything when the document has been loaded
     window.onload = setup;
 
 </script>
@@ -924,10 +952,13 @@ table.a td {
   
   <h1>Blah OH-FOO</h1>
   
-  <button type="button" title="Saves the current numbers as default values in your browser." 
-	  onclick="save_settings()">Save settings</button>
-  <button type="button" title="Clears the saved default settings from your browser."
-	  onclick="clear_settings()">Clear settings</button>
+  <select id="settings_select" onchange="handle_settings_change(this)">
+    <option value="title">Settings</option>
+    <option value="save" >Save</option>
+    <option value="reset">Reset</option>
+    <option value="clear">Clear</option>
+  </select>
+
   <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
 
   <p> </p>
@@ -938,9 +969,9 @@ table.a td {
 	<th style="width:225px;color:red;" id="reminder"></th>
 	<th style="width:75px;text-align:center;">Input</th>
 	<th style="text-align:center;">
-	  <select id="units" onchange="handle_unit_change(this)">
-	    <option selected="selected">kg & litre</option>
-	    <option>lbs & usg</option>
+	  <select id="units_select" onchange="handle_unit_change(this)">
+	    <option value="kg_litre" selected>kg & litre</option>
+	    <option value="lb_usg">lbs & usg</option>
 	  </select>
 	</th>
 	<th style="width:75px;text-align:center;" id="mass_title">Mass</th>
