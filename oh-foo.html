@@ -736,7 +736,7 @@ table.a td {
 	g_lw.vu.num = calc_mass(g_ful, g_fs, g_bs, g_bagg, g_bw);
 
 	// endurance
-	g_endr.vu.num = (g_fuel.vu.num / g_ff.vu.num) * 60.0; // minutes
+	g_endr.vu.num = ((g_fuel.vu.num - g_taxi.vu.num) / g_ff.vu.num) * 60.0; // minutes
 
 	// compute the moment values for each load point
 	calc_moment(g_bw);
