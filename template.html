@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator scratchpad
+    Mass and balance calculator for OH-DEMO
 
     https://github.com/kaltsi/Mass-and-Balance
 
@@ -1049,7 +1049,7 @@ table.a td {
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["mlm"][g_defs.s.lang] + 
+	    w.textContent = lang["mlm"][g_defs.s.lang] + " " +
 		(g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
 
