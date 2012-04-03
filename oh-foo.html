@@ -70,19 +70,21 @@ table.a td {
     /* defaults and storage object */
 
     var g_defs = {
-	acft      : "OH-FOO", // aircraft registration
-	bew       : 697.5,    // basic empty weight
-	ltr2kg    : 0.721,    // 1 ltr -> kg
-	usg2lb    : 6,        // 1 usg -> lb
-	s : { // These are the default values for this plane
-	    fseat : 150,
-	    bseat : 75,
-	    fuel  : 143,
-	    bagg  : 20,
-	    taxi  : 5,
-	    fflow : 38,
-	    time  : 60,
-	    lang  : 0       // English
+	acft      : "OH-FOO",         // aircraft registration
+	acft_type : "Generic A000-Z", // aircraft type
+	bew       : 697.5,            // basic empty weight
+	ltr2kg    : 0.721,            // 1 ltr -> kg
+	usg2lb    : 6,                // 1 usg -> lb
+	s : { // These are the default slider values for this plane
+	    fseat : 150,   // front seat load
+	    bseat : 75,    // back seat load
+	    fuel  : 143,   // fuel in litres
+	    bagg  : 20,    // baggage area load
+	    taxi  : 5,     // taxi fuel
+	    fflow : 38,    // fuel flow
+	    time  : 60,    // flight time
+	    mass  : 0,     // 0 = kg, 1 = lb
+	    lang  : 0      // 0 = English, 1 = Suomi
 	},
 	debug : false,
     };
@@ -206,6 +208,36 @@ table.a td {
 	else {
 	    return this.num + " " + this.unit;
 	}
+    }
+
+    /* 
+       return the SI value (used for saving defaults)
+    */
+
+    value_unit.prototype.get_si = function v_si()
+    {
+	var m = this.num;
+
+	if (g_mass_unit == "kg") {
+	    return m;
+	}
+
+	switch (this.unit) {
+	case "usg":
+	    m = m * (1/g_ltr_usg);
+	    break;
+	case "lb":
+	    m = m * (1/g_kg_lbs);
+	    break;
+	case "qrt":
+	    // TODO XXX implement this
+	case "ltr":
+	case "kg":
+	case "min":
+	    // fall through
+	    break;
+	}
+	return m;
     }
 
     /* 
@@ -509,19 +541,19 @@ table.a td {
 	return a;
     }
 
-    /* refresh a row's content */
-
-    function refresh(row)
-    {
-	document.getElementById(row.id).innerHTML = row.content();
-    }
-
     /* actions to do when the units change */
 
     non_interactive_row.prototype.unitchg = function ni_update()
     {
 	this.lp.vu.unitchg();
 	refresh(this);
+    }
+
+    /* refresh a row's content */
+
+    function refresh(row)
+    {
+	document.getElementById(row.id).innerHTML = row.content();
     }
 
     /* access localstorage */
@@ -545,6 +577,7 @@ table.a td {
 	    /* do language setting chores */
 	    refresh_selectors();
 	    refresh_svg_texts();
+	    document.getElementById("units_select").selectedIndex = g_defs.s.mass;
 	    document.getElementById("lang_select").selectedIndex = g_defs.s.lang;
 	    document.getElementById("settings_select").selectedIndex = g_defs.s.lang;
 	}
@@ -555,12 +588,25 @@ table.a td {
     function save_settings()
     {
 	if (typeof(Storage) !== "undefined") {
-	    var saveables = [g_fs.vu.num, g_bs.vu.num, g_fuel.vu.num, g_bagg.vu.num,
-		g_taxi.vu.num, g_ff.vu.num, g_ftme.vu.num, true];
+	    /* The order of saveables is important!
+
+               Normalize the masses to kg before saving.
+             */
+	    var savevalues = [
+		g_fs.vu.get_si(),
+		g_bs.vu.get_si(),
+		g_fuel.vu.get_si(),
+		g_bagg.vu.get_si(),
+		g_taxi.vu.get_si(),
+		g_ff.vu.get_si(),
+		g_ftme.vu.num,
+		(g_mass_unit=="kg"?0:1),
+		g_defs.s.lang
+	    ];
 	    
 	    var i = 0;
 	    for (var n in g_defs.s) {
-		localStorage.setItem("kaltsi.mb." + g_defs.acft + "." + n, Number(saveables[i]));
+		localStorage.setItem("kaltsi.mb." + g_defs.acft + "." + n, Number(savevalues[i]));
 		i++;
 	    }
 	    document.getElementById("reminder_cell").
@@ -615,6 +661,11 @@ table.a td {
 
 	refresh_title_row();
 
+	// update some static elements
+	document.getElementById("doc_title").textContent=g_defs.acft + " M&B";
+	document.getElementById("ac_type_hdr").textContent=g_defs.acft_type + " " + g_defs.acft;
+	document.getElementById("ac_reg").textContent=g_defs.acft;
+
 	/*
          All these are created global, since I'm not using 'var'.
          The variable name must be the same as the id.
@@ -662,7 +713,14 @@ table.a td {
 	document.getElementById("settings_select").selectedIndex = 0;
 
 	draw_limits_svg();
+
 	calculate();
+
+	// if the mass has been updated from its default value of 0
+	if (g_defs.s.mass == 1) {
+	    var t = { value:"lb_usg" };
+	    handle_unit_change(t);
+	}
     }
 
     /* crunch the numbers */
@@ -808,8 +866,6 @@ table.a td {
 
     function handle_unit_change(t)
     {
-	var i = 0;
-
 	switch (t.value) {
 	case "kg_litre":
 	    g_mass_unit = "kg";
@@ -825,7 +881,7 @@ table.a td {
 	refresh_title_row();
 
 	// request unit change from all rows
-	for (i = 0; i < rows.length; i++) {
+	for (var i = 0; i < rows.length; i++) {
 	    rows[i].unitchg();
 	}
 
@@ -1056,12 +1112,12 @@ table.a td {
 
 </script>
 
-<title>OH-FOO m&amp;b</title>
+<title id="doc_title">Page title</title>
 
 </head>
 <body>
   
-  <h1>Blah OH-FOO</h1>
+  <h1 id="ac_type_hdr">NO AIRCRAFT TYPE SET</h1>
   
   <select id="settings_select" onchange="handle_settings_change(this)">
     <option id="select_settings_title" value="title" disabled>Settings</option>
@@ -1132,7 +1188,7 @@ table.a td {
     </g>
 
     <text id="ac_reg" x="50%" y="50%" font-size="80"
-	  style="opacity:0.15;text-anchor:middle;">OH-FOO</text>
+	  style="opacity:0.15;text-anchor:middle;">NO-REG</text>
 
   </svg>
 
