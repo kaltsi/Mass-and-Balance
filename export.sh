@@ -11,4 +11,7 @@ files=$(eval ls {$sources}.html)
 
 mkdir -p $export_dir
 
+export LC_CTYPE=C
 git archive --format=tar HEAD $files | (cd $export_dir && tar xf -)
+
+echo Exported $files to $export_dir
