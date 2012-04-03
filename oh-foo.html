@@ -542,8 +542,9 @@ table.a td {
 		}
 	    }
 
-	    // initialize the selectors to the correct index
+	    /* do language setting chores */
 	    refresh_selectors();
+	    refresh_svg_texts();
 	    document.getElementById("lang_select").selectedIndex = g_defs.s.lang;
 	    document.getElementById("settings_select").selectedIndex = g_defs.s.lang;
 	}
@@ -564,7 +565,7 @@ table.a td {
 	    }
 	    document.getElementById("reminder_cell").
 	    textContent=(g_defs.s.lang == 0?
-			 "Saved these settings as default":
+			 "Saved these settings":
 			 "Asetukset tallennettu");
 	    setTimeout("remove_reminder()", 3000);
 	}
@@ -765,6 +766,17 @@ table.a td {
 	}
     }
 
+    /* set the correct language */
+
+    function refresh_svg_texts()
+    {
+	document.getElementById("takeoff_text").textContent=
+	    (g_defs.s.lang == 0?"- Take-off":"- Lentoonlähtö");
+
+	document.getElementById("landing_text").textContent=
+	    (g_defs.s.lang == 0?"- Landing":"- Lasku");
+    }
+
     /* change all the language strings */
     
     function handle_lang_change(t)
@@ -787,11 +799,7 @@ table.a td {
 	    refresh(rows[i]);
 	}
 
-	document.getElementById("takeoff_text").textContent=
-	    (g_defs.s.lang == 0?"- Take-off":"- Lentoonlähtö");
-
-	document.getElementById("landing_text").textContent=
-	    (g_defs.s.lang == 0?"- Landing":"- Lasku");
+	refresh_svg_texts();
 
 	calculate();
     }
@@ -810,7 +818,8 @@ table.a td {
 	    g_mass_unit = "lb";
 	    break;
 	default:
-	    alert("this.selectedIndex");
+	    return;
+	    break;
 	}
 
 	refresh_title_row();
@@ -1072,7 +1081,7 @@ table.a td {
   <table border="1" class="a" id="table1">
     <tbody>
       <tr>
-	<th style="width:225px;color:red;" id="reminder_cell"></th>
+	<th style="color:red;" id="reminder_cell"></th>
 	<th style="width:75px;text-align:center;" id="input_cell">Input</th>
 	<th style="text-align:center;">
 	  <select id="units_select" onchange="handle_unit_change(this)">
@@ -1080,7 +1089,7 @@ table.a td {
 	    <option id="units_lb_usg" value="lb_usg">lbs & usg</option>
 	  </select>
 	</th>
-	<th style="width:75px;text-align:center;" id="mass_title">Mass</th>
+	<th style="text-align:center;" id="mass_title">Mass</th>
       </tr>
     </tbody>
   </table>
