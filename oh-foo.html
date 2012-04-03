@@ -69,7 +69,22 @@ table.a td {
     var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
     var g_mass_unit     = "kg";       // default in kilos
 
-    var g_debug         = false;      // global debug switch
+    /* defaults and storage object */
+    g_defs = {
+	bew   : 697.5,
+	acft  : "oh-foo",
+	s : {
+	    fseat : 150,
+	    bseat : 75,
+	    fuel  : 143,
+	    bagg  : 20,
+	    taxi  : 5,
+	    fflow : 38,
+	    time  : 60,
+	    saved : false
+	},
+	debug : false,
+    };
 
     /* mass and balance envelope limits (metres and kilos) */
     
@@ -121,7 +136,6 @@ table.a td {
 	this.min_mass = Math.min.apply(Math, this.y);
 	this.max_mass = Math.max.apply(Math, this.y);
     }
-
 
     /* convert given moment arm value to the new range fitting the svg drawing area */
 
@@ -502,6 +516,57 @@ table.a td {
 	document.getElementById(this.id).innerHTML = this.content();
     }
 
+    /* access localstorage */
+
+    function load_defaults()
+    {
+
+	if (typeof(Storage) !== "undefined") {
+	    var ac = g_defs.acft;
+	    var i;
+
+	    if (localStorage.getItem("kaltsi.mb." + ac + ".saved") == 1) {
+		setTimeout("load_reminder()", 100);
+	    }
+
+	    for (var n in g_defs.s) {
+		i = localStorage.getItem("kaltsi.mb." + ac + "." + n);
+		if (i !== null)
+		    g_defs.s[n] = Number(i);
+	    }
+	}
+    }
+
+    /* save to localstorage */
+
+    function save_settings()
+    {
+	if (typeof(Storage) !== "undefined") {
+	    var ac = g_defs.acft;
+	    var saveables = [g_fs.vu.num, g_bs.vu.num, g_fuel.vu.num, g_bagg.vu.num,
+		g_taxi.vu.num, g_ff.vu.num, g_ftme.vu.num, true];
+
+	    var i = 0;
+	    for (var n in g_defs.s) {
+		localStorage.setItem("kaltsi.mb." + ac + "." + n, Number(saveables[i]));
+		i++;
+	    }
+	    document.getElementById("reminder").innerText="Saved these settings as default";
+	    setTimeout("remove_reminder()", 3000);
+	}
+    }
+
+    /* clear the localstorage */
+    function clear_settings()
+    {
+	if (typeof(Storage) !== "undefined") {
+	    localStorage.clear();
+
+	    document.getElementById("reminder").innerText="Cleared your default settings";
+	    setTimeout("remove_reminder()", 3000);
+	}
+    }
+
     /* initialize everything when the page is loaded */
 
     function setup()
@@ -511,32 +576,28 @@ table.a td {
 	// set the unit name correctly
  	document.getElementById("mass_title").innerText = "Mass (" + g_mass_unit + ")";
 
-	/* TODO implement this stuff
-	if (typeof(Storage) !== "undefined") {
-	    var t = setTimeout("load_reminder()", 1000);
-	}
-        */
+	load_defaults();
 
 	/*
          All these are created global, since I'm not using 'var'.
          The variable name must be the same as the id.
 
         */
-	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  697.5,  0,  -697.5,  0.970);
-	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  150,    25, -200,    0.940);
-	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  150,    0,  -200,    1.850);
-	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", 143,    0,   143,    1.170, 0.1);
-	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  54,     0,   54,     2.440);
-	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", 5,      0,  -20,     1.170, 0.1);
+	g_bw   = new l_point("g_bw",   "Basic weight",  "kg",  g_defs.bew,    0,  -1,  0.970);
+	g_fs   = new l_point("g_fs",   "Front seat",    "kg",  g_defs.s.fseat, 25, -200, 0.940);
+	g_bs   = new l_point("g_bs",   "Back seat",     "kg",  g_defs.s.bseat, 0,  -200, 1.850);
+	g_fuel = new l_point("g_fuel", "Fuel",          "ltr", g_defs.s.fuel,  0,   143, 1.170, 0.1);
+	g_bagg = new l_point("g_bagg", "Baggage",       "kg",  g_defs.s.bagg,  0,   54,  2.440);
+	g_taxi = new l_point("g_taxi", "Taxi fuel",     "ltr", g_defs.s.taxi,  0,  -20,  1.170, 0.1);
 	g_tow  = new l_point("g_tow",  "Take-off mass", "kg",  0,      0,   1156,   1);
 	g_lw   = new l_point("g_lw",   "Landing mass",  "kg",  0,      0,   1156,   1);
 	g_endr = new l_point("g_endr", "Endurance",     "min", 0,      1,  -800,    0);
-	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", 25,     5,  -50,     1, 0.1);
+	g_ff   = new l_point("g_ff",   "Fuel flow/h",   "ltr", g_defs.s.fflow,  5,  -50, 1, 0.1);
 
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
 
-	g_ftme = new l_point("g_ftme", "Flight time",   "min", 60,   1,  -300,  0);
+	g_ftme = new l_point("g_ftme", "Flight time",   "min", g_defs.s.time,   1,  -300,  0);
 
 	// This does not necessarily get a row, but acts just as a calculation object.
 	g_ful = new l_point("g_ful", "Landing fuel",  "ltr", 0, 0, 0, 0);
@@ -568,7 +629,7 @@ table.a td {
 
     function load_reminder()
     {
-	document.getElementById("reminder").innerText="Loaded your default settings.";
+	document.getElementById("reminder").innerText="Loaded your default settings";
 	setTimeout("remove_reminder()", 5000);
     }
 
@@ -696,7 +757,7 @@ table.a td {
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
 
-	if (g_debug) {
+	if (g_defs.debug) {
 	    debug.innerText = g_bw.moment.toFixed(3);
 	    debug.innerText += (" " + g_fs.moment.toFixed(3));
 	    debug.innerText += (" " + g_bs.moment.toFixed(3));
@@ -846,7 +907,7 @@ table.a td {
 
     function toggle_debug()
     {
-	g_debug = !g_debug;
+	g_defs.debug = !g_defs.debug;
 	calculate();
     }
 
@@ -862,9 +923,8 @@ table.a td {
   
   <h1>Blah OH-FOO</h1>
   
-  <button type="button" onclick="calculate()">Calculate</button>
   <button type="button" title="Saves the current numbers as default values in your browser." 
-	  onclick="save_settings()">Save settings</button> <!-- localStorage.clear() -->
+	  onclick="save_settings()">Save settings</button>
   <button type="button" title="Clears the saved default settings from your browser."
 	  onclick="clear_settings()">Clear settings</button>
   <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
