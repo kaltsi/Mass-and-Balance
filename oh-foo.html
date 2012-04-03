@@ -1045,8 +1045,7 @@ table.a td {
 		(g_tow.vu.getmass() - g_tow.max).toFixed(1) +
 		" " + g_mass_unit + "!!";
 
-	    document.getElementById(g_tow.up.cellr).
-	    setAttribute('style', 'color:white; background-color:red;');
+	    tow_warning = 1;
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
@@ -1054,8 +1053,7 @@ table.a td {
 		(g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
 
-	    document.getElementById(g_lw.up.cellr).
-	    setAttribute('style', 'color:white; background-color:red;');
+	    lw_warning = 1;
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
@@ -1065,11 +1063,17 @@ table.a td {
 	    w.setAttribute('fill', "green");
 	    w.textContent = lang["ok"][g_defs.s.lang];
 
-	    document.getElementById(g_tow.up.cellr).
-	    setAttribute('style', 'background-color:none;');
-	    document.getElementById(g_lw.up.cellr).
-	    setAttribute('style', 'background-color:none;');
 	    warning = 0;
+	}
+
+	function check_alert_cell(lp) {
+	    if (lp.vu.getmass() > lp.max) {
+		document.getElementById(lp.up.cellr).
+		setAttribute('style', 'color:white; background-color:red;');
+	    } else {
+		document.getElementById(lp.up.cellr).
+		setAttribute('style', 'background-color:none;');
+	    }
 	}
 
 	if (warning == 1) {
@@ -1077,8 +1081,16 @@ table.a td {
 	    setAttribute('style', 'opacity:0.25;fill:red;text-anchor:middle;');
 
 	    document.getElementById("mb_limits").setAttribute('fill', 'yellow');
+
+	    // recheck tow and lw here so that we can paint both cells
+	    // if necessary
+	    check_alert_cell(g_tow);
+	    check_alert_cell(g_lw);
 	}
 	else {
+	    check_alert_cell(g_tow);
+	    check_alert_cell(g_lw);
+
 	    document.getElementById("ac_reg").
 	    setAttribute('style', 'opacity:0.15;fill:black;text-anchor:middle;');
 	    document.getElementById("mb_limits").setAttribute('fill', 'white');
