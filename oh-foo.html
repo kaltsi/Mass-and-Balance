@@ -74,7 +74,7 @@ table.a td {
 	bew   : 697.5,
 	acft  : "OH-FOO",
 	lang  : 0, // 0 = English
-	s : {
+	d : {    // These are the default values for this plane
 	    fseat : 150,
 	    bseat : 75,
 	    fuel  : 143,
@@ -82,7 +82,15 @@ table.a td {
 	    taxi  : 5,
 	    fflow : 38,
 	    time  : 60,
-	    saved : false
+	},
+	s : {    // These are the saved values
+	    fseat : 0,
+	    bseat : 0,
+	    fuel  : 0,
+	    bagg  : 0,
+	    taxi  : 0,
+	    fflow : 0,
+	    time  : 0,
 	},
 	debug : false,
     };
@@ -521,6 +529,8 @@ table.a td {
 
     function load_defaults()
     {
+	var setup = 1;
+	reset_settings(setup);
 
 	if (typeof(Storage) !== "undefined") {
 	    var i, t = null;
@@ -566,14 +576,24 @@ table.a td {
 
 	    document.getElementById("reminder").innerText="Cleared your default settings";
 	    setTimeout("remove_reminder()", 3000);
+	    document.getElementById("reminder").innerText="Cleared your default settings";
+	    setTimeout("remove_reminder()", 3000);
 	}
     }
 
     /* reset the settings to their default values */
 
-    function reset_settings()
+    function reset_settings(setup)
     {
-	// TODO XXX
+	for (var n in g_defs.d)
+	    g_defs.s[n] = g_defs.d[n];
+
+	if (setup != 1) {
+	    calculate();
+	    document.getElementById("reminder").innerText="Settings reset to default";
+	    setTimeout("remove_reminder()", 3000);
+	}
+
     }
 
     /* initialize everything when the page is loaded */
