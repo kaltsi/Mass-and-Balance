@@ -65,16 +65,16 @@ table.a td {
     var g_kg_lbs        = 2.20462262; // 1 kg  -> lb
     var g_ltr_usg       = 0.26417205; // 1 ltr -> USG
     var g_m_inch        = 39.3700787; // 1 m   -> inches
-    var g_usg_fuel_lb   = 6.0;        // 1 usg = 6 lbs
-    var g_ltr_fuel_kg   = 0.721;      // 1 ltr = 0.721 kg
     var g_mass_unit     = "kg";       // default in kilos
 
     /* defaults and storage object */
-    g_defs = {
-	bew   : 697.5,    // basic empty weight
-	acft  : "OH-FOO", // aircraft registration
-	lang  : 0,        // 0 = English
-	s : {             // These are the default values for this plane
+
+    var g_defs = {
+	acft      : "OH-FOO", // aircraft registration
+	bew       : 697.5,    // basic empty weight
+	ltr2kg    : 0.721,    // 1 ltr -> kg
+	usg2lb    : 6,        // 1 usg -> lb
+	s : { // These are the default values for this plane
 	    fseat : 150,
 	    bseat : 75,
 	    fuel  : 143,
@@ -82,6 +82,7 @@ table.a td {
 	    taxi  : 5,
 	    fflow : 38,
 	    time  : 60,
+	    lang  : 0       // English
 	},
 	debug : false,
     };
@@ -220,15 +221,15 @@ table.a td {
 	switch (this.unit) {
 	case "ltr":
 	    if (g_mass_unit == "kg")
-		m = m * g_ltr_fuel_kg;
+		m = m * g_defs.ltr2kg;
 	    else
-		m = m * g_ltr_fuel_kg * g_kg_lbs;
+		m = m * g_defs.ltr2kg * g_kg_lbs;
 	    break;
 	case "usg":
 	    if (g_mass_unit == "kg")
-		m = m * g_usg_fuel_lb / g_kg_lbs;
+		m = m * g_defs.usg2lb / g_kg_lbs;
 	    else
-		m = m * g_usg_fuel_lb;
+		m = m * g_defs.usg2lb;
 	    break;
 	case "qrt":
 	    // TODO XXX implement this
@@ -343,7 +344,7 @@ table.a td {
 
     interactive_row.prototype.description = function i_descr()
     {
-	var a = '<th>' + this.lp.descr[g_defs.lang];
+	var a = '<th>' + this.lp.descr[g_defs.s.lang];
 
 	if (this.lp.dispmax) 
 	    a += ' (max ' + this.lp.max.toFixed() + ' ' + this.lp.vu.unit +')';
@@ -427,7 +428,7 @@ table.a td {
 	slider.max = this.lp.max;
 	slider.value = this.lp.vu.num;
 
-	document.getElementById(this.id).innerHTML = this.content();
+	refresh(this);
     }
 
     /* 
@@ -450,7 +451,7 @@ table.a td {
 
     non_interactive_row.prototype.description = function ni_descr()
     {
-	var a = '<th>'+ this.lp.descr[g_defs.lang];
+	var a = '<th>'+ this.lp.descr[g_defs.s.lang];
 
 	if (this.lp.dispmax)
 	    a += " (max "+ this.lp.max.toFixed() + " " + this.lp.vu.unit + ")";
@@ -508,12 +509,19 @@ table.a td {
 	return a;
     }
 
+    /* refresh a row's content */
+
+    function refresh(row)
+    {
+	document.getElementById(row.id).innerHTML = row.content();
+    }
+
     /* actions to do when the units change */
 
     non_interactive_row.prototype.unitchg = function ni_update()
     {
 	this.lp.vu.unitchg();
-	document.getElementById(this.id).innerHTML = this.content();
+	refresh(this);
     }
 
     /* access localstorage */
@@ -533,6 +541,11 @@ table.a td {
 		    g_defs.s[n] = Number(i);
 		}
 	    }
+
+	    // initialize the selectors to the correct index
+	    refresh_selectors();
+	    document.getElementById("lang_select").selectedIndex = g_defs.s.lang;
+	    document.getElementById("settings_select").selectedIndex = g_defs.s.lang;
 	}
     }
 
@@ -543,13 +556,16 @@ table.a td {
 	if (typeof(Storage) !== "undefined") {
 	    var saveables = [g_fs.vu.num, g_bs.vu.num, g_fuel.vu.num, g_bagg.vu.num,
 		g_taxi.vu.num, g_ff.vu.num, g_ftme.vu.num, true];
-
+	    
 	    var i = 0;
 	    for (var n in g_defs.s) {
 		localStorage.setItem("kaltsi.mb." + g_defs.acft + "." + n, Number(saveables[i]));
 		i++;
 	    }
-	    document.getElementById("reminder").textContent="Saved these settings as default";
+	    document.getElementById("reminder_cell").
+	    textContent=(g_defs.s.lang == 0?
+			 "Saved these settings as default":
+			 "Asetukset tallennettu");
 	    setTimeout("remove_reminder()", 3000);
 	}
     }
@@ -561,10 +577,29 @@ table.a td {
 	    for (var n in g_defs.s) {
 		localStorage.removeItem("kaltsi.mb." + g_defs.acft + "." + n);
 	    }
-
-	    document.getElementById("reminder").textContent="Cleared your default settings";
+	    
+	    document.getElementById("reminder_cell").
+	    textContent=(g_defs.s.lang == 0?
+			 "Cleared your default settings":
+			 "Asetukset pyyhitty");
 	    setTimeout("remove_reminder()", 3000);
 	}
+    }
+
+    /* update the text on the first row */
+
+    function refresh_title_row()
+    {
+	// correct language
+ 	document.getElementById("input_cell").textContent = 
+	    (g_defs.s.lang == 0?"Input":"Syöte");
+	
+	// set the unit name correctly
+ 	document.getElementById("mass_title").textContent = 
+	    (g_defs.s.lang == 0?
+	     "Mass":
+	     "Massa") + 
+	    " (" + g_mass_unit + ")";
     }
 
     /* initialize everything when the page is loaded */
@@ -573,26 +608,27 @@ table.a td {
     {
 	var i = 0;
 
-	// set the unit name correctly
- 	document.getElementById("mass_title").textContent = "Mass (" + g_mass_unit + ")";
+	// the first thing to do is to load the defaults
 
 	load_defaults();
+
+	refresh_title_row();
 
 	/*
          All these are created global, since I'm not using 'var'.
          The variable name must be the same as the id.
 
         */
-	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],          "kg",  g_defs.bew,    0,  -1,  0.970);
-	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],             "kg",  g_defs.s.fseat, 25, -200, 0.940);
-	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],             "kg",  g_defs.s.bseat, 0,  -200, 1.850);
-	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],                  "ltr", g_defs.s.fuel,  0,   143, 1.170, 0.1);
-	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],          "kg",  g_defs.s.bagg,  0,   54,  2.440);
-	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"],      "ltr", g_defs.s.taxi,  0,  -20,  1.170, 0.1);
-	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lentoonlähtömassa"],  "kg",  0,      0,   1156,   1);
-	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskeutumismassa"],    "kg",  0,      0,   1156,   1);
-	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],          "min", 0,      1,  -800,    0);
-	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"], "ltr", g_defs.s.fflow,  5,  -50, 1, 0.1);
+	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
+	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
+	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
+	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.fuel,  0,   143,  1.170, 0.1);
+	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],     "kg",  g_defs.s.bagg,  0,   54,   2.440);
+	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.taxi,  0,  -20,   1.170, 0.1);
+	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lähtömassa"],    "kg",  0,              0,   1156, 1);
+	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskumassa"],     "kg",  0,              0,   1156, 1);
+	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],     "min", 0,              1,  -800,  0);
+	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"],       "ltr", g_defs.s.fflow, 5,  -50,   1, 0.1);
 
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
@@ -600,7 +636,7 @@ table.a td {
 	g_ftme = new l_point("g_ftme", ["Flight time", "Lentoaika"], "min", g_defs.s.time,   1,  -300,  0);
 
 	// This does not necessarily get a row, but acts just as a calculation object.
-	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"],  "ltr", 0, 0, 0, 0);
+	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"], "ltr", 0, 0, 0, 0);
 
 	rows = [ ];
 	rows.push(new non_interactive_row(g_bw, "reverse"));
@@ -620,7 +656,6 @@ table.a td {
 	    row.id = rows[i].id;
 	    row.innerHTML = rows[i].content();
 	}
-
 
 	// make sure the select element shows the first option
 	document.getElementById("settings_select").selectedIndex = 0;
@@ -684,7 +719,7 @@ table.a td {
 	else {
 	    debug.textContent = "";
 	}
-
+	
 	update_cells();
 	update_svg();
     }
@@ -693,57 +728,74 @@ table.a td {
 
     function load_reminder()
     {
-	document.getElementById("reminder").textContent="Loaded your default settings";
+	document.getElementById("reminder_cell").
+	textContent=(g_defs.s.lang == 0?
+		     "Loaded your default settings":
+		     "Asetukset ladattu");
+	
 	setTimeout("remove_reminder()", 5000);
     }
-
+    
     /* remove the settings reminder */
-
+    
     function remove_reminder()
     {
-	document.getElementById("reminder").textContent="";
+	document.getElementById("reminder_cell").textContent="";
     }
 
+    /* make sure the select elements use the correct language */
+    function refresh_selectors()
+    {
+	var lang = {
+	    "select_settings_title" : ["Settings",
+				       "Asetukset" ],
+	    "select_settings_save"  : ["Save",
+				       "Tallenna" ],
+	    "select_settings_clear" : ["Clear",
+				       "Poista" ],
+	    "units_kg_litre"        : ["kg & litre", "kg & litra"]
+	};
+
+	var x = null;
+	for (var n in lang) {
+	    // update select elements
+	    x = document.getElementById(n);
+	    if (x !== null)
+		x.text = lang[n][g_defs.s.lang];
+	}
+    }
 
     /* change all the language strings */
-
-function handle_lang_change()
-{
-    // TODO XXX
-    var lang = {
-	"select_settings_title" : ["Settings",
-				   "Asetukset" ],
-	"select_settings_save" : ["Save",
-				   "Tallenna" ],
-	"select_settings_clear" : ["Clear",
-				   "Poista" ]
-    };
-
-    var val = document.getElementById("lang_select").value;
     
-    var x = null;
-    switch (val) {
-    case "Suomi":
-	for (var n in lang) {
-	    x = document.getElementById(n);
-	    if (x !== null)
-		x.text = lang[n][1];
+    function handle_lang_change(t)
+    {
+	switch (t.value) {
+	case "Suomi":
+	    g_defs.s.lang = 1;
+	    break;
+	case "English":
+	    g_defs.s.lang = 0;
+	    break;
+	default:
+	    break;
 	}
-	g_defs.lang = 1;
-	break;
-    case "English":
-	for (var n in lang) {
-	    x = document.getElementById(n);
-	    if (x !== null)
-		x.text = lang[n][0];
-	}
-	g_defs.lang = 0;
-	break;
-    default:
-	break;
-    }
-}
 
+	refresh_selectors();
+	refresh_title_row();
+
+	for (i = 0; i < rows.length; i++) {
+	    refresh(rows[i]);
+	}
+
+	document.getElementById("takeoff_text").textContent=
+	    (g_defs.s.lang == 0?"- Take-off":"- Lentoonlähtö");
+
+	document.getElementById("landing_text").textContent=
+	    (g_defs.s.lang == 0?"- Landing":"- Lasku");
+
+	calculate();
+    }
+    
     /* change all numbers and their units */
 
     function handle_unit_change(t)
@@ -761,7 +813,7 @@ function handle_lang_change()
 	    alert("this.selectedIndex");
 	}
 
- 	document.getElementById("mass_title").textContent = "Mass (" + g_mass_unit + ")";
+	refresh_title_row();
 
 	// request unit change from all rows
 	for (i = 0; i < rows.length; i++) {
@@ -801,7 +853,6 @@ function handle_lang_change()
 	    document.getElementById(rows[i].cellr).innerHTML = rows[i].result();
 	}
     }
-
 
     /* take in an arbitrary number of value_unit objects and calculate their mass */
 
@@ -917,35 +968,36 @@ function handle_lang_change()
 		      "YLIPAINOA LASKUSSA"],
 	    "cgaft"  : ["TOO AFT CENTER OF GRAVITY",
 		      "MASSAKESKIPISTE LIIAN TAKANA"],
-	    "ok"     : ["Limits OK", "Kaikki OK"]
+	    "ok"     : ["Limits OK", "Rajat OK"]
 	};
 
 	var warning = 1;
 	var w = document.getElementById("warning_text");
 	if (g_ful.vu.num < g_ful.min) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["nofuel"][g_defs.lang] + "! " +
-		(g_ful.vu.num < 0?"0":g_ful.vu.display(1)) + " " + lang["remain"][g_defs.lang] + "!";
+	    w.textContent = lang["nofuel"][g_defs.s.lang] + "! " +
+		(g_ful.vu.num < 0?"0":g_ful.vu.display(1)) + " " +
+		lang["remain"][g_defs.s.lang] + "!";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) == 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["mtow"][g_defs.lang] + " " +
+	    w.textContent = lang["mtow"][g_defs.s.lang] + " " +
 		(g_tow.vu.getmass() - g_tow.max).toFixed(1) +
 		" " + g_mass_unit + "!!";
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["mlm"][g_defs.lang] + 
+	    w.textContent = lang["mlm"][g_defs.s.lang] + 
 		(g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
 	}
 	else if (warn_limits(g_tow.arm, g_tow.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["cgaft"][g_defs.lang] + "!!";
+	    w.textContent = lang["cgaft"][g_defs.s.lang] + "!!";
 	}
 	else {
 	    w.setAttribute('fill', "green");
-	    w.textContent = lang["ok"][g_defs.lang];
+	    w.textContent = lang["ok"][g_defs.s.lang];
 	    warning = 0;
 	}
 
@@ -970,6 +1022,7 @@ function handle_lang_change()
 	calculate();
     }
 
+    /* user selects an option from settings */
 
     function handle_settings_change(t)
     {
@@ -1007,7 +1060,7 @@ function handle_lang_change()
     <option id="select_settings_clear" value="clear">Clear</option>
   </select>
 
-  <select id="lang_select" onchange="handle_lang_change()">
+  <select id="lang_select" onchange="handle_lang_change(this)">
     <option value="English">English</option>
     <option value="Suomi">Suomi</option>
   </select>
@@ -1019,12 +1072,12 @@ function handle_lang_change()
   <table border="1" class="a" id="table1">
     <tbody>
       <tr>
-	<th style="width:225px;color:red;" id="reminder"></th>
-	<th style="width:75px;text-align:center;">Input</th>
+	<th style="width:225px;color:red;" id="reminder_cell"></th>
+	<th style="width:75px;text-align:center;" id="input_cell">Input</th>
 	<th style="text-align:center;">
 	  <select id="units_select" onchange="handle_unit_change(this)">
-	    <option value="kg_litre" selected>kg & litre</option>
-	    <option value="lb_usg">lbs & usg</option>
+	    <option id="units_kg_litre" value="kg_litre" selected>kg & litre</option>
+	    <option id="units_lb_usg" value="lb_usg">lbs & usg</option>
 	  </select>
 	</th>
 	<th style="width:75px;text-align:center;" id="mass_title">Mass</th>
@@ -1045,10 +1098,10 @@ function handle_lang_change()
 	  fill="green" style="font-weight:bold;">Limits OK</text>
     
     <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
-    <text x="35" y="105">- Take-off</text>
+    <text x="35" y="105" id="takeoff_text">- Take-off</text>
     
     <circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
-    <text x="35" y="130">- Landing</text>
+    <text x="35" y="130" id="landing_text">- Landing</text>
     
     <g transform="scale(1,-1)">
       <g transform="translate(50,-450)">
