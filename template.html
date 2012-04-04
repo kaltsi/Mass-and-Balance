@@ -52,10 +52,6 @@ table.a td {
     float: left;
 }
 
-.aligncenter {
-    float: center;
-}
-
 .alignright {
     float: right;
 }
@@ -85,6 +81,7 @@ table.a td {
 	    bseat : /*BACK_SEAT_LOAD*/    75  /**/,
 	    fuel  : /*FUEL_AMOUNT*/       143 /**/,
 	    bagg  : /*BAGGAGE_AREA_LOAD*/ 20  /**/,
+	    /*EXTRA_SAVEITEMS*/ /**/
 	    taxi  : /*TAXI_FUEL*/         5   /**/,
 	    fflow : /*FUEL_FLOW*/         38  /**/,
 	    time  : 60,    // flight time
@@ -672,26 +669,40 @@ table.a td {
          The variable name must be the same as the id.
 
         */
-	/*LOAD_POINTS*/
+	/*LOAD_POINT_BEW*/
 	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
+	/**/
+	/*LOAD_POINT_FRONT_SEAT*/
 	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
+	/**/
+	/*LOAD_POINT_BACK_SEAT*/
 	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
+	/**/
+	/*LOAD_POINT_FUEL*/
 	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.fuel,  0,   143,  1.170, 0.1);
+	/**/
+	/*LOAD_POINT_BAGGAGE*/
 	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],     "kg",  g_defs.s.bagg,  0,   54,   2.440);
+	/**/
+	/*LOAD_POINT_TAXI_FUEL*/
 	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.taxi,  0,  -20,   1.170, 0.1);
+	/**/
 	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lähtömassa"],    "kg",  0,              0,   1156, 1);
 	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskumassa"],     "kg",  0,              0,   1156, 1);
 	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],     "min", 0,              1,  -800,  0);
+	/*LOAD_POINT_FUEL_FLOW*/
 	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"],       "ltr", g_defs.s.fflow, 5,  -50,   1, 0.1);
+	/**/
 
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
-
+	/*LOAD_POINT_FLIGHT_TIME*/
 	g_ftme = new l_point("g_ftme", ["Flight time", "Lentoaika"], "min", g_defs.s.time,   1,  -300,  0);
+	/**/
 
 	// This does not necessarily get a row, but acts just as a calculation object.
 	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"], "ltr", 0, 0, 0, 0);
-	/**/
+
 	rows = [ ];
 	/*TABLE_ROWS*/
 	rows.push(new non_interactive_row(g_bw, "reverse"));
@@ -735,7 +746,7 @@ table.a td {
 			g_fs,
 			g_bs,
 			g_fuel,
-			 /*EXTRA_WEIGHTS*//**/
+			 /*EXTRA_WEIGHTS*/ /**/
 			g_bagg);
 	g_tow.vu.num -= g_taxi.vu.getmass();
 
@@ -750,7 +761,7 @@ table.a td {
 				g_fs,
 				g_bs,
 				g_bagg,
-				/*EXTRA_WEIGHTS*//**/
+				/*EXTRA_WEIGHTS*/ /**/
 				g_bw);
 
 	// endurance
@@ -762,26 +773,28 @@ table.a td {
 	calc_moment(g_bs);
 	calc_moment(g_bagg);
 	calc_moment(g_taxi);
-	/*EXTRA_MOMENT*//**/
+	/*EXTRA_MOMENT*/ /**/
 	calc_moment(g_fuel);
 
 	// take-off moment arm
-	g_tow.moment = g_bw.moment + 
+	g_tow.moment = 
+	    g_bw.moment + 
 	    g_fs.moment + 
 	    g_bs.moment +
 	    g_bagg.moment + 
-	    /*EXTRA_MOMENT_VAL*//**/
+	    /*EXTRA_MOMENT_VAL*/ /**/
 	    g_fuel.moment - 
 	    g_taxi.moment;
 
 	g_tow.arm = g_tow.moment / g_tow.vu.getmass();
 
 	// landing moment arm
-	g_lw.moment = g_bw.moment + 
+	g_lw.moment = 
+	    g_bw.moment + 
 	    g_fs.moment + 
 	    g_bs.moment +
 	    g_bagg.moment + 
-	    /*EXTRA_MOMENT_VAL*//**/
+	    /*EXTRA_MOMENT_VAL*/ /**/
 	    (g_ful.vu.getmass() * g_fuel.arm);
 
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
@@ -794,7 +807,7 @@ table.a td {
 	    debug.textContent += (" " + g_bagg.moment.toFixed(3));
 	    debug.textContent += (" " + g_taxi.moment.toFixed(3));
 	    debug.textContent += (" " + g_fuel.moment.toFixed(3));
-	    /*EXTRA_DEBUG*//**/
+	    /*EXTRA_DEBUG*/ /**/
 	    debug.textContent += (" tow.arm=" + g_tow.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + g_lw.arm.toFixed(3));
 	    debug.textContent += (" lnd fuel=" + g_ful.vu.display(1));
