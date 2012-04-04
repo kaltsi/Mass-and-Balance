@@ -54,7 +54,8 @@ MASS_DRAW_MAX=375
 
 # These are x-coordinates for the landing limit line.
 # These are needed if the aircraft's MLM < MTOM
-LND_LIMIT_X1=143.09 LND_LIMIT_X2=148.1
+LND_LIMIT_X1=143.09
+LND_LIMIT_X2=148.1
 
 # New load points can be added.
 #
