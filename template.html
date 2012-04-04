@@ -70,7 +70,7 @@ table.a td {
     /* defaults and storage object */
 
     var g_defs = {
-	acft      : "OH-DEMO",         // aircraft registration
+	acft      : "OH-DEMO",        // aircraft registration
 	acft_type : "Generic A000-Z", // aircraft type
 	origin    : "Mass and balance sheet for OH-DEMO 01.01.1970",
 	bew       : 697.5,            // basic empty weight
@@ -724,7 +724,11 @@ table.a td {
     function calculate()
     {
 	// take-off weight
-	g_tow.vu.num = calc_mass(g_bw, g_fs, g_bs, g_fuel, g_bagg);
+	g_tow.vu.num = calc_mass(g_bw,
+			g_fs,
+			g_bs,
+			g_fuel,
+			g_bagg);
 	g_tow.vu.num -= g_taxi.vu.getmass();
 
 	// landing fuel volume
@@ -734,7 +738,11 @@ table.a td {
 	g_ful.min = (g_ff.vu.num * 45.0) / 60.0;
 	
 	// landing weight
-	g_lw.vu.num = calc_mass(g_ful, g_fs, g_bs, g_bagg, g_bw);
+	g_lw.vu.num = calc_mass(g_ful,
+				g_fs,
+				g_bs,
+				g_bagg,
+				g_bw);
 
 	// endurance
 	g_endr.vu.num = ((g_fuel.vu.num - g_taxi.vu.num) / g_ff.vu.num) * 60.0; // minutes
@@ -748,13 +756,22 @@ table.a td {
 	calc_moment(g_fuel);
 
 	// take-off moment arm
-	g_tow.moment = g_bw.moment + g_fs.moment + g_bs.moment +
-	    g_bagg.moment + g_fuel.moment - g_taxi.moment;
+	g_tow.moment = g_bw.moment + 
+	    g_fs.moment + 
+	    g_bs.moment +
+	    g_bagg.moment + 
+	    g_fuel.moment - 
+	    g_taxi.moment;
+
 	g_tow.arm = g_tow.moment / g_tow.vu.getmass();
 
 	// landing moment arm
-	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment +
-	    g_bagg.moment + (g_ful.vu.getmass() * g_fuel.arm);
+	g_lw.moment = g_bw.moment + 
+	    g_fs.moment + 
+	    g_bs.moment +
+	    g_bagg.moment + 
+	    (g_ful.vu.getmass() * g_fuel.arm);
+
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
 	debug = document.getElementById("debug");
@@ -765,7 +782,6 @@ table.a td {
 	    debug.textContent += (" " + g_bagg.moment.toFixed(3));
 	    debug.textContent += (" " + g_taxi.moment.toFixed(3));
 	    debug.textContent += (" " + g_fuel.moment.toFixed(3));
-
 	    debug.textContent += (" tow.arm=" + g_tow.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + g_lw.arm.toFixed(3));
 	    debug.textContent += (" lnd fuel=" + g_ful.vu.display(1));
