@@ -73,18 +73,19 @@ table.a td {
 	acft      : /*ACFT*/             "OH-DEMO"       /**/,
 	acft_type : /*ACFT_TYPE*/        "Generic A000-Z"/**/,
 	origin    : /*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
-	bew       : /*BEW*/              697.5           /**/,
+	/*BASIC_WEIGHT_NAME*/bew/**/ : /*BASIC_WEIGHT*/ 697.5 /**/,
 	ltr2kg    : /*LITRE2KILO*/       0.721           /**/,
 	usg2lb    : /*USG2LB*/           6               /**/,
 	s : { // These are the default slider values for this plane
-	    fseat : /*FRONT_SEAT_LOAD*/   150 /**/,
-	    bseat : /*BACK_SEAT_LOAD*/    75  /**/,
-	    fuel  : /*FUEL_AMOUNT*/       143 /**/,
-	    bagg  : /*BAGGAGE_AREA_LOAD*/ 20  /**/,
-	    /*EXTRA_SAVEITEMS*/ /**/
-	    taxi  : /*TAXI_FUEL*/         5   /**/,
-	    fflow : /*FUEL_FLOW*/         38  /**/,
-	    time  : 60,    // flight time
+	    /*SAVEABLES*/
+	    fseat : /*FRONT_SEAT*/   150 /**/,
+	    bseat : /*BACK_SEAT*/    75  /**/,
+	    fuel  : /*FUEL*/         143 /**/,
+	    bagg  : /*BAGGAGE*/      20  /**/,
+	    taxi  : /*TAXI*/         5   /**/,
+	    fflow : /*FUEL_FLOW*/    38  /**/,
+	    time  : /*FLIGHT_TIME*/  60  /**/,
+	    /**/
 	    mass  : 0,     // 0 = kg, 1 = lb
 	    lang  : 0      // 0 = English, 1 = Suomi
 	},
@@ -669,54 +670,60 @@ table.a td {
          The variable name must be the same as the id.
 
         */
-	/*LOAD_POINT_BEW*/
-	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
-	/**/
-	/*LOAD_POINT_FRONT_SEAT*/
-	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
-	/**/
-	/*LOAD_POINT_BACK_SEAT*/
-	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
-	/**/
-	/*LOAD_POINT_FUEL*/
-	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.fuel,  0,   143,  1.170, 0.1);
-	/**/
-	/*LOAD_POINT_BAGGAGE*/
-	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],     "kg",  g_defs.s.bagg,  0,   54,   2.440);
-	/**/
-	/*LOAD_POINT_TAXI_FUEL*/
-	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.taxi,  0,  -20,   1.170, 0.1);
-	/**/
-	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lähtömassa"],    "kg",  0,              0,   1156, 1);
-	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskumassa"],     "kg",  0,              0,   1156, 1);
-	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],     "min", 0,              1,  -800,  0);
-	/*LOAD_POINT_FUEL_FLOW*/
-	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"],       "ltr", g_defs.s.fflow, 5,  -50,   1, 0.1);
-	/**/
 
+	rows = [ ];
+
+	/*LP_R_BASIC_WEIGHT*/
+	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
+	rows.push(new non_interactive_row(g_bw, "reverse"));
+	/**/
+	/*LP_I_FRONT_SEAT*/
+	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
+	rows.push(new interactive_row(g_fs));
+	/**/
+	/*LP_I_BACK_SEAT*/
+	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
+	rows.push(new interactive_row(g_bs));
+	/**/
+	/*LP_I_FUEL*/
+	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.fuel,  0,   143,  1.170, 0.1);
+	rows.push(new interactive_row(g_fuel));
+	/**/
+	/*LP_I_BAGGAGE*/
+	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],     "kg",  g_defs.s.bagg,  0,   54,   2.440);
+	rows.push(new interactive_row(g_bagg));
+	/**/
+	/*LP_I_TAXI_FUEL*/
+	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.taxi,  0,  -20,   1.170, 0.1);
+	rows.push(new interactive_row(g_taxi));
+	/**/
+	/*LP_N_TOW*/
+	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lähtömassa"],    "kg",  0,              0,   1156, 1);
+	rows.push(new non_interactive_row(g_tow));
+	/**/
+	/*LP_N_LNDW*/
+	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskumassa"],     "kg",  0,              0,   1156, 1);
+	rows.push(new non_interactive_row(g_lw));
+	/**/
+	/*LP_N_ENDURANCE*/
+	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],     "min", 0,              1,  -800,  0);
+	rows.push(new non_interactive_row(g_endr));
+	/**/
+	/*LP_F_FUEL_FLOW*/
+	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"],       "ltr", g_defs.s.fflow, 5,  -50,   1, 0.1);
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
-	/*LOAD_POINT_FLIGHT_TIME*/
+	rows.push(new interactive_row(g_ff));
+	/**/
+
+	/*LP_I_FLIGHT_TIME*/
 	g_ftme = new l_point("g_ftme", ["Flight time", "Lentoaika"], "min", g_defs.s.time,   1,  -300,  0);
+	rows.push(new interactive_row(g_ftme));
 	/**/
 
 	// This does not necessarily get a row, but acts just as a calculation object.
 	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"], "ltr", 0, 0, 0, 0);
 
-	rows = [ ];
-	/*TABLE_ROWS*/
-	rows.push(new non_interactive_row(g_bw, "reverse"));
-	rows.push(new interactive_row(g_fs));
-	rows.push(new interactive_row(g_bs));
-	rows.push(new interactive_row(g_fuel));
-	rows.push(new interactive_row(g_bagg));
-	rows.push(new interactive_row(g_taxi));
-	rows.push(new non_interactive_row(g_tow));
-	rows.push(new non_interactive_row(g_lw));
-	rows.push(new non_interactive_row(g_endr));
-	rows.push(new interactive_row(g_ff));
-	rows.push(new interactive_row(g_ftme));
-	/**/
 	for (i = 0; i < rows.length; i++) {
 	    var row = document.getElementById("table1").insertRow(-1);
 	    row.id = rows[i].id;
