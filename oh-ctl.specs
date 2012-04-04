@@ -1,0 +1,44 @@
+# Comment test
+
+ACFT="OH-CTL"
+ACFT_TYPE="Cessna C172M (180 hp)"
+DATA_ORIGIN="Numbers: OH-CTL mass and balance excel (MIK) 29.07.2010"
+BASIC_WEIGHT=697.5
+LITRE2KILO=0.721
+USG2LB=6
+FRONT_SEAT=150
+BACK_SEAT=75
+FUEL=143
+BAGGAGE=20
+TAXI=5
+FUEL_FLOW=38
+FLIGHT_TIME=60
+
+
+MOMENT_ARMS='[0.890, 0.890, 0.977, 1.202, 1.202, 0.890]'
+TOF_MASS_LIMITS='[680, 885, 1156, 1156, 680, 680]'
+LND_MASS_LIMITS='[680, 885, 1156, 1156, 680, 680]'
+MOM_DRAW_MAX=475
+MASS_DRAW_MAX=375
+LND_LIMIT_X1=143.09
+LND_LIMIT_X2=148.1
+
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 0 -1 0.970
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 25 -200 0.940
+LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 0 -200 1.850
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 0 143 1.170 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 0 54 2.440
+LOAD_POINT=LP_I_TAXI "Taxi#fuel" "Rullauspolttoaine" "ltr" 0 -20 1.170 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1156 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1156 1
+LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 5 -50 1 0.1
+LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 1 -300 0
+
+EXTRA_SAVEITEMS=
+EXTRA_SAVEVALUES=
+EXTRA_WEIGHTS=
+EXTRA_MOMENT=
+EXTRA_MOMENT_VAL=
+EXTRA_DEBUG=
+
