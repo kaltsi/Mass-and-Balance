@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator for OH-DEMO
+    Mass and balance calculator for /*ACFT*/OH-DEMO/**/
 
     https://github.com/kaltsi/Mass-and-Balance
 
@@ -52,6 +52,10 @@ table.a td {
     float: left;
 }
 
+.aligncenter {
+    float: center;
+}
+
 .alignright {
     float: right;
 }
@@ -70,19 +74,19 @@ table.a td {
     /* defaults and storage object */
 
     var g_defs = {
-	acft      : "OH-DEMO",        // aircraft registration
-	acft_type : "Generic A000-Z", // aircraft type
-	origin    : "Mass and balance sheet for OH-DEMO 01.01.1970",
-	bew       : 697.5,            // basic empty weight
-	ltr2kg    : 0.721,            // 1 ltr -> kg
-	usg2lb    : 6,                // 1 usg -> lb
+	acft      : /*ACFT*/             "OH-DEMO"       /**/,
+	acft_type : /*ACFT_TYPE*/        "Generic A000-Z"/**/,
+	origin    : /*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
+	bew       : /*BEW*/              697.5           /**/,
+	ltr2kg    : /*LITRE2KILO*/       0.721           /**/,
+	usg2lb    : /*USG2LB*/           6               /**/,
 	s : { // These are the default slider values for this plane
-	    fseat : 150,   // front seat load
-	    bseat : 75,    // back seat load
-	    fuel  : 143,   // fuel in litres
-	    bagg  : 20,    // baggage area load
-	    taxi  : 5,     // taxi fuel
-	    fflow : 38,    // fuel flow
+	    fseat : /*FRONT_SEAT_LOAD*/   150 /**/,
+	    bseat : /*BACK_SEAT_LOAD*/    75  /**/,
+	    fuel  : /*FUEL_AMOUNT*/       143 /**/,
+	    bagg  : /*BAGGAGE_AREA_LOAD*/ 20  /**/,
+	    taxi  : /*TAXI_FUEL*/         5   /**/,
+	    fflow : /*FUEL_FLOW*/         38  /**/,
 	    time  : 60,    // flight time
 	    mass  : 0,     // 0 = kg, 1 = lb
 	    lang  : 0      // 0 = English, 1 = Suomi
@@ -93,15 +97,15 @@ table.a td {
     /* mass and balance envelope limits (metres and kilos) */
     
     var g_lim = {
-	x          : [0.890, 0.890, 0.977, 1.202, 1.202, 0.890],
-	y          : [680, 885, 1156, 1156, 680, 680],
-	y_land     : [680, 885, 1156, 1156, 680, 680],
-	x_draw_max : 475,
-	y_draw_max : 375,
+	x          : /*MOMENT_ARMS*/     [0.890, 0.890, 0.977, 1.202, 1.202, 0.890] /**/,
+	y          : /*TOW_MASS_LIMITS*/ [680, 885, 1156, 1156, 680, 680]           /**/,
+	y_land     : /*LND_MASS_LIMITS*/ [680, 885, 1156, 1156, 680, 680]           /**/,
+	x_draw_max : /*MOM_DRAW_MAX*/    475 /**/,
+	y_draw_max : /*MASS_DRAW_MAX*/   375 /**/,
 	x_draw_min : 1,
 	y_draw_min : 1,
-	lim_lnd1   : 143.09,  // landing limit x-coord 1
-	lim_lnd2   : 148.1    // landing limit x-coord 2
+	lim_lnd1   : /*LND_LIMIT_X1*/  143.09  /**/,
+	lim_lnd2   : /*LND_LIMIT_X2*/  148.1   /**/
     };
 
     g_lim.min_arm  = Math.min.apply(Math, g_lim.x);
@@ -592,6 +596,7 @@ table.a td {
 		g_bs.vu.get_si(),
 		g_fuel.vu.get_si(),
 		g_bagg.vu.get_si(),
+		/*EXTRA_SAVEVALUES*/ /**/
 		g_taxi.vu.get_si(),
 		g_ff.vu.get_si(),
 		g_ftme.vu.num,
@@ -667,6 +672,7 @@ table.a td {
          The variable name must be the same as the id.
 
         */
+	/*LOAD_POINTS*/
 	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
 	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
 	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
@@ -685,8 +691,9 @@ table.a td {
 
 	// This does not necessarily get a row, but acts just as a calculation object.
 	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"], "ltr", 0, 0, 0, 0);
-
+	/**/
 	rows = [ ];
+	/*TABLE_ROWS*/
 	rows.push(new non_interactive_row(g_bw, "reverse"));
 	rows.push(new interactive_row(g_fs));
 	rows.push(new interactive_row(g_bs));
@@ -698,7 +705,7 @@ table.a td {
 	rows.push(new non_interactive_row(g_endr));
 	rows.push(new interactive_row(g_ff));
 	rows.push(new interactive_row(g_ftme));
-
+	/**/
 	for (i = 0; i < rows.length; i++) {
 	    var row = document.getElementById("table1").insertRow(-1);
 	    row.id = rows[i].id;
@@ -728,6 +735,7 @@ table.a td {
 			g_fs,
 			g_bs,
 			g_fuel,
+			 /*EXTRA_WEIGHTS*//**/
 			g_bagg);
 	g_tow.vu.num -= g_taxi.vu.getmass();
 
@@ -742,6 +750,7 @@ table.a td {
 				g_fs,
 				g_bs,
 				g_bagg,
+				/*EXTRA_WEIGHTS*//**/
 				g_bw);
 
 	// endurance
@@ -753,6 +762,7 @@ table.a td {
 	calc_moment(g_bs);
 	calc_moment(g_bagg);
 	calc_moment(g_taxi);
+	/*EXTRA_MOMENT*//**/
 	calc_moment(g_fuel);
 
 	// take-off moment arm
@@ -760,6 +770,7 @@ table.a td {
 	    g_fs.moment + 
 	    g_bs.moment +
 	    g_bagg.moment + 
+	    /*EXTRA_MOMENT_VAL*//**/
 	    g_fuel.moment - 
 	    g_taxi.moment;
 
@@ -770,6 +781,7 @@ table.a td {
 	    g_fs.moment + 
 	    g_bs.moment +
 	    g_bagg.moment + 
+	    /*EXTRA_MOMENT_VAL*//**/
 	    (g_ful.vu.getmass() * g_fuel.arm);
 
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
@@ -782,6 +794,7 @@ table.a td {
 	    debug.textContent += (" " + g_bagg.moment.toFixed(3));
 	    debug.textContent += (" " + g_taxi.moment.toFixed(3));
 	    debug.textContent += (" " + g_fuel.moment.toFixed(3));
+	    /*EXTRA_DEBUG*//**/
 	    debug.textContent += (" tow.arm=" + g_tow.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + g_lw.arm.toFixed(3));
 	    debug.textContent += (" lnd fuel=" + g_ful.vu.display(1));
@@ -1231,7 +1244,7 @@ table.a td {
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small>$Format: <a href="mailto:kaltsi+github@gmail.com">%an</a> %ci$</small></p>
+    <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> $Format: <a href="mailto:kaltsi+github@gmail.com">%an</a> %ci$</small></p>
       <div style="clear:both;"></div>
     </div>
     

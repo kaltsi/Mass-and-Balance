@@ -1,0 +1,40 @@
+TODO - template tag description file.
+
+
+/*ACFT*/             "OH-DEMO"       /**/,
+/*ACFT_TYPE*/        "Generic A000-Z"/**/,
+/*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
+/*BEW*/              697.5           /**/,
+/*LITRE2KILO*/       0.721           /**/,
+/*USG2LB*/           6               /**/,
+se are the default slider values for this plane
+/*FRONT_SEAT_LOAD*/   150 /**/,
+/*BACK_SEAT_LOAD*/    75  /**/,
+/*FUEL_AMOUNT*/       143 /**/,
+/*BAGGAGE_AREA_LOAD*/ 20  /**/,
+/*TAXI_FUEL*/         5   /**/,
+/*FUEL_FLOW*/         38  /**/,                                              
+
+
+/*MOMENT_ARMS*/     [0.890, 0.890, 0.977, 1.202, 1.202, 0.890] /**/,
+/*TOW_MASS_LIMITS*/ [680, 885, 1156, 1156, 680, 680]           /**/,
+/*LND_MASS_LIMITS*/ [680, 885, 1156, 1156, 680, 680],          /**/
+/*MOM_DRAW_MAX*/    475 /**/,
+/*MASS_DRAW_MAX*/   375 /**/,
+/*LND_LIMIT_X1*/143.09  /**/,
+/*LND_LIMIT_X2*/148.1
+
+/*EXTRA_SAVEVALUES*/ /**/ (must add comma)
+/*EXTRA_WEIGHTS*//**/ (must add comma)
+/*EXTRA_MOMENT*//**/
+/*EXTRA_MOMENT_VAL*//**/ (must add +)
+/*EXTRA_DEBUG*//**/
+
+
+/*LOAD_POINTS*/
+
+/**/
+
+/*TABLE_ROWS*/
+
+/**/
