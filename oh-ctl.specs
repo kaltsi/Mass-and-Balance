@@ -1,28 +1,75 @@
-# Comment test
+# Basic plane info
+#
+# Enter each option without extra spaces between the name and '=' char
 
+# aircraft registration
 ACFT="OH-CTL"
+
+# aircraft type and short description
 ACFT_TYPE="Cessna C172M (180 hp)"
+
+# where the mass and balance numbers come from
 DATA_ORIGIN="Numbers: OH-CTL mass and balance excel (MIK) 29.07.2010"
+
+# aircraft basic weight (kg)
 BASIC_WEIGHT=697.5
+
+# 1 litre fuel weight in kilos
 LITRE2KILO=0.721
+
+# 1 USG fuel weight in pounds
 USG2LB=6
+
+# Front seat default load (kg) SAVEABLE
 FRONT_SEAT=150
+
+# Back seat default load (kg)  SAVEABLE
 BACK_SEAT=75
+
+# Default amount of fuel (litres) SAVEABLE
 FUEL=143
+
+# Default baggage area load (kg) SAVEABLE
 BAGGAGE=20
+
+# Default taxi fuel (litres) SAVEABLE
 TAXI=5
+
+# Default fuel flow (litres/h) SAVEABLE
 FUEL_FLOW=38
+
+# Default flight time SAVEABLE
 FLIGHT_TIME=60
 
 
+# Measurements in metres and kilos
 MOMENT_ARMS='[0.890, 0.890, 0.977, 1.202, 1.202, 0.890]'
 TOF_MASS_LIMITS='[680, 885, 1156, 1156, 680, 680]'
 LND_MASS_LIMITS='[680, 885, 1156, 1156, 680, 680]'
+
+# You may need to tweak these values for the mass and balance diagram
+# to fit nicely
 MOM_DRAW_MAX=475
 MASS_DRAW_MAX=375
-LND_LIMIT_X1=143.09
-LND_LIMIT_X2=148.1
 
+# These are x-coordinates for the landing limit line.
+# These are needed if the aircraft's MLM < MTOM
+LND_LIMIT_X1=143.09 LND_LIMIT_X2=148.1
+
+# New load points can be added.
+#
+# The load points appear in the table in the order they are introduced here.
+#
+# LP_N_xxx = non-interactive load point xxx
+# LP_R_xxx = non-interactive load point xxx, with reversed output cells
+# LP_I_xxx = interactive load point xxx, the default value will be saveable
+# LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
+#
+# Name English Finnish Unit min max moment-arm [step]
+#
+# Substitute all spaces with '#' in the English/Finnish field.
+# The [step] is optional, it sets how discrete steps the sliders take when adjusted.
+#
 LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 0 -1 0.970
 LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 25 -200 0.940
 LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 0 -200 1.850
