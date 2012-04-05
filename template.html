@@ -668,6 +668,9 @@ table.a td {
 	document.getElementById("ac_reg").textContent=g_defs.acft;
 	document.getElementById("origin_text").textContent=g_defs.origin;
 
+	var trs = /*TRANSLATE_X*/50/**/;
+	document.getElementById("translate_group").setAttribute('transform', 'translate(' + trs + ',-450)');
+
 	/*
          All these are created global, since I'm not using 'var'.
          The variable name must be the same as the id.
@@ -780,6 +783,9 @@ table.a td {
 
 	// endurance
 	/*ENDURANCE*/g_endr/**/.vu.num = ((/*FUEL*/g_fuel/**/.vu.num - /*TAXI_FUEL*/g_taxi/**/.vu.num) / /*FUEL_FLOW*/g_ff/**/.vu.num) * 60.0; // minutes
+	if (/*ENDURANCE*/g_endr/**/.vu.num < 0)
+	    /*ENDURANCE*/g_endr/**/.vu.num = 0;
+	    
 
 	// compute the moment values for each load point
 	calc_moment(/*BASIC_WEIGHT*/g_bw/**/);
@@ -850,6 +856,7 @@ table.a td {
     }
 
     /* make sure the select elements use the correct language */
+
     function refresh_selectors()
     {
 	var lang = {
@@ -1245,7 +1252,7 @@ table.a td {
     <text x="35" y="130" id="landing_text">- Landing</text>
     
     <g transform="scale(1,-1)">
-      <g transform="translate(50,-450)">
+      <g id="translate_group" >
 	<polygon id="mb_limits"
 		 points="0,0 1,1"
 		 fill="white"
