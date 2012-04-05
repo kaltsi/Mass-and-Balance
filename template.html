@@ -75,7 +75,7 @@ table.a td {
 	acft_type : /*ACFT_TYPE*/        "Generic A000-Z"/**/,
 	origin    : /*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
 	ltr2kg    : /*LITRE2KILO*/       0.721           /**/,
-	usg2lb    : /*USG2LB*/           6               /**/,
+	usg2lb    : /*USG2LB*/           6.017           /**/,
 	s : { // These are the default slider values for this plane
 	    /*SAVEABLES*/
 	    fseat : 150,
@@ -593,13 +593,13 @@ table.a td {
              */
 	    var savevalues = [
 		/*SAVEABLE_VALUES*/
-		/*FRONT_SEAT*/g_fs/**/.vu.get_si(),
-		/*BACK_SEAT*/g_bs/**/.vu.get_si(),
-		/*FUEL*/g_fuel/**/.vu.get_si(),
-		/*BAGGAGE*/g_bagg/**/.vu.get_si(),
-		/*TAXI*/g_taxi/**/.vu.get_si(),
-		/*FUEL_FLOW*/g_ff/**/.vu.get_si(),
-		/*FLIGHT_TIME*/g_ftme/**/.vu.get_si(),
+		g_fs.vu.get_si(),
+		g_bs.vu.get_si(),
+		g_fuel.vu.get_si(),
+		g_bagg.vu.get_si(),
+		g_taxi.vu.get_si(),
+		g_ff.vu.get_si(),
+		g_ftme.vu.get_si(),
 		/**/
 		(g_mass_unit=="kg"?0:1),
 		g_defs.s.lang
@@ -760,10 +760,10 @@ table.a td {
 	    /*BAGGAGE*/g_bagg/**/,
 	    null
 	);
-	/*TOW*/g_tow/**/.vu.num -= /*TAXI*/g_taxi/**/.vu.getmass();
+	/*TOW*/g_tow/**/.vu.num -= /*TAXI_FUEL*/g_taxi/**/.vu.getmass();
 
 	// landing fuel volume
-	g_ful.vu.num = /*FUEL*/g_fuel/**/.vu.num - (/*FUEL_FLOW*/g_ff/**/.vu.num * /*FLIGHT_TIME*/g_ftme/**/.vu.num) / 60.0 - /*TAXI*/g_taxi/**/.vu.num;
+	g_ful.vu.num = /*FUEL*/g_fuel/**/.vu.num - (/*FUEL_FLOW*/g_ff/**/.vu.num * /*FLIGHT_TIME*/g_ftme/**/.vu.num) / 60.0 - /*TAXI_FUEL*/g_taxi/**/.vu.num;
 
 	// minimum landing fuel (45 mins reserve)
 	g_ful.min = (/*FUEL_FLOW*/g_ff/**/.vu.num * 45.0) / 60.0;
@@ -779,14 +779,14 @@ table.a td {
 	);
 
 	// endurance
-	/*ENDURANCE*/g_endr/**/.vu.num = ((/*FUEL*/g_fuel/**/.vu.num - /*TAXI*/g_taxi/**/.vu.num) / /*FUEL_FLOW*/g_ff/**/.vu.num) * 60.0; // minutes
+	/*ENDURANCE*/g_endr/**/.vu.num = ((/*FUEL*/g_fuel/**/.vu.num - /*TAXI_FUEL*/g_taxi/**/.vu.num) / /*FUEL_FLOW*/g_ff/**/.vu.num) * 60.0; // minutes
 
 	// compute the moment values for each load point
 	calc_moment(/*BASIC_WEIGHT*/g_bw/**/);
 	calc_moment(/*FRONT_SEAT*/g_fs/**/);
 	calc_moment(/*BACK_SEAT*/g_bs/**/);
 	calc_moment(/*BAGGAGE*/g_bagg/**/);
-	calc_moment(/*TAXI*/g_taxi/**/);
+	calc_moment(/*TAXI_FUEL*/g_taxi/**/);
 	calc_moment(/*FUEL*/g_fuel/**/);
 
 	// take-off moment arm
@@ -796,7 +796,7 @@ table.a td {
 	    /*BACK_SEAT*/g_bs/**/.moment +
 	    /*BAGGAGE*/g_bagg/**/.moment + 
 	    /*FUEL*/g_fuel/**/.moment - 
-	    /*TAXI*/g_taxi/**/.moment;
+	    /*TAXI_FUEL*/g_taxi/**/.moment;
 
 	/*TOW*/g_tow/**/.arm = /*TOW*/g_tow/**/.moment / /*TOW*/g_tow/**/.vu.getmass();
 
@@ -816,7 +816,7 @@ table.a td {
 	    debug.textContent += (" " + /*FRONT_SEAT*/g_fs/**/.moment.toFixed(3));
 	    debug.textContent += (" " + /*BACK_SEAT*/g_bs/**/.moment.toFixed(3));
 	    debug.textContent += (" " + /*BAGGAGE*/g_bagg/**/.moment.toFixed(3));
-	    debug.textContent += (" " + /*TAXI*/g_taxi/**/.moment.toFixed(3));
+	    debug.textContent += (" " + /*TAXI_FUEL*/g_taxi/**/.moment.toFixed(3));
 	    debug.textContent += (" " + /*FUEL*/g_fuel/**/.moment.toFixed(3));
 	    debug.textContent += (" tow.arm=" + /*TOW*/g_tow/**/.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + /*LNDW*/g_lw/**/.arm.toFixed(3));
@@ -1232,7 +1232,7 @@ table.a td {
 
     <rect id="svg_border" x="5" y="10" width="1" height="1"
 	  rx="20" ry="20" fill="white"
-	  style="stroke:black;stroke-width:3;opacity:0.75;"
+	  style="stroke:black;stroke-width:3;opacity:0.6;"
 	  filter = "url(#my_shadow_filter)" />
 
     <text id="warning_text" x="20" y="50"
@@ -1273,7 +1273,7 @@ table.a td {
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-    <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> $Format: <a href="mailto:kaltsi+github@gmail.com">%an</a> %ci$</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> $Format: %ci$</small></p>
       <div style="clear:both;"></div>
     </div>
     
