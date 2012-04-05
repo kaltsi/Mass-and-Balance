@@ -3,6 +3,8 @@
 # External variables
 g_code_line=""
 g_saveable=""
+g_saveable_value=""
+g_nonsaveable=""
 
 # name     translation       unit def min max mom   [step]
 #
@@ -35,12 +37,12 @@ function create_lp()
     fi
 
     local save_item=""
-    if [ "${lpname:0:5}" == "LP_I_" ]; then
+    if [ "${lpname:0:5}" == "LP_I_" ] || [ "${lpname:0:5}" == "LP_F_" ]; then
 	save_item=".s"
     fi
 
     # Whatever comes after the first 5 chars
-    local save_name="${lpname:5}"
+    local the_name="${lpname:5}"
 
     g_code_line=""
 
@@ -53,7 +55,7 @@ function create_lp()
     if [ "${lpname:0:5}" == "LP_N_" ] || [ "${lpname:0:5}" == "LP_R_" ]; then
 	g_code_line="$g_code_line ${unit_def},"
     else
-	g_code_line="$g_code_line g_defs${save_item}.${save_name},"
+	g_code_line="$g_code_line g_defs${save_item}.${the_name},"
     fi
 
     g_code_line="$g_code_line ${unit_min}, ${unit_max}, ${mom}"
@@ -69,7 +71,9 @@ function create_lp()
 	g_code_line="$g_code_line ${lpname}.fuel_flow = true;"
     fi
 
-    g_saveable="$save_name : ${unit_def},"
+    g_saveable="$the_name : ${unit_def},"
+    g_saveable_value="$the_name.vu.get_si(),"
+    g_nonsaveable="$the_name"
 }
 
 #create_lp LP_N_BEW "English" "Suomi" "kg" 0 0 -1  1.923 0.1
