@@ -1223,9 +1223,16 @@ table.a td {
   <!-- SVG stuff here -->
 
   <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
+    <filter id = "my_shadow_filter" width = "150%" height = "150%">
+      <feOffset result = "offOut" in = "SourceAlpha" dx = "2" dy = "2"/>
+      <feGaussianBlur result = "blurOut" in = "offOut" stdDeviation = "3"/>
+      <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
+    </filter>
+
     <rect id="svg_border" x="5" y="10" width="1" height="1"
 	  rx="20" ry="20" fill="white"
-	  style="stroke:black;stroke-width:3;opacity:0.75;"/>
+	  style="stroke:black;stroke-width:3;opacity:0.75;"
+	  filter = "url(#my_shadow_filter)" />
 
     <text id="warning_text" x="20" y="50"
 	  fill="green" style="font-weight:bold;">Limits OK</text>
