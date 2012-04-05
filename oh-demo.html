@@ -1,11 +1,16 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator scratchpad
+    Mass and balance calculator for /*ACFT*/OH-DEMO/**/
 
     https://github.com/kaltsi/Mass-and-Balance
 
     Copyright (c) 2012 Juha Kallioinen <kaltsi+github@gmail.com>
+
+    html5slider - a JS implementation of <input type=range> for Firefox 4 and up
+    https://github.com/fryn/html5slider
+
+    Copyright (c) 2010-2011 Frank Yan, <http://frankyan.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +63,278 @@ table.a td {
 
 </style>
 
+<script>
+/*
+    html5slider - a JS implementation of <input type=range> for Firefox 4 and up
+    https://github.com/fryn/html5slider
+
+    Copyright (c) 2010-2011 Frank Yan, <http://frankyan.com>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+*/
+
+    (function() {
+
+	// test for native support
+	var test = document.createElement('input');
+	try {
+	    test.type = 'range';
+	    if (test.type == 'range')
+		return;
+	} catch (e) {
+	    return;
+	}
+	
+	// test for required property support
+	if (!document.mozSetImageElement || !('MozAppearance' in test.style))
+	    return;
+	
+	var scale;
+	var isMac = navigator.platform == 'MacIntel';
+	var thumb = {
+	    radius: isMac ? 9 : 6,
+	    width: isMac ? 22 : 12,
+	    height: isMac ? 16 : 20
+	};
+	var track = '-moz-linear-gradient(top, transparent ' + 
+	    (isMac ?
+	     '6px, #999 6px, #999 7px, #ccc 9px, #bbb 11px, #bbb 12px, transparent 12px' :
+	     '9px, #999 9px, #bbb 10px, #fff 11px, transparent 11px') +
+	    ', transparent)';
+	var styles = {
+	    'min-width': thumb.width + 'px',
+	    'min-height': thumb.height + 'px',
+	    'max-height': thumb.height + 'px',
+	    padding: 0,
+	    border: 0,
+	    'border-radius': 0,
+	    cursor: 'default',
+	    'text-indent': '-999999px' // -moz-user-select: none; breaks mouse capture
+	};
+	var onChange = document.createEvent('HTMLEvents');
+	onChange.initEvent('change', true, false);
+	
+	if (document.readyState == 'loading')
+	    document.addEventListener('DOMContentLoaded', initialize, true);
+	else
+	    initialize();
+
+	function initialize() {
+	    // create initial sliders
+	    Array.forEach(document.querySelectorAll('input[type=range]'), transform);
+	    // create sliders on-the-fly
+	    document.addEventListener('DOMNodeInserted', onNodeInserted, true);
+	}
+
+	function onNodeInserted(e) {
+	    check(e.target);
+	    if (e.target.querySelectorAll)
+		Array.forEach(e.target.querySelectorAll('input'), check);
+	}
+
+	function check(input, async) {
+	    if (input.localName != 'input' || input.type == 'range');
+	    else if (input.getAttribute('type') == 'range')
+		transform(input);
+	    else if (!async)
+		setTimeout(check, 0, input, true);
+	}
+
+	function transform(slider) {
+
+	    var isValueSet, areAttrsSet, isChanged, isClick, prevValue, rawValue, prevX;
+	    var min, max, step, range, value = slider.value;
+	    
+	    // lazily create shared slider affordance
+	    if (!scale) {
+		scale = document.body.appendChild(document.createElement('hr'));
+		style(scale, {
+		    '-moz-appearance': isMac ? 'scale-horizontal' : 'scalethumb-horizontal',
+		    display: 'block',
+		    visibility: 'visible',
+		    opacity: 1,
+		    position: 'fixed',
+		    top: '-999999px'
+		});
+		document.mozSetImageElement('__sliderthumb__', scale);
+	    }
+
+	    // reimplement value and type properties
+	    var getValue = function() { return '' + value; };
+	    var setValue = function setValue(val) {
+		value = '' + val;
+		isValueSet = true;
+		draw();
+		delete slider.value;
+		slider.value = value;
+		slider.__defineGetter__('value', getValue);
+		slider.__defineSetter__('value', setValue);
+	    };
+	    slider.__defineGetter__('value', getValue);
+	    slider.__defineSetter__('value', setValue);
+	    slider.__defineGetter__('type', function() { return 'range'; });
+
+	    // sync properties with attributes
+	    ['min', 'max', 'step'].forEach(function(prop) {
+		if (slider.hasAttribute(prop))
+		    areAttrsSet = true;
+		slider.__defineGetter__(prop, function() {
+		    return this.hasAttribute(prop) ? this.getAttribute(prop) : '';
+		});
+		slider.__defineSetter__(prop, function(val) {
+		    val === null ? this.removeAttribute(prop) : this.setAttribute(prop, val);
+		});
+	    });
+
+	    // initialize slider
+	    slider.readOnly = true;
+	    style(slider, styles);
+	    update();
+
+	    slider.addEventListener('DOMAttrModified', function(e) {
+		// note that value attribute only sets initial value
+		if (e.attrName == 'value' && !isValueSet) {
+		    value = e.newValue;
+		    draw();
+		}
+		else if (~['min', 'max', 'step'].indexOf(e.attrName)) {
+		    update();
+		    areAttrsSet = true;
+		}
+	    }, true);
+	    
+	    slider.addEventListener('mousedown', onDragStart, true);
+	    slider.addEventListener('keydown', onKeyDown, true);
+	    slider.addEventListener('focus', onFocus, true);
+	    slider.addEventListener('blur', onBlur, true);
+	    
+	    function onDragStart(e) {
+		isClick = true;
+		setTimeout(function() { isClick = false; }, 0);
+		if (e.button || !range)
+		    return;
+		var width = parseFloat(getComputedStyle(this, 0).width);
+		var multiplier = (width - thumb.width) / range;
+		if (!multiplier)
+		    return;
+		// distance between click and center of thumb
+		var dev = e.clientX - this.getBoundingClientRect().left - thumb.width / 2 -
+		    (value - min) * multiplier;
+		// if click was not on thumb, move thumb to click location
+		if (Math.abs(dev) > thumb.radius) {
+		    isChanged = true;
+		    this.value -= -dev / multiplier;
+		}
+		rawValue = value;
+		prevX = e.clientX;
+		this.addEventListener('mousemove', onDrag, true);
+		this.addEventListener('mouseup', onDragEnd, true);
+	    }
+	    
+	    function onDrag(e) {
+		var width = parseFloat(getComputedStyle(this, 0).width);
+		var multiplier = (width - thumb.width) / range;
+		if (!multiplier)
+		    return;
+		rawValue += (e.clientX - prevX) / multiplier;
+		prevX = e.clientX;
+		isChanged = true;
+		this.value = rawValue;
+	    }
+	    
+	    function onDragEnd() {
+		this.removeEventListener('mousemove', onDrag, true);
+		this.removeEventListener('mouseup', onDragEnd, true);
+	    }
+	    
+	    function onKeyDown(e) {
+		if (e.keyCode > 36 && e.keyCode < 41) { // 37-40: left, up, right, down
+		    onFocus.call(this);
+		    isChanged = true;
+		    this.value = value + (e.keyCode == 38 || e.keyCode == 39 ? step : -step);
+		}
+	    }
+
+	    function onFocus() {
+		if (!isClick)
+		    this.style.boxShadow = !isMac ? '0 0 0 2px #fb0' :
+		    '0 0 2px 1px -moz-mac-focusring, inset 0 0 1px -moz-mac-focusring';
+	    }
+
+	    function onBlur() {
+		this.style.boxShadow = '';
+	    }
+
+	    // determines whether value is valid number in attribute form
+	    function isAttrNum(value) {
+		return !isNaN(value) && +value == parseFloat(value);
+	    }
+
+	    // validates min, max, and step attributes and redraws
+	    function update() {
+		min = isAttrNum(slider.min) ? +slider.min : 0;
+		max = isAttrNum(slider.max) ? +slider.max : 100;
+		if (max < min)
+		    max = min > 100 ? min : 100;
+		step = isAttrNum(slider.step) && slider.step > 0 ? +slider.step : 1;
+		range = max - min;
+		draw(true);
+	    }
+
+	    // recalculates value property
+	    function calc() {
+		if (!isValueSet && !areAttrsSet)
+		    value = slider.getAttribute('value');
+		if (!isAttrNum(value))
+		    value = (min + max) / 2;;
+		// snap to step intervals (WebKit sometimes does not - bug?)
+		value = Math.round((value - min) / step) * step + min;
+		if (value < min)
+		    value = min;
+		else if (value > max)
+		    value = min + ~~(range / step) * step;
+	    }
+
+	    // renders slider using CSS background ;)
+	    function draw(attrsModified) {
+		calc();
+		if (isChanged && value != prevValue)
+		    slider.dispatchEvent(onChange);
+		isChanged = false;
+		if (!attrsModified && value == prevValue)
+		    return;
+		prevValue = value;
+		var position = range ? (value - min) / range * 100 : 0;
+		var bg = '-moz-element(#__sliderthumb__) ' + position + '% no-repeat, ';
+		style(slider, { background: bg + track });
+	    }
+
+	}
+
+	function style(element, styles) {
+	    for (var prop in styles)
+		element.style.setProperty(prop, styles[prop], 'important');
+	}
+
+    })();
+</script>
+
 <script type="text/javascript">
 
     /*  Some conversion constants */
@@ -70,20 +347,22 @@ table.a td {
     /* defaults and storage object */
 
     var g_defs = {
-	acft      : "OH-DEMO",         // aircraft registration
-	acft_type : "Generic A000-Z", // aircraft type
-	origin    : "Mass and balance sheet for OH-DEMO 01.01.1970",
-	bew       : 697.5,            // basic empty weight
-	ltr2kg    : 0.721,            // 1 ltr -> kg
-	usg2lb    : 6,                // 1 usg -> lb
+	acft      : /*ACFT*/             "OH-DEMO"       /**/,
+	acft_type : /*ACFT_TYPE*/        "Generic A000-Z"/**/,
+	origin    : /*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
+	/*BASIC_WEIGHT_NAME*/bew/**/ : /*BASIC_WEIGHT*/ 697.5 /**/,
+	ltr2kg    : /*LITRE2KILO*/       0.721           /**/,
+	usg2lb    : /*USG2LB*/           6               /**/,
 	s : { // These are the default slider values for this plane
-	    fseat : 150,   // front seat load
-	    bseat : 75,    // back seat load
-	    fuel  : 143,   // fuel in litres
-	    bagg  : 20,    // baggage area load
-	    taxi  : 5,     // taxi fuel
-	    fflow : 38,    // fuel flow
-	    time  : 60,    // flight time
+	    /*SAVEABLES*/
+	    fseat : /*FRONT_SEAT*/   150 /**/,
+	    bseat : /*BACK_SEAT*/    75  /**/,
+	    fuel  : /*FUEL*/         143 /**/,
+	    bagg  : /*BAGGAGE*/      20  /**/,
+	    taxi  : /*TAXI*/         5   /**/,
+	    fflow : /*FUEL_FLOW*/    38  /**/,
+	    time  : /*FLIGHT_TIME*/  60  /**/,
+	    /**/
 	    mass  : 0,     // 0 = kg, 1 = lb
 	    lang  : 0      // 0 = English, 1 = Suomi
 	},
@@ -93,15 +372,15 @@ table.a td {
     /* mass and balance envelope limits (metres and kilos) */
     
     var g_lim = {
-	x          : [0.890, 0.890, 0.977, 1.202, 1.202, 0.890],
-	y          : [680, 885, 1156, 1156, 680, 680],
-	y_land     : [680, 885, 1156, 1156, 680, 680],
-	x_draw_max : 475,
-	y_draw_max : 375,
+	x          : /*MOMENT_ARMS*/     [0.890, 0.890, 0.977, 1.202, 1.202, 0.890] /**/,
+	y          : /*TOF_MASS_LIMITS*/ [680, 885, 1156, 1156, 680, 680]           /**/,
+	y_land     : /*LND_MASS_LIMITS*/ [680, 885, 1156, 1156, 680, 680]           /**/,
+	x_draw_max : /*MOM_DRAW_MAX*/    475 /**/,
+	y_draw_max : /*MASS_DRAW_MAX*/   375 /**/,
 	x_draw_min : 1,
 	y_draw_min : 1,
-	lim_lnd1   : 143.09,  // landing limit x-coord 1
-	lim_lnd2   : 148.1    // landing limit x-coord 2
+	lim_lnd1   : /*LND_LIMIT_X1*/  143.09  /**/,
+	lim_lnd2   : /*LND_LIMIT_X2*/  148.1   /**/
     };
 
     g_lim.min_arm  = Math.min.apply(Math, g_lim.x);
@@ -592,6 +871,7 @@ table.a td {
 		g_bs.vu.get_si(),
 		g_fuel.vu.get_si(),
 		g_bagg.vu.get_si(),
+		/*EXTRA_SAVEVALUES*/ /**/
 		g_taxi.vu.get_si(),
 		g_ff.vu.get_si(),
 		g_ftme.vu.num,
@@ -667,37 +947,59 @@ table.a td {
          The variable name must be the same as the id.
 
         */
-	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
-	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
-	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
-	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.fuel,  0,   143,  1.170, 0.1);
-	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],     "kg",  g_defs.s.bagg,  0,   54,   2.440);
-	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.taxi,  0,  -20,   1.170, 0.1);
-	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lähtömassa"],    "kg",  0,              0,   1156, 1);
-	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskumassa"],     "kg",  0,              0,   1156, 1);
-	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],     "min", 0,              1,  -800,  0);
-	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"],       "ltr", g_defs.s.fflow, 5,  -50,   1, 0.1);
 
+	rows = [ ];
+
+	/*LP_R_BASIC_WEIGHT*/
+	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
+	rows.push(new non_interactive_row(g_bw, "reverse"));
+	/**/
+	/*LP_I_FRONT_SEAT*/
+	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.fseat, 25, -200,  0.940);
+	rows.push(new interactive_row(g_fs));
+	/**/
+	/*LP_I_BACK_SEAT*/
+	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.bseat, 0,  -200,  1.850);
+	rows.push(new interactive_row(g_bs));
+	/**/
+	/*LP_I_FUEL*/
+	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.fuel,  0,   143,  1.170, 0.1);
+	rows.push(new interactive_row(g_fuel));
+	/**/
+	/*LP_I_BAGGAGE*/
+	g_bagg = new l_point("g_bagg", ["Baggage", "Matkatavaratila"],     "kg",  g_defs.s.bagg,  0,   54,   2.440);
+	rows.push(new interactive_row(g_bagg));
+	/**/
+	/*LP_I_TAXI_FUEL*/
+	g_taxi = new l_point("g_taxi", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.taxi,  0,  -20,   1.170, 0.1);
+	rows.push(new interactive_row(g_taxi));
+	/**/
+	/*LP_N_TOW*/
+	g_tow  = new l_point("g_tow",  ["Take-off mass", "Lähtömassa"],    "kg",  0,              0,   1156, 1);
+	rows.push(new non_interactive_row(g_tow));
+	/**/
+	/*LP_N_LNDW*/
+	g_lw   = new l_point("g_lw",   ["Landing mass", "Laskumassa"],     "kg",  0,              0,   1156, 1);
+	rows.push(new non_interactive_row(g_lw));
+	/**/
+	/*LP_N_ENDURANCE*/
+	g_endr = new l_point("g_endr", ["Endurance", "Toiminta-aika"],     "min", 0,              1,  -800,  0);
+	rows.push(new non_interactive_row(g_endr));
+	/**/
+	/*LP_F_FUEL_FLOW*/
+	g_ff   = new l_point("g_ff",   ["Fuel flow/h", "Kulutus/h"],       "ltr", g_defs.s.fflow, 5,  -50,   1, 0.1);
 	// Mark this a fuel flow row - special handling for result cell
 	g_ff.fuel_flow = true;
+	rows.push(new interactive_row(g_ff));
+	/**/
 
+	/*LP_I_FLIGHT_TIME*/
 	g_ftme = new l_point("g_ftme", ["Flight time", "Lentoaika"], "min", g_defs.s.time,   1,  -300,  0);
+	rows.push(new interactive_row(g_ftme));
+	/**/
 
 	// This does not necessarily get a row, but acts just as a calculation object.
 	g_ful = new l_point("g_ful", ["Landing fuel", "Laskupolttoaine"], "ltr", 0, 0, 0, 0);
-
-	rows = [ ];
-	rows.push(new non_interactive_row(g_bw, "reverse"));
-	rows.push(new interactive_row(g_fs));
-	rows.push(new interactive_row(g_bs));
-	rows.push(new interactive_row(g_fuel));
-	rows.push(new interactive_row(g_bagg));
-	rows.push(new interactive_row(g_taxi));
-	rows.push(new non_interactive_row(g_tow));
-	rows.push(new non_interactive_row(g_lw));
-	rows.push(new non_interactive_row(g_endr));
-	rows.push(new interactive_row(g_ff));
-	rows.push(new interactive_row(g_ftme));
 
 	for (i = 0; i < rows.length; i++) {
 	    var row = document.getElementById("table1").insertRow(-1);
@@ -724,7 +1026,12 @@ table.a td {
     function calculate()
     {
 	// take-off weight
-	g_tow.vu.num = calc_mass(g_bw, g_fs, g_bs, g_fuel, g_bagg);
+	g_tow.vu.num = calc_mass(g_bw,
+			g_fs,
+			g_bs,
+			g_fuel,
+			 /*EXTRA_WEIGHTS*/ /**/
+			g_bagg);
 	g_tow.vu.num -= g_taxi.vu.getmass();
 
 	// landing fuel volume
@@ -734,7 +1041,12 @@ table.a td {
 	g_ful.min = (g_ff.vu.num * 45.0) / 60.0;
 	
 	// landing weight
-	g_lw.vu.num = calc_mass(g_ful, g_fs, g_bs, g_bagg, g_bw);
+	g_lw.vu.num = calc_mass(g_ful,
+				g_fs,
+				g_bs,
+				g_bagg,
+				/*EXTRA_WEIGHTS*/ /**/
+				g_bw);
 
 	// endurance
 	g_endr.vu.num = ((g_fuel.vu.num - g_taxi.vu.num) / g_ff.vu.num) * 60.0; // minutes
@@ -745,16 +1057,30 @@ table.a td {
 	calc_moment(g_bs);
 	calc_moment(g_bagg);
 	calc_moment(g_taxi);
+	/*EXTRA_MOMENT*/ /**/
 	calc_moment(g_fuel);
 
 	// take-off moment arm
-	g_tow.moment = g_bw.moment + g_fs.moment + g_bs.moment +
-	    g_bagg.moment + g_fuel.moment - g_taxi.moment;
+	g_tow.moment = 
+	    g_bw.moment + 
+	    g_fs.moment + 
+	    g_bs.moment +
+	    g_bagg.moment + 
+	    /*EXTRA_MOMENT_VAL*/ /**/
+	    g_fuel.moment - 
+	    g_taxi.moment;
+
 	g_tow.arm = g_tow.moment / g_tow.vu.getmass();
 
 	// landing moment arm
-	g_lw.moment = g_bw.moment + g_fs.moment + g_bs.moment +
-	    g_bagg.moment + (g_ful.vu.getmass() * g_fuel.arm);
+	g_lw.moment = 
+	    g_bw.moment + 
+	    g_fs.moment + 
+	    g_bs.moment +
+	    g_bagg.moment + 
+	    /*EXTRA_MOMENT_VAL*/ /**/
+	    (g_ful.vu.getmass() * g_fuel.arm);
+
 	g_lw.arm = g_lw.moment / g_lw.vu.getmass();
 
 	debug = document.getElementById("debug");
@@ -765,7 +1091,7 @@ table.a td {
 	    debug.textContent += (" " + g_bagg.moment.toFixed(3));
 	    debug.textContent += (" " + g_taxi.moment.toFixed(3));
 	    debug.textContent += (" " + g_fuel.moment.toFixed(3));
-
+	    /*EXTRA_DEBUG*/ /**/
 	    debug.textContent += (" tow.arm=" + g_tow.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + g_lw.arm.toFixed(3));
 	    debug.textContent += (" lnd fuel=" + g_ful.vu.display(1));
@@ -898,7 +1224,7 @@ table.a td {
 
     function user_input_range(ir, lp)
     {
-	eval(lp).vu.num = ir.valueAsNumber;
+	eval(lp).vu.num = Number(ir.value);
 	calculate();
     }
 
@@ -1049,7 +1375,7 @@ table.a td {
 	}
 	else if (warn_limits(g_lw.arm, g_lw.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["mlm"][g_defs.s.lang] + 
+	    w.textContent = lang["mlm"][g_defs.s.lang] + " " +
 		(g_lw.vu.getmass() - g_lw.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
 
@@ -1215,7 +1541,7 @@ table.a td {
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 03.04.2012</small></p>
+    <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> $Format: <a href="mailto:kaltsi+github@gmail.com">%an</a> %ci$</small></p>
       <div style="clear:both;"></div>
     </div>
     
