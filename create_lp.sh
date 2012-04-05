@@ -2,9 +2,11 @@
 
 # External variables
 g_code_line=""
+g_code_line_name=""
 g_saveable=""
-g_saveable_value=""
-g_nonsaveable=""
+g_saveable_group=""
+g_saveable_group_value=""
+g_name=""
 
 # name     translation       unit def min max mom   [step]
 #
@@ -45,8 +47,9 @@ function create_lp()
     local the_name="${lpname:5}"
 
     g_code_line=""
+    g_code_line_name="$lpname"
 
-    g_code_line="${lpname}=new l_point(\"${lpname}\","
+    g_code_line="${the_name}=new l_point(\"${the_name}\","
     g_code_line="$g_code_line [$lang_en, $lang_fi],"
     g_code_line="$g_code_line ${unit},"
 
@@ -68,12 +71,12 @@ function create_lp()
 
     if [ "${lpname:0:5}" == "LP_F_" ]; then
 	# fuel flow row
-	g_code_line="$g_code_line ${lpname}.fuel_flow = true;"
+	g_code_line="$g_code_line ${the_name}.fuel_flow = true;"
     fi
 
-    g_saveable="$the_name : ${unit_def},"
-    g_saveable_value="$the_name.vu.get_si(),"
-    g_nonsaveable="$the_name"
+    g_name="$the_name"
+    g_saveable_group="$the_name : ${unit_def},"
+    g_saveable_group_value="$the_name.vu.get_si(),"
 }
 
 #create_lp LP_N_BEW "English" "Suomi" "kg" 0 0 -1  1.923 0.1

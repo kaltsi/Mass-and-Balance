@@ -20,6 +20,7 @@ function create_row()
     local lpname=$1
     local reverse=""
     local non=""
+    local the_name="${lpname:5}"
 
     if [ "${1:0:5}" == "LP_R_" ]; then
 	reverse=", \"reverse\""
@@ -29,5 +30,5 @@ function create_row()
 	non="non_"
     fi
 
-    g_code_line="rows.push(new ${non}interactive_row(${lpname})${reverse});"
+    g_code_line="rows.push(new ${non}interactive_row(${the_name}${reverse}));"
 }
