@@ -47,6 +47,8 @@ cp $INPUT_FILE $WORK_FILE
 
 code_output=""
 saveables=""
+non_saveables=""
+saveable_values=""
 
 while read i; do
     if [[ "${i:0:1}" != "#" ]] && [[ "${i:0:1}" != " " ]] && [[ "${i:0:1}" != '' ]]; then
@@ -59,6 +61,9 @@ while read i; do
 	    code_output="$code_output"$(echo $g_code_line | sed -e "s/#/ /g")"\n"
 	    if [ "${y:0:5}" == "LP_I_" ] ||[ "${y:0:5}" == "LP_F_" ]; then
 		saveables="$saveables$g_saveable\n"
+		saveable_values="$saveable_values$g_saveable_value\n"
+	    else
+		non_saveables="$non_saveables$g_nonsaveable\n"
 	    fi
 	    create_row $y
 	    code_output="$code_output$g_code_line\n"
@@ -71,7 +76,8 @@ done < $WORK_FILE
 
 echo -e $code_output
 echo -e $saveables
-
+echo -e $saveable_values
+echo -e $non_saveables
 exit 0
 
 
