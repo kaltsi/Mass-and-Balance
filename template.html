@@ -74,18 +74,17 @@ table.a td {
 	acft      : /*ACFT*/             "OH-DEMO"       /**/,
 	acft_type : /*ACFT_TYPE*/        "Generic A000-Z"/**/,
 	origin    : /*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
-	/*BASIC_WEIGHT_NAME*/bew/**/ : /*BASIC_WEIGHT*/ 697.5 /**/,
 	ltr2kg    : /*LITRE2KILO*/       0.721           /**/,
 	usg2lb    : /*USG2LB*/           6               /**/,
 	s : { // These are the default slider values for this plane
 	    /*SAVEABLES*/
-	    fseat : /*FRONT_SEAT*/   150 /**/,
-	    bseat : /*BACK_SEAT*/    75  /**/,
-	    fuel  : /*FUEL*/         143 /**/,
-	    bagg  : /*BAGGAGE*/      20  /**/,
-	    taxi  : /*TAXI*/         5   /**/,
-	    fflow : /*FUEL_FLOW*/    38  /**/,
-	    time  : /*FLIGHT_TIME*/  60  /**/,
+	    fseat : 150,
+	    bseat : 75,
+	    fuel  : 143,
+	    bagg  : 20,
+	    taxi  : 5,
+	    fflow : 38,
+	    time  : 60,
 	    /**/
 	    mass  : 0,     // 0 = kg, 1 = lb
 	    lang  : 0      // 0 = English, 1 = Suomi
@@ -235,6 +234,7 @@ table.a td {
 	    break;
 	case "qrt":
 	    // TODO XXX implement this
+	    break;
 	case "ltr":
 	case "kg":
 	case "min":
@@ -448,6 +448,7 @@ table.a td {
 	if (this.lp.step)
 	    a += 'step="' + this.lp.step +'" ';
 	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
+
 	a += this.result();
 	
 	return a;
@@ -598,7 +599,7 @@ table.a td {
 		/*EXTRA_SAVEVALUES*/ /**/
 		g_taxi.vu.get_si(),
 		g_ff.vu.get_si(),
-		g_ftme.vu.num,
+		g_ftme.vu.get_si(),
 		(g_mass_unit=="kg"?0:1),
 		g_defs.s.lang
 	    ];
@@ -675,7 +676,7 @@ table.a td {
 	rows = [ ];
 
 	/*LP_R_BASIC_WEIGHT*/
-	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  g_defs.bew,     0,  -1,    0.970);
+	g_bw   = new l_point("g_bw",   ["Basic weight", "Perusmassa"],     "kg",  697.5,     0,  -1,    0.970);
 	rows.push(new non_interactive_row(g_bw, "reverse"));
 	/**/
 	/*LP_I_FRONT_SEAT*/
@@ -750,12 +751,14 @@ table.a td {
     function calculate()
     {
 	// take-off weight
-	g_tow.vu.num = calc_mass(g_bw,
-			g_fs,
-			g_bs,
-			g_fuel,
-			 /*EXTRA_WEIGHTS*/ /**/
-			g_bagg);
+	g_tow.vu.num = calc_mass(
+	    g_bw,
+	    g_fs,
+	    g_bs,
+	    g_fuel,
+	    /*EXTRA_WEIGHTS*/ /**/
+	    g_bagg
+	);
 	g_tow.vu.num -= g_taxi.vu.getmass();
 
 	// landing fuel volume
@@ -996,8 +999,7 @@ table.a td {
 	var in_envelope = 0;
 	var i, yi, xi, yj, xj;
 	
-	for (i=0; i < g_lim.x.length - 1; j=i++)
-	{
+	for (i=0; i < g_lim.x.length - 1; j=i++) {
 	    xi = g_lim.x[i];
 	    xj = g_lim.x[j];
 	    yi = yarray[i];
@@ -1023,7 +1025,6 @@ table.a td {
 
     function draw_limits_svg()
     {
-	var i;
 	var polygon = "";
 
 	var svg = document.getElementById("svg_main");
@@ -1034,7 +1035,7 @@ table.a td {
 	rct.setAttribute('width',  550);
 	rct.setAttribute('height', 450);
 
-	for (i = 0; i < g_lim.x.length; i++) {
+	for (var i = 0; i < g_lim.x.length; i++) {
 	    polygon += new_mom(g_lim.x[i]) + ',' + new_mass(g_lim.y[i]) + " ";
 	}
 	
