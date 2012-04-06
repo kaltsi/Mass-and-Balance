@@ -35,6 +35,7 @@ table.a {
     border-radius: 4%;
     padding: 10px 10px 10px 10px;
     box-shadow: 3px 3px 5px gray;
+    border-spacing:4px;
 }
 
 table.a th {
@@ -442,12 +443,13 @@ table.a td {
 
 	a += this.iresult();
 
-	a += '<th> <input id="' + this.sldr + '" type="range" min="' + this.lp.min + '" ';
+	a += '<th style="text-align:center;padding-right:0px;"> ';
+	a+=  '<input id="' + this.sldr + '" type="range" min="' + this.lp.min + '" ';
 	a += 'max="' + this.lp.max + '" value="' + this.lp.vu.num +'" ';
 	if (this.lp.step)
 	    a += 'step="' + this.lp.step +'" ';
+	a += 'style="width:97%;" ';
 	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
-
 	a += this.result();
 	
 	return a;
@@ -1198,7 +1200,7 @@ table.a td {
       <tr>
 	<th style="color:red;" id="reminder_cell"></th>
 	<th style="width:75px;text-align:center;" id="input_cell">Input</th>
-	<th style="text-align:center;">
+	<th style="text-align:center;width:175px;">
 	  <select id="units_select" onchange="handle_unit_change(this)">
 	    <option id="units_kg_litre" value="kg_litre" selected>kg & litre</option>
 	    <option id="units_lb_usg" value="lb_usg">lbs & usg</option>
