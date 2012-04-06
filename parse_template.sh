@@ -1,7 +1,10 @@
 #!/bin/bash
 #
 
+debug=0
+
 export LC_CTYPE=C
+
 
 if [ $# -ne 2 ]; then
     echo "Usage $0 template.html aircraft.specs";
@@ -46,7 +49,9 @@ function simple_replace()
 	exit 1
     fi
 
-    echo "Replacing: /$a/ with /$b/"
+    if [ $debug -ne 0 ]; then
+	echo "Replacing: /$a/ with /$b/"
+    fi
     perl -i -pe 'BEGIN{undef $/;} s§/\*'$a'\*/.*?/\*\*/§'"$b"'§smg' $OUTPUT_FILE
 }
 
