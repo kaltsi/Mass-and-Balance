@@ -1,4 +1,4 @@
-# Basic plane info
+# Aircraft spec file
 #
 # Enter each option without extra spaces between the name and '=' char
 
@@ -26,6 +26,9 @@ LND_MASS_LIMITS=[680, 885, 1156, 1156, 680, 680]
 # to fit nicely
 MOM_DRAW_MAX=475
 MASS_DRAW_MAX=375
+
+# This moves the limits drawing horizontally by the given amount
+TRANSLATE_X=50
 
 # These are x-coordinates for the landing limit line.
 # These are needed if the aircraft's MLM < MTOM
