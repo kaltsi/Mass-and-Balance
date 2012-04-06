@@ -2,16 +2,22 @@
 #
 # Script for exporting files to gh-pages
 #
+export LC_CTYPE=C
 
 export_dir=$PWD/gh
 
-sources="index,oh-cox,oh-ctl,oh-esr,oh-pyw,oh-srh"
+sources="index,template"
 
 files=$(eval ls {$sources}.html)
 
 mkdir -p $export_dir
 
-export LC_CTYPE=C
+# Expand the gitvariables
 git archive --format=tar HEAD $files | (cd $export_dir && tar xf -)
 
 echo Exported $files to $export_dir
+
+for spec in $(ls specs/*.specs); do
+    ./parse_template.sh ./gh/template.html $spec ./gh
+done
+

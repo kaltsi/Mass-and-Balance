@@ -1,13 +1,15 @@
 #!/bin/bash
 #
+# template-file aircraft.specs [output_dir]
+#
 
 debug=0
 
 export LC_CTYPE=C
 
 
-if [ $# -ne 2 ]; then
-    echo "Usage $0 template.html aircraft.specs";
+if [ $# -lt 3 ] ; then
+    echo "Usage $0 template aircraft.specs [output_dir]";
     exit 1;
 fi
 
@@ -22,11 +24,30 @@ if [ ! -f $2 ]; then
 
 fi
 
-SPECS_FILE="$2"
-OUTPUT_FILE="$SPECS_FILE.html"
 TEMPLATE_FILE="$1"
+SPECS_FILE_PATH="$2"
+OUTPUT_DIR=""
 
-echo "Handling file: $SPECS_FILE"
+if [ ! -z $3 ]; then
+    OUTPUT_DIR=$3
+fi
+
+SPEC_BASE=$(basename $SPECS_FILE_PATH)
+SPEC_FILE=${SPEC_BASE%.*}
+SPEC_EXT=${SPEC_BASE##*.}
+
+if [ z"$SPEC_EXT" != "zspecs" ]; then
+    echo "Spec file must have .specs extension ($SPEC_EXT)"
+    exit 1
+fi
+
+if [ ! -z "$OUTPUT_DIR" ]; then
+    OUTPUT_FILE="$OUTPUT_DIR/$SPEC_FILE.html"
+else
+    OUTPUT_FILE="$SPEC_FILE.html"
+fi
+
+echo "Handling file: $SPECS_FILE_PATH"
 
 # load point creation
 source ./create_lp.sh
@@ -55,6 +76,7 @@ function simple_replace()
     perl -i -pe 'BEGIN{undef $/;} s§/\*'$a'\*/.*?/\*\*/§'"$b"'§smg' $OUTPUT_FILE
 }
 
+# the modifications will be done on the output file
 cp $TEMPLATE_FILE $OUTPUT_FILE
 
 code_output=""
@@ -89,7 +111,7 @@ while read i; do
 	fi
 
    fi
-done < $SPECS_FILE
+done < $SPECS_FILE_PATH
 
 simple_replace "REPLACE_TABLE_ROWS" "$code_output"
 
