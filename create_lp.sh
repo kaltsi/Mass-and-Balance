@@ -7,6 +7,20 @@ g_saveable=""
 g_saveable_group=""
 g_saveable_group_value=""
 g_name=""
+g_extra_mass=""
+
+# These are the known load points. Anything else is considered user-added.
+declare -a known=("BASIC_WEIGHT" "FRONT_SEAT" "FUEL" "BAGGAGE" "TAXI_FUEL" "TOW" "LNDW" "ENDURANCE" "FUEL_FLOW" "FLIGHT_TIME")
+
+# Checks if a string is in the array
+in_array() {
+    local hay needle=$1
+    shift
+    for hay; do
+        [[ $hay == $needle ]] && return 0
+    done
+    return 1
+}
 
 # name     translation       unit def min max mom   [step]
 #
@@ -77,6 +91,10 @@ function create_lp()
     g_name="$the_name"
     g_saveable_group="$the_name : ${unit_def},"
     g_saveable_group_value="$the_name.vu.get_si(),"
+
+    # check if this was an unknown load point
+    g_extra_mass=""
+    in_array "$the_name" "${known[@]}" || g_extra_mass=$the_name
 }
 
 #create_lp LP_N_BEW "English" "Suomi" "kg" 0 0 -1  1.923 0.1
