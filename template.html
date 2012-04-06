@@ -328,7 +328,7 @@ table.a td {
 	acft_type : /*ACFT_TYPE*/        "Generic A000-Z"/**/,
 	origin    : /*DATA_ORIGIN*/      "Mass and balance sheet for OH-DEMO 01.01.1970"/**/,
 	ltr2kg    : /*LITRE2KILO*/       0.721           /**/,
-	usg2lb    : /*USG2LB*/           6.017           /**/,
+	usg2lb    : 0, // will be computed at setup()
 	s : { // These are the default slider values for this plane
 	    /*SAVEABLES*/
 	    g_fs    : 150,
@@ -909,7 +909,10 @@ table.a td {
     {
 	var i = 0;
 
-	// the first thing to do is to load the defaults
+	// calculate the 1 usg fuel -> lb constant
+	g_defs.usg2lb = (1 / g_ltr_usg) * g_kg_lbs * g_defs.ltr2kg;
+
+	// the load the default values for the sliders
 
 	load_defaults();
 
