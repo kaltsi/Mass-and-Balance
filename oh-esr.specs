@@ -5,13 +5,13 @@
 #
 
 # aircraft registration
-ACFT="OH-CTL"
+ACFT="OH-ESR"
 
 # aircraft type and short description
-ACFT_TYPE="Cessna C172M (180 hp)"
+ACFT_TYPE="Cirrus SR20"
 
 # where the mass and balance numbers come from
-DATA_ORIGIN="Numbers: OH-CTL mass and balance excel (MIK) 29.07.2010"
+DATA_ORIGIN="Numbers: OH-ESR mass and balance excel sheet (ESMO) 18.06.2011"
 
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.721
@@ -20,14 +20,14 @@ LITRE2KILO=0.721
 USG2LB=6.017
 
 # Measurements in metres and kilos
-MOMENT_ARMS=[0.890, 0.890, 0.977, 1.202, 1.202, 0.890]
-TOF_MASS_LIMITS=[680, 885, 1156, 1156, 680, 680]
-LND_MASS_LIMITS=[680, 885, 1156, 1156, 680, 680]
+MOMENT_ARMS=[3.52298, 3.58140, 3.66014, 3.75920, 3.76174, 3.74396, 3.67284, 3.52298]
+TOF_MASS_LIMITS=[957.07990, 1221.97784, 1360.77711, 1360.77711, 1315.41787, 1165.73239, 957.07990, 957.07990]
+LND_MASS_LIMITS=[957.07990, 1221.97784, 1315.41787, 1315.41787, 1315.41787, 1165.73239, 957.07990, 957.07990]
 
 # You may need to tweak these values for the mass and balance diagram
 # to fit nicely
-MOM_DRAW_MAX=475
-MASS_DRAW_MAX=375
+MOM_DRAW_MAX=510
+MASS_DRAW_MAX=390
 
 # This moves the limits drawing horizontally by the given amount
 TRANSLATE_X=50
@@ -56,14 +56,14 @@ LND_LIMIT_X2=148.1
 #
 # The following names are fixed. You can't change the names, but you can rearrange them.
 
-LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 697.5 0 -1 0.970
-LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -200 0.940
-LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 75 0 -200 1.850
-LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 143 0 143 1.170 0.1
-LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 20 0 54 2.440
-LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 1.170 0.1
-LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1156 1
-LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1156 1
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 973.41 0 -1 3.56616
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 180 25 -200 3.64490
+LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 90 0 -200 4.57200
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 100 0 211.4 3.93446 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 30 0 54 5.28320
+LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 3.93446 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1360.77711 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1315.41787 1
 LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
 LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 38 5 -50 1 0.1
 LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
