@@ -113,11 +113,14 @@ create_extra_mass()
     done
 }
 
-create_extra_mass "$extra_masses"
 
-simple_replace "EXTRA_CALC_MASS" "$extra_calc_mass"
-simple_replace "EXTRA_MASS_CALC_MOMENTS" "$extra_mass_calc_moments"
-simple_replace "EXTRA_MASS_MOMENTS" "$extra_mass_moments"
+if [ "z" != z"$extra_masses" ]; then 
+    create_extra_mass "$extra_masses"
+
+    simple_replace "EXTRA_CALC_MASS" "$extra_calc_mass"
+    simple_replace "EXTRA_MASS_CALC_MOMENTS" "$extra_mass_calc_moments"
+    simple_replace "EXTRA_MASS_MOMENTS" "$extra_mass_moments"
+fi
 
 echo "Output file is: $OUTPUT_FILE"
 
