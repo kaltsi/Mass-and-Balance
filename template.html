@@ -1341,8 +1341,6 @@ table.a td {
 	    w.textContent = lang["mtow"][g_defs.s.lang] + " " +
 		(/*TOW*/g_tow/**/.vu.getmass() - /*TOW*/g_tow/**/.max).toFixed(1) +
 		" " + g_mass_unit + "!!";
-
-	    tow_warning = 1;
 	}
 	else if (warn_limits(/*LNDW*/g_lw/**/.arm, /*LNDW*/g_lw/**/.vu.getmass(), g_lim.y_land) == 0) {
 	    w.setAttribute('fill', "red");
@@ -1350,9 +1348,12 @@ table.a td {
 		(/*LNDW*/g_lw/**/.vu.getmass() - /*LNDW*/g_lw/**/.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
 
-	    lw_warning = 1;
 	}
 	else if (warn_limits(/*TOW*/g_tow/**/.arm, /*TOW*/g_tow/**/.vu.getmass(), g_lim.y) < 0) {
+	    w.setAttribute('fill', "red");
+	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
+	}
+	else if (warn_limits(/*LNDW*/g_lw/**/.arm, /*LNDW*/g_lw/**/.vu.getmass(), g_lim.y_land) < 0) {
 	    w.setAttribute('fill', "red");
 	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
 	}
