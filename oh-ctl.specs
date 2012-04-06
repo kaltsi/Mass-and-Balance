@@ -29,10 +29,10 @@ MASS_DRAW_MAX=375
 # This moves the limits diagram horizontally by the given amount.
 TRANSLATE_X=50
 
-# These are x-coordinates for the landing limit line.
+# These are moment-arms of the x-coordinates of the landing limit.
 # These are needed if the aircraft's MLM < MTOM
-LND_LIMIT_X1=143.09
-LND_LIMIT_X2=148.1
+LND_LIMIT_X1=0.850
+LND_LIMIT_X2=1.202
 
 # New load points can be added.
 #
@@ -51,11 +51,12 @@ LND_LIMIT_X2=148.1
 #
 # The [step] is optional, it sets how discrete steps the slider takes when adjusted.
 #
-# The following names are fixed. You can't change the names, but you can rearrange them.
+# The following names are fixed. You can't change these names, but you can rearrange them.
+# You can also remove the back seat row.
 
 LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 697.5 0 -1 0.970
-LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -200 0.940
-LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 75 0 -200 1.850
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 0.940
+LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 75 0 -250 1.850
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 143 0 143 1.170 0.1
 LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 20 0 54 2.440
 LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 1.170 0.1
@@ -65,11 +66,16 @@ LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
 LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 38 5 -50 1 0.1
 LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
 
-# Add your extra load points below following the scheme from above
+# Add your extra load points following the scheme from above
 #
-# It makes sense to add only new mass load points, so the unit has to be "kg".
+# Each load point must have a unique name.
+#
+# It makes sense to add only new interactive points, because you can adjust their loading,
+# which then affects the take-off and landing masses.
+# The mass unit has to be "kg".
 #
 # For example:
+#
 # An interactive point, named "Test point", values in kg, default=50, min=10, max=100,
 # moment-arm=1.5, slider-step=0.1
 # LOAD_POINT=LP_I_YOUR_POINT "Test#point" "Testi#piste" "kg" 50 10 100 1.5 0.1
