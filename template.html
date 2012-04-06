@@ -79,14 +79,12 @@ table.a td {
 	s : { // These are the default slider values for this plane
 	    /*SAVEABLES*/
 	    g_fs    : 150,
-	    g_bs    : 75,
 	    g_fuel  : 143,
 	    g_bagg  : 20,
 	    g_taxi  : 5,
 	    g_ff    : 38,
 	    g_ftme  : 60,
 	    /**/
-	    /*EXTRA_SAVEABLES*//**/
 	    mass  : 0,     // 0 = kg, 1 = lb
 	    lang  : 0      // 0 = English, 1 = Suomi
 	},
@@ -595,7 +593,6 @@ table.a td {
 	    var savevalues = [
 		/*SAVEABLE_VALUES*/
 		g_fs.vu.get_si(),
-		g_bs.vu.get_si(),
 		g_fuel.vu.get_si(),
 		g_bagg.vu.get_si(),
 		g_taxi.vu.get_si(),
@@ -687,9 +684,6 @@ table.a td {
 	g_fs   = new l_point("g_fs",   ["Front seat", "Etupenkki"],        "kg",  g_defs.s.g_fs, 25, -200,  0.940);
 	rows.push(new interactive_row(g_fs));
 
-	g_bs   = new l_point("g_bs",   ["Back seat", "Takapenkki"],        "kg",  g_defs.s.g_bs, 0,  -200,  1.850);
-	rows.push(new interactive_row(g_bs));
-
 	g_fuel = new l_point("g_fuel", ["Fuel", "Polttoaine"],             "ltr", g_defs.s.g_fuel,  0,   143,  1.170, 0.1);
 	rows.push(new interactive_row(g_fuel));
 
@@ -748,10 +742,9 @@ table.a td {
 	/*TOW*/g_tow/**/.vu.num = calc_mass(
 	    /*BASIC_WEIGHT*/g_bw/**/,
 	    /*FRONT_SEAT*/g_fs/**/,
-	    /*BACK_SEAT*/g_bs/**/,
 	    /*FUEL*/g_fuel/**/,
 	    /*BAGGAGE*/g_bagg/**/,
-	    /**//**/
+	    /*EXTRA_CALC_MASS*//**/
 	    null
 	);
 	/*TOW*/g_tow/**/.vu.num -= /*TAXI_FUEL*/g_taxi/**/.vu.getmass();
@@ -766,9 +759,9 @@ table.a td {
 	/*LNDW*/g_lw/**/.vu.num = calc_mass(
 	    g_lnd_fuel,
 	    /*FRONT_SEAT*/g_fs/**/,
-	    /*BACK_SEAT*/g_bs/**/,
 	    /*BAGGAGE*/g_bagg/**/,
 	    /*BASIC_WEIGHT*/g_bw/**/,
+	    /*EXTRA_CALC_MASS*//**/
 	    null
 	);
 
@@ -781,17 +774,17 @@ table.a td {
 	// compute the moment values for each load point
 	calc_moment(/*BASIC_WEIGHT*/g_bw/**/);
 	calc_moment(/*FRONT_SEAT*/g_fs/**/);
-	calc_moment(/*BACK_SEAT*/g_bs/**/);
 	calc_moment(/*BAGGAGE*/g_bagg/**/);
 	calc_moment(/*TAXI_FUEL*/g_taxi/**/);
 	calc_moment(/*FUEL*/g_fuel/**/);
+	/*EXTRA_MASS_CALC_MOMENTS*//**/
 
 	// take-off moment arm
 	/*TOW*/g_tow/**/.moment = 
 	    /*BASIC_WEIGHT*/g_bw/**/.moment + 
 	    /*FRONT_SEAT*/g_fs/**/.moment + 
-	    /*BACK_SEAT*/g_bs/**/.moment +
-	    /*BAGGAGE*/g_bagg/**/.moment + 
+	    /*BAGGAGE*/g_bagg/**/.moment +
+	    /*EXTRA_MASS_MOMENTS*//**/
 	    /*FUEL*/g_fuel/**/.moment - 
 	    /*TAXI_FUEL*/g_taxi/**/.moment;
 
@@ -801,8 +794,8 @@ table.a td {
 	/*LNDW*/g_lw/**/.moment = 
 	    /*BASIC_WEIGHT*/g_bw/**/.moment + 
 	    /*FRONT_SEAT*/g_fs/**/.moment + 
-	    /*BACK_SEAT*/g_bs/**/.moment +
 	    /*BAGGAGE*/g_bagg/**/.moment + 
+	    /*EXTRA_MASS_MOMENTS*//**/
 	    (g_lnd_fuel.vu.getmass() * /*FUEL*/g_fuel/**/.arm);
 
 	/*LNDW*/g_lw/**/.arm = /*LNDW*/g_lw/**/.moment / /*LNDW*/g_lw/**/.vu.getmass();
@@ -811,7 +804,6 @@ table.a td {
 	if (g_defs.debug) {
 	    debug.textContent = /*BASIC_WEIGHT*/g_bw/**/.moment.toFixed(3);
 	    debug.textContent += (" " + /*FRONT_SEAT*/g_fs/**/.moment.toFixed(3));
-	    debug.textContent += (" " + /*BACK_SEAT*/g_bs/**/.moment.toFixed(3));
 	    debug.textContent += (" " + /*BAGGAGE*/g_bagg/**/.moment.toFixed(3));
 	    debug.textContent += (" " + /*TAXI_FUEL*/g_taxi/**/.moment.toFixed(3));
 	    debug.textContent += (" " + /*FUEL*/g_fuel/**/.moment.toFixed(3));
