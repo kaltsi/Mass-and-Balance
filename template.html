@@ -1242,20 +1242,19 @@ table.a td {
 
     function warn_limits(x, y, yarray)
     {
-	var j = g_lim.x.length - 2;
+	var j = g_lim.x.length - 1;
 	var in_envelope = 0;
 	var i, yi, xi, yj, xj;
 	
-	for (i=0; i < g_lim.x.length - 1; j=i++) {
+	for (i=0; i < g_lim.x.length; j=i++) {
 	    xi = g_lim.x[i];
 	    xj = g_lim.x[j];
 	    yi = yarray[i];
 	    yj = yarray[j];
 	    
 	    if ( ((yi > y) != (yj > y)))  {
-		if (x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
-		    in_envelope = 1;
-		}
+		if (x < ((xj - xi) * (y - yi) / (yj - yi) + xi))
+		    in_envelope = (in_envelope==1?0:1);
 	    }
 	}
 
@@ -1324,8 +1323,8 @@ table.a td {
 		      "YLIPAINOA LENTOONLÄHDÖSSÄ"],
 	    "mlm"    : ["LANDING OVERWEIGHT",
 		      "YLIPAINOA LASKUSSA"],
-	    "cgaft"  : ["TOO AFT CENTER OF GRAVITY",
-		      "MASSAKESKIPISTE LIIAN TAKANA"],
+	    "cgbust" : ["CENTER OF GRAVITY OUT OF BOUNDS",
+		      "MASSAKESKIPISTE RAJOJEN ULKOPUOLELLA"],
 	    "ok"     : ["Limits OK", "Rajat OK"]
 	};
 
@@ -1355,7 +1354,7 @@ table.a td {
 	}
 	else if (warn_limits(/*TOW*/g_tow/**/.arm, /*TOW*/g_tow/**/.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
-	    w.textContent = lang["cgaft"][g_defs.s.lang] + "!!";
+	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
 	}
 	else {
 	    w.setAttribute('fill', "green");
