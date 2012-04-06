@@ -16,20 +16,17 @@ DATA_ORIGIN="Numbers: OH-CTL mass and balance excel (MIK) 29.07.2010"
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.721
 
-# 1 USG fuel weight in pounds
-USG2LB=6.017
-
 # Measurements in metres and kilos
 MOMENT_ARMS=[0.890, 0.890, 0.977, 1.202, 1.202, 0.890]
 TOF_MASS_LIMITS=[680, 885, 1156, 1156, 680, 680]
 LND_MASS_LIMITS=[680, 885, 1156, 1156, 680, 680]
 
 # You may need to tweak these values for the mass and balance diagram
-# to fit nicely
+# to fit nicely inside the bounding rectangle.
 MOM_DRAW_MAX=475
 MASS_DRAW_MAX=375
 
-# This moves the limits drawing horizontally by the given amount
+# This moves the limits diagram horizontally by the given amount.
 TRANSLATE_X=50
 
 # These are x-coordinates for the landing limit line.

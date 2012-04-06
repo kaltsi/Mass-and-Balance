@@ -16,20 +16,17 @@ DATA_ORIGIN="Numbers: OH-ESR mass and balance excel sheet (ESMO) 18.06.2011"
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.721
 
-# 1 USG fuel weight in pounds
-USG2LB=6.017
-
 # Measurements in metres and kilos
 MOMENT_ARMS=[3.52298, 3.58140, 3.66014, 3.75920, 3.76174, 3.74396, 3.67284, 3.52298]
 TOF_MASS_LIMITS=[957.07990, 1221.97784, 1360.77711, 1360.77711, 1315.41787, 1165.73239, 957.07990, 957.07990]
 LND_MASS_LIMITS=[957.07990, 1221.97784, 1315.41787, 1315.41787, 1315.41787, 1165.73239, 957.07990, 957.07990]
 
 # You may need to tweak these values for the mass and balance diagram
-# to fit nicely
+# to fit nicely inside the bounding rectangle.
 MOM_DRAW_MAX=510
 MASS_DRAW_MAX=390
 
-# This moves the limits drawing horizontally by the given amount
+# This moves the limits diagram horizontally by the given amount.
 TRANSLATE_X=50
 
 # These are x-coordinates for the landing limit line.
