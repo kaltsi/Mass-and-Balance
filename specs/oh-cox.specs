@@ -29,25 +29,7 @@ MASS_DRAW_MAX=375
 # This moves the limits diagram horizontally by the given amount.
 TRANSLATE_X=50
 
-# New load points can be added.
-#
-# The load points appear in the table in the order they are introduced below.
-#
-# LP_N_xxx = non-interactive load point xxx
-# LP_R_xxx = non-interactive load point xxx, with reversed output cells
-# LP_I_xxx = interactive load point xxx, the default value will be saveable
-# LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
-#
-# Name English Finnish unit default min max moment-arm [step]
-#
-# If the max value is a negative value, it is not printed out in the description.
-#
-# Substitute all spaces with '#' in the English/Finnish field.
-#
-# The [step] is optional, it sets how discrete steps the slider takes when adjusted.
-#
-# The following names are fixed. You can't change these names, but you can rearrange them.
-# You can also remove the back seat row.
+# load points
 
 LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 562 0 -1 0.770
 LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 85 25 -200 0.990

@@ -29,30 +29,7 @@ MASS_DRAW_MAX=375
 # This moves the limits diagram horizontally by the given amount.
 TRANSLATE_X=50
 
-# These are moment-arms of the x-coordinates of the landing limit.
-# These are needed if the aircraft's MLM < MTOM
-LND_LIMIT_X1=0.850
-LND_LIMIT_X2=1.202
-
-# New load points can be added.
-#
-# The load points appear in the table in the order they are introduced below.
-#
-# LP_N_xxx = non-interactive load point xxx
-# LP_R_xxx = non-interactive load point xxx, with reversed output cells
-# LP_I_xxx = interactive load point xxx, the default value will be saveable
-# LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
-#
-# Name English Finnish unit default min max moment-arm [step]
-#
-# If the max value is a negative value, it is not printed out in the description.
-#
-# Substitute all spaces with '#' in the English/Finnish field.
-#
-# The [step] is optional, it sets how discrete steps the slider takes when adjusted.
-#
-# The following names are fixed. You can't change these names, but you can rearrange them.
-# You can also remove the back seat row.
+# load points
 
 LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 697.5 0 -1 0.970
 LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 0.940
@@ -66,16 +43,3 @@ LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
 LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 38 5 -50 1 0.1
 LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
 
-# Add your extra load points following the scheme from above
-#
-# Each load point must have a unique name.
-#
-# It makes sense to add only new interactive points, because you can adjust their loading,
-# which then affects the take-off and landing masses.
-# The mass unit has to be "kg".
-#
-# For example:
-#
-# An interactive point, named "Test point", values in kg, default=50, min=10, max=100,
-# moment-arm=1.5, slider-step=0.1
-# LOAD_POINT=LP_I_YOUR_POINT "Test#point" "Testi#piste" "kg" 50 10 100 1.5 0.1
