@@ -335,7 +335,6 @@ table.a td {
 BACK_SEAT : 0,
 FUEL : 70.0,
 BAGGAGE : 10,
-FAIRINGS : 0,
 TAXI_FUEL : 5,
 FUEL_FLOW : 25,
 FLIGHT_TIME : 60,
@@ -851,7 +850,6 @@ FLIGHT_TIME : 60,
 BACK_SEAT.vu.get_si(),
 FUEL.vu.get_si(),
 BAGGAGE.vu.get_si(),
-FAIRINGS.vu.get_si(),
 TAXI_FUEL.vu.get_si(),
 FUEL_FLOW.vu.get_si(),
 FLIGHT_TIME.vu.get_si(),
@@ -947,8 +945,6 @@ FUEL=new l_point("FUEL", ["Fuel", "Polttoaine"], "ltr", g_defs.s.FUEL, 0, 148.0,
 rows.push(new interactive_row(FUEL));
 BAGGAGE=new l_point("BAGGAGE", ["Baggage", "Matkatavaratila"], "kg", g_defs.s.BAGGAGE, 0, 30, 3.650);
 rows.push(new interactive_row(BAGGAGE));
-FAIRINGS=new l_point("FAIRINGS", ["Wheel fairings (no/yes)", "Muotosuojat (ei/kyllä)"], "kg", g_defs.s.FAIRINGS, -3.75, 0, 2.24, 3.75);
-rows.push(new interactive_row(FAIRINGS));
 TAXI_FUEL=new l_point("TAXI_FUEL", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.TAXI_FUEL, 0, -20, 2.630, 0.1);
 rows.push(new interactive_row(TAXI_FUEL));
 TOW=new l_point("TOW", ["Take-off mass", "Lähtömassa"], "kg", 0, 0, 1150, 1);
@@ -997,7 +993,6 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    FUEL,
 	    BAGGAGE,
 	    BACK_SEAT,
-FAIRINGS,
 
 	    null
 	);
@@ -1016,7 +1011,6 @@ FAIRINGS,
 	    BAGGAGE,
 	    BASIC_WEIGHT,
 	    BACK_SEAT,
-FAIRINGS,
 
 	    null
 	);
@@ -1034,7 +1028,6 @@ FAIRINGS,
 	calc_moment(TAXI_FUEL);
 	calc_moment(FUEL);
 	calc_moment(BACK_SEAT);
-calc_moment(FAIRINGS);
 
 
 	// take-off moment arm
@@ -1043,7 +1036,6 @@ calc_moment(FAIRINGS);
 	    FRONT_SEAT.moment + 
 	    BAGGAGE.moment +
 	    BACK_SEAT.moment +
-FAIRINGS.moment +
 
 	    FUEL.moment - 
 	    TAXI_FUEL.moment;
@@ -1056,7 +1048,6 @@ FAIRINGS.moment +
 	    FRONT_SEAT.moment + 
 	    BAGGAGE.moment + 
 	    BACK_SEAT.moment +
-FAIRINGS.moment +
 
 	    (g_lnd_fuel.vu.getmass() * FUEL.arm);
 
@@ -1070,7 +1061,6 @@ FAIRINGS.moment +
 	    debug.textContent += (" " + TAXI_FUEL.moment.toFixed(3));
 	    debug.textContent += (" " + FUEL.moment.toFixed(3));
 	    debug.textContent += (" " + BACK_SEAT.moment.toFixed(3));
-debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
 
 	    debug.textContent += (" tow.arm=" + TOW.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + LNDW.arm.toFixed(3));
@@ -1532,7 +1522,7 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2012-04-07 23:33:25 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2012-04-07 23:39:26 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     
