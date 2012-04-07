@@ -371,7 +371,7 @@ FLIGHT_TIME : 60,
 	function convert(a, m) {
 	    var i;
 	    for (i = 0; i < a.length; i++) {
-		a[i] = a[i] * m;
+		a[i] = (100000.0 * a[i] * m) / 100000.0;
 	    }
 	}
 
@@ -480,10 +480,10 @@ FLIGHT_TIME : 60,
 
 	switch (this.unit) {
 	case "usg":
-	    m = m * (1/g_ltr_usg);
+	    m = (100000.0 * m * (1/g_ltr_usg)) / 100000.0;
 	    break;
 	case "lb":
-	    m = m * (1/g_kg_lbs);
+	    m = (100000.0 * m * (1/g_kg_lbs)) / 100000.0;
 	    break;
 	case "qrt":
 	    // TODO XXX implement this
@@ -510,15 +510,15 @@ FLIGHT_TIME : 60,
 	switch (this.unit) {
 	case "ltr":
 	    if (g_mass_unit == "kg")
-		m = m * g_defs.ltr2kg;
+		m = (100000.0 * m * g_defs.ltr2kg) / 100000.0;
 	    else
-		m = m * g_defs.ltr2kg * g_kg_lbs;
+		m = (100000.0 * m * g_defs.ltr2kg * g_kg_lbs) / 100000.0;
 	    break;
 	case "usg":
 	    if (g_mass_unit == "kg")
-		m = m * g_defs.usg2lb / g_kg_lbs;
+		m = (100000.0 * m * g_defs.usg2lb / g_kg_lbs) / 100000.0;
 	    else
-		m = m * g_defs.usg2lb;
+		m = (100000.0 * m * g_defs.usg2lb) / 100000.0;
 	    break;
 	case "qrt":
 	    // TODO XXX implement this
@@ -549,31 +549,31 @@ FLIGHT_TIME : 60,
 	var that = this; // inner function trick
 	var update_min_max = function(m, a) {
  	    if (that.lp) {
-		that.lp.min = that.lp.min * m;
-		that.lp.max = that.lp.max * m;
-		that.lp.arm = that.lp.arm * a;
+		that.lp.min = (100000.0 * that.lp.min * m) / 100000.0;
+		that.lp.max = (100000.0 * that.lp.max * m) / 100000.0;
+		that.lp.arm = (100000.0 * that.lp.arm * a) / 100000.0;
 	    }
 	}
 
 	switch (this.unit) {
 	case "kg":
 	    this.unit  = "lb";
-	    this.num = this.num * g_kg_lbs;
+	    this.num = (100000.0 * this.num * g_kg_lbs) / 100000.0;
 	    update_min_max(g_kg_lbs, g_m_inch);
 	    break;
 	case "lb":
 	    this.unit = "kg";
-	    this.num = this.num / g_kg_lbs;
+	    this.num = (100000.0 * this.num / g_kg_lbs) / 100000.0;
 	    update_min_max(1/g_kg_lbs, 1/g_m_inch);
 	    break;
 	case "ltr":
 	    this.unit = "usg";
-	    this.num = this.num * g_ltr_usg;
+	    this.num = (100000.0 * this.num * g_ltr_usg) / 100000.0;
 	    update_min_max(g_ltr_usg, g_m_inch);
 	    break;
 	case "usg":
 	    this.unit = "ltr";
-	    this.num = this.num / g_ltr_usg;
+	    this.num = (100000.0 * this.num / g_ltr_usg) / 100000.0;
 	    update_min_max(1/g_ltr_usg, 1/g_m_inch);
 	    break;
 	case "qrt":
@@ -719,6 +719,70 @@ FLIGHT_TIME : 60,
 	slider.max = this.lp.max;
 	slider.value = this.lp.vu.num;
 
+	refresh(this);
+    }
+
+
+    /* 
+      a table row with interactive checkbox elements
+
+      lp:    load point object
+     */
+
+    function cbox_interactive_row(lp)
+    {
+	this.lp    = lp;
+	this.id    = this.lp.id;
+	this.celli = null;  // checkbox is here, can't be interactive cell id
+	this.cellr = this.lp.id + "c2";  // result cell id
+	this.cbox  = this.lp.id + "ck";  // checkbox element id
+    }
+    
+    /* return the descriptive name for the row (first cell) */
+
+    cbox_interactive_row.prototype.description = function i_cdescr()
+    {
+	var a = '<th>' + this.lp.descr[g_defs.s.lang] + '</th>';
+	return a;
+    }
+
+    /* return the result value of this row (last cell) */
+
+    cbox_interactive_row.prototype.result = function ic_result()
+    {
+	var a = '<td id="' + this.cellr + '">';
+	a += this.lp.vu.getmass(1);
+	a += '</td>';
+	return a;
+    }
+
+    /* generate content for the whole row */
+
+    cbox_interactive_row.prototype.content = function ic_content()
+    {
+	var chk = (this.lp.max == this.lp.vu.num?"checked":"");
+
+	var a = this.description();
+
+	a += '<td style="background-color:yellow;text-align:center;" id="' + this.celli + '">';
+ 	a += '<input id="' + this.cbox + '" type="checkbox" ' + chk + ' ' +
+	    'onchange="user_checkbox(this, \'' + this.lp.id + '\', ' +
+	    this.lp.min + ', ' + this.lp.max + ')"/>';
+
+	a += '</td>';
+
+	a += '<th style="font-weight:normal; text-align:center;">. . . . .</th>';
+
+	a += this.result();
+	
+	return a;
+    }
+
+    /* actions to do when the units change */
+
+    cbox_interactive_row.prototype.unitchg = function i_update()
+    {
+	this.lp.vu.unitchg();
 	refresh(this);
     }
 
@@ -920,7 +984,7 @@ FLIGHT_TIME.vu.get_si(),
 	refresh_title_row();
 
 	// update some static elements
-	document.getElementById("doc_title").textContent=g_defs.acft + " M&amp;B";
+	document.getElementById("doc_title").textContent=g_defs.acft + " M&B";
 	document.getElementById("ac_type_hdr").textContent=g_defs.acft_type + " " + g_defs.acft;
 	document.getElementById("ac_reg").textContent=g_defs.acft;
 	document.getElementById("origin_text").textContent=g_defs.origin;
@@ -1080,7 +1144,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     {
 	document.getElementById("reminder_cell").
 	textContent=(g_defs.s.lang == 0?
-		     "Loaded your default settings":
+		     "Loaded default settings":
 		     "Asetukset ladattu");
 	
 	setTimeout("remove_reminder()", 5000);
@@ -1200,6 +1264,28 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	calculate();
     }
 
+    /*
+       user checkbox event
+       cb:  checkbox reference
+       lp:  global load point variable
+       min: lp min value
+       max: lp max value
+
+       Seems that I can't use eval twice in this function. First I tried
+       reading the min/max values using eval and then assigning them to
+       the vu.num, but that fails. TODO: find out why.
+     */
+
+     function user_checkbox(cb, lp, min, max)
+    {
+	if (cb.checked == true)
+	    eval(lp).vu.num = max;
+	else
+	    eval(lp).vu.num = min;
+
+	calculate();
+    }
+
     /* update the value cells in the table */
 
     function update_cells()
@@ -1235,7 +1321,6 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
     /*
       Checks if given point (x,y) is inside the mass and balance envelope.
-    
       http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
     */
 
@@ -1458,8 +1543,8 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	<th style="width:75px;text-align:center;" id="input_cell">Input</th>
 	<th style="text-align:center;width:175px;">
 	  <select id="units_select" onchange="handle_unit_change(this)">
-	    <option id="units_kg_litre" value="kg_litre" selected>kg &amp; litre</option>
-	    <option id="units_lb_usg" value="lb_usg">lbs &amp; usg</option>
+	    <option id="units_kg_litre" value="kg_litre" selected>kg & litre</option>
+	    <option id="units_lb_usg" value="lb_usg">lbs & usg</option>
 	  </select>
 	</th>
 	<th style="text-align:center;" id="mass_title">Mass</th>
@@ -1522,7 +1607,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2012-04-07 23:39:26 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2012-04-08 02:41:47 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     
