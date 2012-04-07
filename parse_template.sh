@@ -8,7 +8,7 @@ debug=0
 export LC_CTYPE=C
 
 
-if [ $# -lt 3 ] ; then
+if [ $# -lt 2 ] ; then
     echo "Usage $0 template aircraft.specs [output_dir]";
     exit 1;
 fi
