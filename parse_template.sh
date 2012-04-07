@@ -97,7 +97,7 @@ while read i; do
 	    variable_names="$variable_names$g_name\n"
 	    code_output="$code_output"$(echo $g_code_line | sed -e "s/#/ /g")"\n"
 
-	    if [ "${value:0:5}" == "LP_I_" ] ||[ "${value:0:5}" == "LP_F_" ]; then
+	    if [ "${value:0:5}" == "LP_I_" ] || [ "${value:0:5}" == "LP_F_" ] || [ "${value:0:5}" == "LP_C_" ]; then
 		saveables_group="$saveables_group$g_saveable_group\n"
 		saveable_group_values="$saveable_group_values$g_saveable_group_value\n"
 	    fi

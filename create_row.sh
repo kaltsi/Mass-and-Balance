@@ -7,8 +7,9 @@ g_code_line=""
 #
 # LP_I_xxx = interactive load point, declares a saveable variable
 # LP_F_xxx = interactive fuel flow row
+# LP_C_xxx = interactive check box row
 # LP_R_xxx = non-interactive load point with result and value cells reversed
-# LP_xxx   = non-interactive load point
+# LP_N_xxx = non-interactive load point
 
 function create_row()
 {
@@ -20,15 +21,20 @@ function create_row()
     local lpname=$1
     local reverse=""
     local non=""
+    local cbox=""
     local the_name="${lpname:5}"
 
     if [ "${1:0:5}" == "LP_R_" ]; then
 	reverse=", \"reverse\""
     fi
 
-    if [[ "${1:0:5}" != "LP_I_" ]] && [[ "${1:0:5}" != "LP_F_" ]]; then
+    if [[ "${1:0:5}" == "LP_N_" ]] || [[ "${1:0:5}" == "LP_R_" ]]; then
 	non="non_"
     fi
 
-    g_code_line="rows.push(new ${non}interactive_row(${the_name}${reverse}));"
+    if [[ "${1:0:5}" == "LP_C_" ]]; then
+	cbox="cbox_"
+    fi
+
+    g_code_line="rows.push(new ${non}${cbox}interactive_row(${the_name}${reverse}));"
 }

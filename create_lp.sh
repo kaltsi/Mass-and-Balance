@@ -28,6 +28,7 @@ in_array() {
 #
 # LP_I_xxx = interactive load point, declares a saveable variable
 # LP_F_xxx = interactive fuel flow row
+# LP_C_xxx = interactive checkbox row
 # LP_R_xxx = non-interactive load point with result and value cells reversed
 # LP_N_xxx = non-interactive load point
 
@@ -53,7 +54,7 @@ function create_lp()
     fi
 
     local save_item=""
-    if [ "${lpname:0:5}" == "LP_I_" ] || [ "${lpname:0:5}" == "LP_F_" ]; then
+    if [ "${lpname:0:5}" == "LP_I_" ] || [ "${lpname:0:5}" == "LP_F_" ] || [ "${lpname:0:5}" == "LP_C_" ]; then
 	save_item=".s"
     fi
 
