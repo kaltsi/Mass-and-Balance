@@ -34,6 +34,7 @@
 
 <head>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="width=device-width"/>
 
 <style type="text/css">
 table.a {
@@ -353,8 +354,8 @@ FLIGHT_TIME : 60,
 	y_draw_max : 375,
 	x_draw_min : 1,
 	y_draw_min : 1,
-	lim_lnd1   : /*LND_LIMIT_X1*/  143.09  /**/,
-	lim_lnd2   : /*LND_LIMIT_X2*/  148.1   /**/
+	lim_lnd1   : /*LND_LIMIT_X1*/  0.8075  /**/,
+	lim_lnd2   : /*LND_LIMIT_X2*/  0.925   /**/
     };
 
     g_lim.min_arm  = Math.min.apply(Math, g_lim.x);
@@ -917,7 +918,7 @@ FLIGHT_TIME.vu.get_si(),
 	refresh_title_row();
 
 	// update some static elements
-	document.getElementById("doc_title").textContent=g_defs.acft + " M&B";
+	document.getElementById("doc_title").textContent=g_defs.acft + " M&amp;B";
 	document.getElementById("ac_type_hdr").textContent=g_defs.acft_type + " " + g_defs.acft;
 	document.getElementById("ac_reg").textContent=g_defs.acft;
 	document.getElementById("origin_text").textContent=g_defs.origin;
@@ -1050,6 +1051,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    debug.textContent += (" " + BAGGAGE.moment.toFixed(3));
 	    debug.textContent += (" " + TAXI_FUEL.moment.toFixed(3));
 	    debug.textContent += (" " + FUEL.moment.toFixed(3));
+	    /*EXTRA_DEBUG*//**/
 	    debug.textContent += (" tow.arm=" + TOW.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + LNDW.arm.toFixed(3));
 	    debug.textContent += (" lnd fuel=" + g_lnd_fuel.vu.display(1));
@@ -1092,7 +1094,8 @@ rows.push(new interactive_row(FLIGHT_TIME));
 				       "Tallenna" ],
 	    "select_settings_clear" : ["Clear",
 				       "Poista" ],
-	    "units_kg_litre"        : ["kg & litre", "kg & litra"]
+	    "units_kg_litre"        : ["kg & litre",
+				       "kg & litra"]
 	};
 
 	var x = null;
@@ -1253,7 +1256,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     }
     
 
-    /* draw the svg boxes and the line around the m&b envelope */
+    /* draw the svg boxes and the line around the MnB envelope */
 
     function draw_limits_svg()
     {
@@ -1333,13 +1336,15 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    w.textContent = lang["mlm"][g_defs.s.lang] + " " +
 		(LNDW.vu.getmass() - LNDW.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
-
 	}
 	else if (warn_limits(TOW.arm, TOW.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
 	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
 	}
-	else if (warn_limits(LNDW.arm, LNDW.vu.getmass(), g_lim.y_land) < 0) {
+	else if (warn_limits(LNDW.arm, LNDW.vu.getmass(), g_lim.y) < 0) {
+	    // This landing CG check uses the take-off weight limits
+	    // (y-coords) because the MnB envelope is drawn according
+	    // to the take-off values.
 	    w.setAttribute('fill', "red");
 	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
 	}
@@ -1443,8 +1448,8 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	<th style="width:75px;text-align:center;" id="input_cell">Input</th>
 	<th style="text-align:center;width:175px;">
 	  <select id="units_select" onchange="handle_unit_change(this)">
-	    <option id="units_kg_litre" value="kg_litre" selected>kg & litre</option>
-	    <option id="units_lb_usg" value="lb_usg">lbs & usg</option>
+	    <option id="units_kg_litre" value="kg_litre" selected>kg &amp; litre</option>
+	    <option id="units_lb_usg" value="lb_usg">lbs &amp; usg</option>
 	  </select>
 	</th>
 	<th style="text-align:center;" id="mass_title">Mass</th>
@@ -1469,9 +1474,6 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    style="stroke:black;stroke-width:3;opacity:0.6;"
 	    filter = "url(#my_shadow_filter)" />
 
-      <text id="warning_text" x="20" y="50"
-	    fill="green" style="font-weight:bold;">Limits OK</text>
-    
       <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
       <text x="35" y="105" id="takeoff_text">- Take-off</text>
     
@@ -1499,6 +1501,9 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
       <text id="ac_reg" x="50%" y="50%" font-size="80"
 	    style="opacity:0.15;text-anchor:middle;">NO-REG</text>
+
+      <text id="warning_text" x="20" y="50" font-size="20"
+	    fill="green" style="font-weight:bold;">Limits OK</text>
     </g>
   </svg>
 
@@ -1507,7 +1512,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2012-04-06 20:47:06 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2012-04-07 23:02:46 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     

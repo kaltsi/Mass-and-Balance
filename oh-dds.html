@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <!--
-    Mass and balance calculator for "OH-ESR"
+    Mass and balance calculator for "OH-DDS"
 
     https://github.com/kaltsi/Mass-and-Balance
 
@@ -325,18 +325,18 @@ table.a td {
     /* defaults and storage object */
 
     var g_defs = {
-	acft      : "OH-ESR",
-	acft_type : "Cirrus SR20",
-	origin    : "Numbers: OH-ESR mass and balance excel sheet (ESMO) 18.06.2011",
-	ltr2kg    : 0.721,
+	acft      : "OH-DDS",
+	acft_type : "Diamond DA-40 Star",
+	origin    : "Numbers: OH-DDS mass and balance excel (PIK 14.09.2011)",
+	ltr2kg    : 0.840,
 	usg2lb    : 0, // will be computed at setup()
 	s : { // These are the default slider values for this plane
-	    FRONT_SEAT : 180,
-BACK_SEAT : 90,
-FUEL : 100,
-BAGGAGE : 30,
+	    FRONT_SEAT : 150,
+BACK_SEAT : 0,
+FUEL : 70.0,
+BAGGAGE : 10,
 TAXI_FUEL : 5,
-FUEL_FLOW : 38,
+FUEL_FLOW : 25,
 FLIGHT_TIME : 60,
 
 	    mass  : 0,     // 0 = kg, 1 = lb
@@ -348,15 +348,15 @@ FLIGHT_TIME : 60,
     /* mass and balance envelope limits (metres and kilos) */
     
     var g_lim = {
-	x          : [3.52298, 3.58140, 3.66014, 3.75920, 3.76174, 3.74396, 3.67284, 3.52298],
-	y          : [957.07990, 1221.97784, 1360.77711, 1360.77711, 1315.41787, 1165.73239, 957.07990, 957.07990],
-	y_land     : [957.07990, 1221.97784, 1315.41787, 1315.41787, 1315.41787, 1165.73239, 957.07990, 957.07990],
-	x_draw_max : 510,
+	x          : [2.4, 2.4, 2.46, 2.55, 2.55, 2.4],
+	y          : [780, 980, 1150, 1150, 780, 780],
+	y_land     : [780, 980, 1092, 1092, 780, 780],
+	x_draw_max : 475,
 	y_draw_max : 390,
 	x_draw_min : 1,
 	y_draw_min : 1,
-	lim_lnd1   : 3.63448,
-	lim_lnd2   : 3.76174
+	lim_lnd1   : 2.44,
+	lim_lnd2   : 2.55
     };
 
     g_lim.min_arm  = Math.min.apply(Math, g_lim.x);
@@ -925,7 +925,7 @@ FLIGHT_TIME.vu.get_si(),
 	document.getElementById("ac_reg").textContent=g_defs.acft;
 	document.getElementById("origin_text").textContent=g_defs.origin;
 
-	var trs = 30;
+	var trs = 50;
 	document.getElementById("translate_group").setAttribute('transform', 'translate(' + trs + ',-450)');
 
 	/*
@@ -935,21 +935,21 @@ FLIGHT_TIME.vu.get_si(),
         */
 
 	rows = [ ];
-	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 973.41, 0, -1, 3.56616);
+	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 809.5, 0, -1, 2.418);
 rows.push(new non_interactive_row(BASIC_WEIGHT, "reverse"));
-FRONT_SEAT=new l_point("FRONT_SEAT", ["Front seat", "Etupenkki"], "kg", g_defs.s.FRONT_SEAT, 25, -250, 3.64490);
+FRONT_SEAT=new l_point("FRONT_SEAT", ["Front seat", "Etupenkki"], "kg", g_defs.s.FRONT_SEAT, 25, -250, 2.300);
 rows.push(new interactive_row(FRONT_SEAT));
-BACK_SEAT=new l_point("BACK_SEAT", ["Back seat", "Takapenkki"], "kg", g_defs.s.BACK_SEAT, 0, -250, 4.57200);
+BACK_SEAT=new l_point("BACK_SEAT", ["Back seat", "Takapenkki"], "kg", g_defs.s.BACK_SEAT, 0, -250, 3.250);
 rows.push(new interactive_row(BACK_SEAT));
-FUEL=new l_point("FUEL", ["Fuel", "Polttoaine"], "ltr", g_defs.s.FUEL, 0, 211.4, 3.93446, 0.1);
+FUEL=new l_point("FUEL", ["Fuel", "Polttoaine"], "ltr", g_defs.s.FUEL, 0, 148.0, 2.630, 0.1);
 rows.push(new interactive_row(FUEL));
-BAGGAGE=new l_point("BAGGAGE", ["Baggage", "Matkatavaratila"], "kg", g_defs.s.BAGGAGE, 0, 54, 5.28320);
+BAGGAGE=new l_point("BAGGAGE", ["Baggage", "Matkatavaratila"], "kg", g_defs.s.BAGGAGE, 0, 30, 3.650);
 rows.push(new interactive_row(BAGGAGE));
-TAXI_FUEL=new l_point("TAXI_FUEL", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.TAXI_FUEL, 0, -20, 3.93446, 0.1);
+TAXI_FUEL=new l_point("TAXI_FUEL", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.TAXI_FUEL, 0, -20, 2.630, 0.1);
 rows.push(new interactive_row(TAXI_FUEL));
-TOW=new l_point("TOW", ["Take-off mass", "Lähtömassa"], "kg", 0, 0, 1360.77711, 1);
+TOW=new l_point("TOW", ["Take-off mass", "Lähtömassa"], "kg", 0, 0, 1150, 1);
 rows.push(new non_interactive_row(TOW));
-LNDW=new l_point("LNDW", ["Landing mass", "Laskumassa"], "kg", 0, 0, 1315.41787, 1);
+LNDW=new l_point("LNDW", ["Landing mass", "Laskumassa"], "kg", 0, 0, 1092, 1);
 rows.push(new non_interactive_row(LNDW));
 ENDURANCE=new l_point("ENDURANCE", ["Endurance", "Toiminta-aika"], "min", 0, 1, -800, 0);
 rows.push(new non_interactive_row(ENDURANCE));
