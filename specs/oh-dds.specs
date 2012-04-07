@@ -42,6 +42,9 @@ LND_LIMIT_X2=2.55
 # LP_R_xxx = non-interactive load point xxx, with reversed output cells
 # LP_I_xxx = interactive load point xxx, the default value will be saveable
 # LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
+# LP_C_xxx = interactive checkbox row, saveable
+#
+# The checkbox state is ON if max value = default value.
 #
 # Name English Finnish unit default min max moment-arm [step]
 #
@@ -59,12 +62,12 @@ LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 2.300
 LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 0 0 -250 3.250
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 70.0 0 148.0 2.630 0.1
 LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 10 0 30 3.650
-#LOAD_POINT=LP_I_FAIRINGS "Wheel#fairings#(no/yes)" "Renkaiden#muotosuojat#(ei/kyllä)" "kg" 0 -3.75 0 2.24 3.75
+LOAD_POINT=LP_C_FAIRINGS "Wheel#fairings" "Renkaiden#muotosuojat" "kg" 0 -3.75 0 2.24
 LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 2.630 0.1
 LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1150 1
 LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1092 1
 LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
-LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 25 5 -50 1 0.1
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 21 5 -50 1 0.1
 LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
 
 # Add your extra load points following the scheme from above
