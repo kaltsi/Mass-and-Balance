@@ -1347,13 +1347,15 @@ table.a td {
 	    w.textContent = lang["mlm"][g_defs.s.lang] + " " +
 		(/*LNDW*/g_lw/**/.vu.getmass() - /*LNDW*/g_lw/**/.max).toFixed(1) + " " +
 		g_mass_unit + "!!";
-
 	}
 	else if (warn_limits(/*TOW*/g_tow/**/.arm, /*TOW*/g_tow/**/.vu.getmass(), g_lim.y) < 0) {
 	    w.setAttribute('fill', "red");
 	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
 	}
-	else if (warn_limits(/*LNDW*/g_lw/**/.arm, /*LNDW*/g_lw/**/.vu.getmass(), g_lim.y_land) < 0) {
+	else if (warn_limits(/*LNDW*/g_lw/**/.arm, /*LNDW*/g_lw/**/.vu.getmass(), g_lim.y) < 0) {
+	    // This landing CG check uses the take-off weight limits
+	    // (y-coords) because the M&B envelope is drawn according
+	    // to the take-off values.
 	    w.setAttribute('fill', "red");
 	    w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
 	}
@@ -1483,9 +1485,6 @@ table.a td {
 	    style="stroke:black;stroke-width:3;opacity:0.6;"
 	    filter = "url(#my_shadow_filter)" />
 
-      <text id="warning_text" x="20" y="50"
-	    fill="green" style="font-weight:bold;">Limits OK</text>
-    
       <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
       <text x="35" y="105" id="takeoff_text">- Take-off</text>
     
@@ -1513,6 +1512,9 @@ table.a td {
 
       <text id="ac_reg" x="50%" y="50%" font-size="80"
 	    style="opacity:0.15;text-anchor:middle;">NO-REG</text>
+
+      <text id="warning_text" x="20" y="50" font-size="20"
+	    fill="green" style="font-weight:bold;">Limits OK</text>
     </g>
   </svg>
 
