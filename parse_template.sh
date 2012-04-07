@@ -125,6 +125,7 @@ simple_replace "SAVEABLE_VALUES" "$saveable_group_values"
 extra_calc_mass=""
 extra_mass_calc_moments=""
 extra_mass_moments=""
+extra_debug_lines=""
 
 create_extra_mass()
 {
@@ -132,6 +133,7 @@ create_extra_mass()
 	extra_calc_mass="$extra_calc_mass$i,\n"
 	extra_mass_calc_moments="${extra_mass_calc_moments}calc_moment($i);\n"
 	extra_mass_moments="$extra_mass_moments$i.moment +\n"
+	extra_debug_lines="${extra_debug_lines}debug.textContent += (\" \" + $i.moment.toFixed(3));\n"
     done
 }
 
@@ -142,6 +144,7 @@ if [ "z" != z"$extra_masses" ]; then
     simple_replace "EXTRA_CALC_MASS" "$extra_calc_mass"
     simple_replace "EXTRA_MASS_CALC_MOMENTS" "$extra_mass_calc_moments"
     simple_replace "EXTRA_MASS_MOMENTS" "$extra_mass_moments"
+    simple_replace "EXTRA_DEBUG" "$extra_debug_lines"
 fi
 
 echo "Output file is: $OUTPUT_FILE"
