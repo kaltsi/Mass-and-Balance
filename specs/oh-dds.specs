@@ -11,7 +11,7 @@ ACFT="OH-DDS"
 ACFT_TYPE="Diamond DA-40 Star"
 
 # where the mass and balance numbers come from
-DATA_ORIGIN="Numbers: OH-DDS mass and balance excel (PIK 2008)"
+DATA_ORIGIN="Numbers: OH-DDS mass and balance excel (PIK 14.09.2011)"
 
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.840
