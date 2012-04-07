@@ -52,6 +52,9 @@ LND_LIMIT_X2=1.202
 # LP_R_xxx = non-interactive load point xxx, with reversed output cells
 # LP_I_xxx = interactive load point xxx, the default value will be saveable
 # LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
+# LP_C_xxx = interactive checkbox row, saveable
+#
+# The checkbox state is ON if max value = default value.
 #
 # Name English Finnish unit default min max moment-arm [step]
 #
@@ -86,4 +89,5 @@ LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
 LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 38 5 -50 1 0.1
 LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
 
-# all done
+# Here's an extra load point
+LOAD_POINT=LP_C_FAIRINGS "Wheel#fairings" "Renkaiden#muotosuojat" "kg" 0 -3.75 0 2.24
