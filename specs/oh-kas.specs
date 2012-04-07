@@ -1,0 +1,84 @@
+# Aircraft spec file
+#
+# Enter each option without extra spaces between the name and '=' char
+# Put strings inside "quotes". Do not use the § character for anything.
+#
+
+# aircraft registration
+ACFT="OH-KAS"
+
+# aircraft type and short description
+ACFT_TYPE="Diamond DA40 G1000"
+
+# where the mass and balance numbers come from
+DATA_ORIGIN="Numbers: OH-KAS mass and balance sheet v.2"
+
+# 1 litre fuel weight in kilos
+LITRE2KILO=0.721
+
+# Measurements in metres and kilos
+MOMENT_ARMS=[2.40, 2.40, 2.48, 2.59, 2.59, 2.40]
+TOF_MASS_LIMITS=[780, 980, 1200, 1200, 780, 780]
+LND_MASS_LIMITS=[780, 980, 1150, 1150, 780, 780]
+
+# You may need to tweak these values for the mass and balance diagram
+# to fit nicely inside the bounding rectangle.
+MOM_DRAW_MAX=475
+MASS_DRAW_MAX=375
+
+# This moves the limits diagram horizontally by the given amount.
+TRANSLATE_X=50
+
+# These are moment-arms of the x-coordinates of the landing limit.
+# These are needed if the aircraft's MLM < MTOM
+LND_LIMIT_X1=2.4622
+LND_LIMIT_X2=2.59
+
+# New load points can be added.
+#
+# The load points appear in the table in the order they are introduced below.
+#
+# LP_N_xxx = non-interactive load point xxx
+# LP_R_xxx = non-interactive load point xxx, with reversed output cells
+# LP_I_xxx = interactive load point xxx, the default value will be saveable
+# LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
+#
+# Name English Finnish unit default min max moment-arm [step]
+#
+# If the max value is a negative value, it is not printed out in the description.
+#
+# Substitute all spaces with '#' in the English/Finnish field.
+#
+# The [step] is optional, it sets how discrete steps the slider takes when adjusted.
+#
+# The following names are fixed. You can't change these names, but you can rearrange them.
+# You can also remove the back seat row.
+
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 797.88 0 -1 2.46384
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 2.3
+LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 75 0 -250 3.25
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 156 0 156 2.63 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 15 0 30 3.65
+LOAD_POINT=LP_I_BAGGAGE_T "Baggage#Tube" "Matkatavaraputki" "kg" 0 0 5 4.32
+LOAD_POINT=LP_I_BAGGAGE_F "Baggage#Fwd#Ext." "Etutavaratila#Ext." "kg" 0 0 45 3.89
+LOAD_POINT=LP_I_BAGGAGE_A "Baggage#Aft#Ext." "Takatavaratila#Ext." "kg" 0 0 18 4.54
+LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 2.63 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1200 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1150 1
+LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 38 5 -50 1 0.1
+LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
+
+# Add your extra load points following the scheme from above
+#
+# Each load point must have a unique name.
+#
+# It makes sense to add only new interactive points, because you can adjust their loading,
+# which then affects the take-off and landing masses.
+# The mass unit has to be "kg".
+#
+# For example:
+#
+# An interactive point, named "Test point", values in kg, default=50, min=10, max=100,
+# moment-arm=1.5, slider-step=0.1
+# LOAD_POINT=LP_I_YOUR_POINT "Test#point" "Testi#piste" "kg" 50 10 100 1.5 0.1
