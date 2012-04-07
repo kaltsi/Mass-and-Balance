@@ -58,6 +58,7 @@ LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 797.88 0 -1 2.4638
 LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 2.3
 LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 75 0 -250 3.25
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 156 0 156 2.63 0.1
+LOAD_POINT=LP_I_NOTOIL "Oil#not#added#(Max.#8#qts)" "Lisäämätön#öljy#(Max.#8#qts)" "ltr" -1 -8 -0 1 0.1
 LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 15 0 30 3.65
 LOAD_POINT=LP_I_BAGGAGE_T "Baggage#Tube" "Matkatavaraputki" "kg" 0 0 5 4.32
 LOAD_POINT=LP_I_BAGGAGE_F "Baggage#Fwd#Ext." "Etutavaratila#Ext." "kg" 0 0 45 3.89
@@ -73,9 +74,10 @@ LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
 #
 # Each load point must have a unique name.
 #
-# It makes sense to add only new interactive points, because you can adjust their loading,
-# which then affects the take-off and landing masses.
-# The mass unit has to be "kg".
+# It makes sense to add only new interactive points, because you can adjust
+# their loading, which then affects the take-off and landing masses.
+#
+# The mass unit has to be "kg" or "ltr".
 #
 # For example:
 #
