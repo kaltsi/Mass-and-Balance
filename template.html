@@ -979,8 +979,10 @@ table.a td {
 	// calculate the 1 usg fuel -> lb constant
 	g_defs.usg2lb = (1 / g_ltr_usg) * g_kg_lbs * g_defs.ltr2kg;
 
-	// the load the default values for the sliders
+	/*HIDE_DEBUG*/document.getElementById("debug_button").
+	setAttribute('style', 'display');/**/
 
+	// then load the default values for the sliders
 	load_defaults();
 
 	refresh_title_row();
@@ -1551,7 +1553,8 @@ table.a td {
     <option value="Suomi">Suomi</option>
   </select>
 
-  <button type="button" title="Toggle debug info." onclick="toggle_debug()">Debug</button>
+  <button id="debug_button" type="button" title="Toggle debug info."
+  onclick="toggle_debug()" style="display:none;">Debug</button>
 
   <p> </p>
 

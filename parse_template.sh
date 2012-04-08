@@ -65,7 +65,7 @@ function simple_replace()
     local a=$1
     local b=$2
 
-    if [[ -z $a ]] || [[ -z $b ]]; then
+    if [[ -z $a ]]; then
 	echo $FUNCNAME got zero length string
 	exit 1
     fi
@@ -137,15 +137,20 @@ create_extra_mass()
     done
 }
 
-
 if [ "z" != z"$extra_masses" ]; then 
     create_extra_mass "$extra_masses"
-
-    simple_replace "EXTRA_CALC_MASS" "$extra_calc_mass"
-    simple_replace "EXTRA_MASS_CALC_MOMENTS" "$extra_mass_calc_moments"
-    simple_replace "EXTRA_MASS_MOMENTS" "$extra_mass_moments"
-    simple_replace "EXTRA_DEBUG" "$extra_debug_lines"
+else
+    # create empty replace for the extra equipment
+    create_extra_mass "  "
 fi
+
+simple_replace "EXTRA_CALC_MASS" "$extra_calc_mass"
+simple_replace "EXTRA_MASS_CALC_MOMENTS" "$extra_mass_calc_moments"
+simple_replace "EXTRA_MASS_MOMENTS" "$extra_mass_moments"
+simple_replace "EXTRA_DEBUG" "$extra_debug_lines"
+
+# finally hide the debug button from the published sheets
+simple_replace "HIDE_DEBUG" " "
 
 echo "Output file is: $OUTPUT_FILE"
 
