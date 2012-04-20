@@ -1,0 +1,44 @@
+# Aircraft spec file
+#
+# Enter each option without extra spaces between the name and '=' char
+# Put strings inside "quotes". Do not use the § character for anything.
+#
+
+# aircraft registration
+ACFT="SE-KSM"
+
+# aircraft type and short description
+ACFT_TYPE="Piper Cherokee Archer II PA-28-181"
+
+# where the mass and balance numbers come from
+DATA_ORIGIN="Numbers: SE-KSM POH and mass and balance report x.y.zzzz"
+
+# 1 litre fuel weight in kilos
+LITRE2KILO=0.721
+
+# Measurements in metres and kilos
+MOMENT_ARMS=[2.083, 2.083, 2.250, 2.362, 2.362, 2.083]
+TOF_MASS_LIMITS=[700, 930, 1157, 1157, 700, 700]
+LND_MASS_LIMITS=[700, 930, 1157, 1157, 700, 700]
+
+# You may need to tweak these values for the mass and balance diagram
+# to fit nicely inside the bounding rectangle.
+MOM_DRAW_MAX=475
+MASS_DRAW_MAX=375
+
+# This moves the limits diagram horizontally by the given amount.
+TRANSLATE_X=50
+
+# Load points
+
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 739.5 0 -1 2.212
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 2.045
+LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 0 0 -250 3.0
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 177.5 0 177.5 2.413 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 20 0 91 3.627
+LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 2.413 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1157 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1157 1
+LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 36 5 -50 1 0.1
+LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
