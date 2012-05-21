@@ -8,10 +8,10 @@
 ACFT="OH-KAT"
 
 # aircraft type and short description
-ACFT_TYPE="Diamond DA20-C1"
+ACFT_TYPE="Diamond DA20-C1 (800 kg MTOW)"
 
 # where the mass and balance numbers come from
-DATA_ORIGIN="Numbers: OH-KAT mass and balance sheet copied at EHFH 21.05.2012 and 800 kg cross weight increase (AFM)"
+DATA_ORIGIN="OH-KAT w&b copied at EHFH 21.05.2012 and 800 kg gross weight increase (AFM)"
 
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.721
@@ -23,15 +23,15 @@ LND_MASS_LIMITS=[500, 750, 800, 800, 750, 500, 500]
 
 # You may need to tweak these values for the mass and balance diagram
 # to fit nicely inside the bounding rectangle.
-MOM_DRAW_MAX=475
+MOM_DRAW_MAX=400
 MASS_DRAW_MAX=375
 
 # This moves the limits diagram horizontally by the given amount.
-TRANSLATE_X=50
+TRANSLATE_X=125
 
 # load points
 
-LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 554 0 -1 0.4079
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 554 0 -1 0.2433
 LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 85 25 -200 0.143
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 93 0 93 0.824 0.1
 LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 10 0 20 0.824
@@ -39,5 +39,5 @@ LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 0.824 0.
 LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 800 1
 LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 800 1
 LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
-LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 23 5 -50 1 0.1
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 21 5 -50 1 0.1
 LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
