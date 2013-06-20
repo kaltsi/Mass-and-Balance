@@ -7,5 +7,11 @@ The publish page for the sheets is here:
 
 http://kaltsi.github.com/Mass-and-Balance/
 
+If you want to create an m&b sheet for your own plane, take a look at
+the existing specification files under the specs subdirectory. Then
+create a new file there and run the export.sh script. The script will
+apply the specs to the template.html file and create the plane
+specific m&b sheets.
+
 Juha Kallioinen
 
