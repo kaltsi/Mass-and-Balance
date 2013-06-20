@@ -64,6 +64,29 @@ table.a td {
     float: right;
 }
 
+#info_overlay {
+    visibility: hidden;
+    position:   absolute;
+    left:       0px;
+    top:        0px;
+    width:      100%;
+    height:     100%;
+    z-index:    1000;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAD0lEQVQImWNgQAX/yeAAAIHCA/0RE2WAAAAAAElFTkSuQmCC');
+    background-repeat: repeat;
+
+}
+
+#info_overlay div {
+    width:  75%;
+    margin: 100px auto;
+    background-color: #fff;
+    border:1px solid  #000;
+    border-radius:    4%;
+    padding:          10px 10px 10px 10px;
+    text-align:       center;
+}
+
 </style>
 
 <script type="text/javascript">
@@ -314,6 +337,10 @@ table.a td {
     })();
     /* END Frank Yan's code */
 
+     function overlay() {
+	el = document.getElementById("info_overlay");
+	el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+     }
 
     /*  Some conversion constants */
 
@@ -1553,6 +1580,8 @@ table.a td {
     <option value="Suomi">Suomi</option>
   </select>
 
+  <button id="info_button" type="button" title="Display aircraft extra info."
+	  onclick="overlay()">Info</button>
   <button id="debug_button" type="button" title="Toggle debug info."
   onclick="toggle_debug()" style="display:none;">Debug</button>
 
@@ -1623,6 +1652,13 @@ table.a td {
 	    fill="green" style="font-weight:bold;">Limits OK</text>
     </g>
   </svg>
+
+  <div id="info_overlay">
+    <div>
+    <button id="info_close" type="button" title="Close" onclick="overlay()">Close</button>
+      <p>No extra info</p>
+    </div>
+  </div>
 
   <footer>
     <hr/>
