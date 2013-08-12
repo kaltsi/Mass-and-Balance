@@ -1,0 +1,44 @@
+# Aircraft spec file
+#
+# Enter each option without extra spaces between the name and '=' char
+# Put strings inside "quotes". Do not use the § character for anything.
+#
+
+# aircraft registration
+ACFT="OH-TIL"
+
+# aircraft type and short description
+ACFT_TYPE="Piper Warrior II PA28-161"
+
+# where the mass and balance numbers come from
+DATA_ORIGIN="Numbers: OH-TIL weight and balance excel v1.0 and weighing report (20.05.2011)"
+
+# 1 litre fuel weight in kilos
+LITRE2KILO=0.721
+
+# Measurements in metres and kilos
+MOMENT_ARMS=[3.268, 3.268, 3.465, 3.661, 3.661, 3.268]
+TOF_MASS_LIMITS=[700, 885, 1107, 1107, 700, 700]
+LND_MASS_LIMITS=[700, 885, 1107, 1107, 700, 700]
+
+# You may need to tweak these values for the mass and balance diagram
+# to fit nicely inside the bounding rectangle.
+MOM_DRAW_MAX=475
+MASS_DRAW_MAX=375
+
+# This moves the limits diagram horizontally by the given amount.
+TRANSLATE_X=50
+
+# Load points
+
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 709.4 0 -1 3.463
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 3.169
+LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 0 0 -250 4.6496
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 160 0 182 3.740 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 20 0 91 5.622
+LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 3.740 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1107 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1107 1
+LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 32 5 -50 1 0.1
+LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
