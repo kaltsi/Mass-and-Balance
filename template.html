@@ -71,8 +71,18 @@ table.a td {
     /* BEGIN Frank Yan's firefox <input type=range> code */
     (function() {
 
+	/*
+	 * http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+	 */
+	var isFirefox = typeof InstallTrigger !== 'undefined';
+	if (!isFirefox)
+	    return;
+
 	// test for native support
 	var test = document.createElement('input');
+
+	/* Firefox 23 does <input type="range"> differently
+	 * So let's ignore native support for firefox
 	try {
 	    test.type = 'range';
 	    if (test.type == 'range')
@@ -80,7 +90,7 @@ table.a td {
 	} catch (e) {
 	    return;
 	}
-
+	*/
 	// test for required property support
 	if (!document.mozSetImageElement || !('MozAppearance' in test.style))
 	    return;
@@ -117,7 +127,7 @@ table.a td {
 
 	function initialize() {
 	    // create initial sliders
-	    Array.forEach(document.querySelectorAll('input[type=range]'), transform);
+	    Array.forEach(document.querySelectorAll('input[type=kurafox]'), transform);
 	    // create sliders on-the-fly
 	    document.addEventListener('DOMNodeInserted', onNodeInserted, true);
 	}
@@ -129,8 +139,8 @@ table.a td {
 	}
 
 	function check(input, async) {
-	    if (input.localName != 'input' || input.type == 'range');
-	    else if (input.getAttribute('type') == 'range')
+	    if (input.localName != 'input' || input.type == 'kurafox');
+	    else if (input.getAttribute('type') == 'kurafox')
 		transform(input);
 	    else if (!async)
 		setTimeout(check, 0, input, true);
@@ -314,6 +324,7 @@ table.a td {
     })();
     /* END Frank Yan's code */
 
+    var isFirefox = typeof InstallTrigger !== 'undefined';
 
     /*  Some conversion constants */
 
@@ -698,7 +709,13 @@ table.a td {
 	a += this.iresult();
 
 	a += '<th style="text-align:center;padding-right:0px;"> ';
-	a+=  '<input id="' + this.sldr + '" type="range" min="' + this.lp.min + '" ';
+	a +=  '<input id="' + this.sldr +'" ';
+	if (isFirefox) {
+	    a += 'type="kurafox" ';
+	} else {
+	    a += 'type="range" ';
+	}
+	a += 'min="' + this.lp.min + '" ';
 	a += 'max="' + this.lp.max + '" value="' + this.lp.vu.num +'" ';
 	if (this.lp.step)
 	    a += 'step="' + this.lp.step +'" ';
