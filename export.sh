@@ -6,18 +6,15 @@ export LC_CTYPE=C
 
 export_dir=$PWD/gh
 
-sources="index,template"
-
-files=$(eval ls {$sources}.html)
+files=template.html
 
 mkdir -p $export_dir
 
 # Expand the gitvariables
-git archive --format=tar HEAD $files | (cd $export_dir && tar xf -)
+git archive --format=tar HEAD $files | tar xf - -C $export_dir
 
 echo Exported $files to $export_dir
 
-for spec in $(ls specs/*.specs); do
-    ./parse_template.sh ./gh/template.html $spec ./gh
+for spec in specs/*.specs; do
+    ./parse_template.sh $export_dir/template.html $spec $export_dir
 done
-
