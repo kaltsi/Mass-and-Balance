@@ -1,0 +1,44 @@
+# Aircraft spec file
+#
+# Enter each option without extra spaces between the name and '=' char
+# Put strings inside "quotes". Do not use the § character for anything.
+#
+
+# aircraft registration
+ACFT="OH-IHQ"
+
+# aircraft type and short description
+ACFT_TYPE="Diamond DV 20 (Rotax 912S)"
+
+# where the mass and balance numbers come from
+DATA_ORIGIN="Numbers: DV 20 (S/N: 20205) Weighing report 14.10.2010"
+
+# 1 litre fuel weight in kilos
+LITRE2KILO=0.75
+
+# Measurements in metres and kilos
+MOMENT_ARMS=[0.250, 0.250, 0.390, 0.390, 0.250]
+TOF_MASS_LIMITS=[560, 730, 730, 560, 560]
+LND_MASS_LIMITS=[560, 730, 730, 560, 560]
+
+# You may need to tweak these values for the mass and balance diagram
+# to fit nicely inside the bounding rectangle.
+MOM_DRAW_MAX=475
+MASS_DRAW_MAX=310
+
+# This moves the limits diagram horizontally by the given amount.
+TRANSLATE_X=50
+
+# load points
+
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 513.3 0 -1 0.310813
+LOAD_POINT=LP_I_FRONT_SEAT "Left#seat" "Vasen#istuin" "kg" 85 5 -110 0.143
+LOAD_POINT=LP_I_FRONT_RIGHT "Right#seat" "Oikea#istuin" "kg" 0 0 -110 0.143
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 79.0 0 79.0 0.824 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 10 0 20 0.824
+LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 3 0 -20 0.824 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 730 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 730 1
+LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 17 5 -30 1 0.1
+LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
