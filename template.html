@@ -720,7 +720,8 @@ table.a td {
 	if (this.lp.step)
 	    a += 'step="' + this.lp.step +'" ';
 	a += 'style="width:97%;" ';
-	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
+	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')" ';
+	a += 'oninput="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
 	a += this.result();
 	
 	return a;
