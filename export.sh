@@ -6,7 +6,7 @@ export LC_CTYPE=C
 
 export_dir=$PWD/gh
 
-files=template.html
+files="index.html template.html"
 
 mkdir -p $export_dir
 
