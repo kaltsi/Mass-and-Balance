@@ -1,7 +1,7 @@
 # Aircraft spec file
 #
 # Enter each option without extra spaces between the name and '=' char
-# Put strings inside "quotes". Do not use the § character for anything.
+# Put strings inside "quotes". Do not use the Â§ character for anything.
 #
 
 # aircraft registration
@@ -37,7 +37,7 @@ LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 75 0 -250 1.850
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 143 0 143 1.170 0.1
 LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 20 0 54 2.440
 LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 1.170 0.1
-LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 1156 1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "LÃ¤htÃ¶massa" "kg" 0 0 1156 1
 LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 1156 1
 LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
 LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 38 5 -50 1 0.1
