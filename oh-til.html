@@ -1,5 +1,9 @@
 <!DOCTYPE HTML>
 <html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="width=device-width"/>
+
 <!--
     Mass and balance calculator for "OH-TIL"
 
@@ -26,10 +30,6 @@
     THE SOFTWARE.
 
 -->
-
-<head>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-<meta name="viewport" content="width=device-width"/>
 
 <style type="text/css">
 table.a {
@@ -59,6 +59,34 @@ table.a td {
     float: right;
 }
 
+.number_class {
+    position: absolute;
+    border: 1px solid;
+    border-radius: 15px;
+    box-shadow: 3px 3px 2px rgba(0,0,0,0.4);
+    background-color: #83ffff;
+    padding: 4px;
+    width: 3em;
+    text-align: right;
+    z-index: 10;
+    padding-right: 10px;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    border: 0px;
+    background-color: #83ffff;
+    width: 2em;
+    text-align: right;
+    font-size: 1.2em;
+    font-family: serif;
+}
 </style>
 
 <script type="text/javascript">
@@ -394,7 +422,8 @@ FLIGHT_TIME : 60,
 
     interactive_row.prototype.iresult = function i_iresult()
     {
-	var a = '<td style="background-color:yellow;" id="' + this.celli + '">';
+	var a = '<td style="background-color:yellow;" id="' + this.celli + '" ' +
+	    'onclick="show_number_entry(\'' + this.celli + '\', \'' + this.sldr + '\', \'block\')">';
 
 	switch (this.lp.vu.unit) {
 	case "min":
@@ -451,7 +480,6 @@ FLIGHT_TIME : 60,
 	a += 'max="' + this.lp.max + '" value="' + this.lp.vu.num +'" ';
 	if (this.lp.step)
 	    a += 'step="' + this.lp.step +'" ';
-	a += 'style="width:97%;" ';
 	a += 'oninput="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
 	a += this.result();
 	
@@ -1260,6 +1288,82 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	t.selectedIndex = 0;
     }
 
+    /* return the x and y coords for the given element */
+
+    function getXYpos(elem)
+    {
+	if (!elem) {
+	    return {"x":0,"y":0};
+	}
+	var xy={"x":elem.offsetLeft,"y":elem.offsetTop}
+	var par=getXYpos(elem.offsetParent);
+	for (var key in par) {
+	    xy[key]+=par[key];
+	}
+	return xy;
+    }
+
+    function show_number_entry(id, slider, visibility)
+    {
+	var cell = document.getElementById(id);
+	var cpos = getXYpos(cell);
+	var x = cpos['x']-5;
+	var y = cpos['y']-5;
+	var input_div = document.getElementById("number");
+	input_div.style.left = x + 'px';
+	input_div.style.top = y + 'px';
+
+	var input_num = document.getElementById("number_input");
+	var s = document.getElementById(slider);
+	var v = Number(s.value);
+	if (s.step != '') {
+	    v = v.toFixed(1);
+	    input_num.step = s.step;
+	} else {
+	    v = v.toFixed(0);
+	    input_num.step = '';
+	}
+
+	input_num.value = v;
+	// abuse the input element's name attribute
+	input_num.name = slider;
+
+	input_div.style.display=visibility;
+
+	// add an event handler to hide the div in case user touches
+	// or clicks outside the number div in the table
+	var tbl = document.getElementById("table1");
+	tbl.onmouseover = function() {
+	    var input_div = document.getElementById("number");
+	    if (input_div.style.display === 'block') {
+		input_div.style.display = 'none';
+		tbl.onmouseover = null;
+	    }
+	}
+
+	input_num.focus();
+	input_num.select();
+
+	/* this would pre-select the number in iPad when clicked, but
+	 * does not work on desktop */
+	//input_num.setSelectionRange(0, 9999);
+    }
+
+    function enter_number(slider, value)
+    {
+	if (value == '') return;
+
+	var sldr = document.getElementById(slider);
+	sldr.value = value;
+	// hide the div
+	document.getElementById("number").style.display = 'none';
+	// unfocus the number input so that iPad keyboard goes away
+	document.getElementById("number_input").blur();
+	// remove the trigger to hide the div
+	document.getElementById("table1").onmouseover = null;
+	sldr.oninput();
+    }
+
    // initialize everything when the document has been loaded
     window.onload = setup;
 
@@ -1303,6 +1407,11 @@ rows.push(new interactive_row(FLIGHT_TIME));
       </tr>
     </tbody>
   </table>
+
+  <!-- The number entry div -->
+  <div id="number" style="display:none;" class="number_class">
+    <input type="number" id="number_input" onchange="enter_number(this.name, this.value)" value="0">
+  </div>
 
   <p id="debug"></p>
 
@@ -1360,7 +1469,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-05-13 02:26:01 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-05-14 12:05:02 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     
