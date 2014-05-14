@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="content-type" content="text/html" charset="UTF-8">
 <meta name="viewport" content="width=device-width"/>
 
 <!--
@@ -424,7 +424,7 @@ FLIGHT_TIME : 60,
     interactive_row.prototype.iresult = function i_iresult()
     {
 	var a = '<td style="background-color:yellow;" id="' + this.celli + '" ' +
-	    'onclick="show_number_entry(\'' + this.celli + '\', \'' + this.sldr + '\', \'block\')">';
+	    'onclick="show_number_entry(\'' + this.celli + '\', \'' + this.sldr + '\')">';
 
 	switch (this.lp.vu.unit) {
 	case "min":
@@ -481,7 +481,8 @@ FLIGHT_TIME : 60,
 	a += 'max="' + this.lp.max + '" value="' + this.lp.vu.num +'" ';
 	if (this.lp.step)
 	    a += 'step="' + this.lp.step +'" ';
-	a += 'oninput="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
+	a += 'oninput="user_input_range(this,\'' + this.lp.id + '\')" ';
+	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
 	a += this.result();
 	
 	return a;
@@ -738,7 +739,7 @@ FLIGHT_TIME.vu.get_si(),
     {
 	// correct language
  	document.getElementById("input_cell").textContent = 
-	    (g_defs.s.lang == 0?"Input":"Syöte");
+	    (g_defs.s.lang == 0?"Input":"SyÃ¶te");
 	
 	// set the unit name correctly
  	document.getElementById("mass_title").textContent = 
@@ -794,7 +795,7 @@ FAIRINGS=new l_point("FAIRINGS", ["Wheel fairings", "Renkaiden muotosuojat"], "k
 rows.push(new cbox_interactive_row(FAIRINGS));
 TAXI_FUEL=new l_point("TAXI_FUEL", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.TAXI_FUEL, 0, -20, 2.630, 0.1);
 rows.push(new interactive_row(TAXI_FUEL));
-TOW=new l_point("TOW", ["Take-off mass", "Lähtömassa"], "kg", 0, 0, 1150, 1);
+TOW=new l_point("TOW", ["Take-off mass", "LÃ¤htÃ¶massa"], "kg", 0, 0, 1150, 1);
 rows.push(new non_interactive_row(TOW));
 LNDW=new l_point("LNDW", ["Landing mass", "Laskumassa"], "kg", 0, 0, 1092, 1);
 rows.push(new non_interactive_row(LNDW));
@@ -975,7 +976,7 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
     function refresh_svg_texts()
     {
 	document.getElementById("takeoff_text").textContent=
-	    (g_defs.s.lang == 0?"- Take-off":"- Lentoonlähtö");
+	    (g_defs.s.lang == 0?"- Take-off":"- LentoonlÃ¤htÃ¶");
 
 	document.getElementById("landing_text").textContent=
 	    (g_defs.s.lang == 0?"- Landing":"- Lasku");
@@ -1191,9 +1192,9 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
 	var lang = {
 	    "nofuel" : ["NOT ENOUGH LANDING FUEL",
 		      "EI TARPEEKSI POLTTOAINETTA"],
-	    "remain" : ["remaining", "jäljellä"],
+	    "remain" : ["remaining", "jÃ¤ljellÃ¤"],
 	    "mtow"   : ["TAKE-OFF OVERWEIGHT",
-		      "YLIPAINOA LENTOONLÄHDÖSSÄ"],
+		      "YLIPAINOA LENTOONLÃ„HDÃ–SSÃ„"],
 	    "mlm"    : ["LANDING OVERWEIGHT",
 		      "YLIPAINOA LASKUSSA"],
 	    "cgbust" : ["CENTER OF GRAVITY OUT OF BOUNDS",
@@ -1313,7 +1314,7 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
 	return xy;
     }
 
-    function show_number_entry(id, slider, visibility)
+    function show_number_entry(id, slider)
     {
 	var cell = document.getElementById(id);
 	var cpos = getXYpos(cell);
@@ -1338,7 +1339,7 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
 	// abuse the input element's name attribute
 	input_num.name = slider;
 
-	input_div.style.display=visibility;
+	input_div.style.display='block';
 
 	// add an event handler to hide the div in case user touches
 	// or clicks outside the number div in the table
@@ -1479,7 +1480,7 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-05-14 12:05:02 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-05-14 18:20:55 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     
