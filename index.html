@@ -7,31 +7,48 @@
 
   <style type="text/css">
     body {
-      margin-top: 1.0em;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
+	margin: 1.0em 0px 0px 0px;
+	font-family: Helvetica, Arial, FreeSans, san-serif;
+	color: #000000;
     }
     #container {
-      margin: 0 auto;
-      width: 700px;
+	margin: 0 auto;
+	width: 700px;
     }
     h1 { font-size: 3.8em; color: #453b69; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
     h2 { font-size: 1.5em; color: #453b69; }
     h3 { color: #453b69; }
+    h4 { font-weight: 300;}
     hr { border: 0; width: 100%; border-bottom: 1px solid #aaa}
     a { color: #453b69; }
 
+    li { list-style: none; padding: 0px; }
+    li:before { content: '\2708'; margin: 0 0.5em; }
+
     .mblink {
-	font-size: 1.2em;
+	font-size: 1.1em;
 	text-decoration: none;
 	font-family: serif;
-	border: 1px dotted;
+	border: 1px solid;
 	border-radius: 10px;
 	padding: 2px 8px 2px 8px;
+	background: none;
 	box-shadow: 2px 2px 3px rgba(0,0,0,0.4);
+	transition: background 0.2s linear 0s;
     }
+    .mblink:hover { background: yellow; }
+
+    .toggle_class {
+	border: 1px solid;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	padding: 2px 8px 2px 8px;
+	box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+	transition: background 0.2s linear 0s;
+    }
+    .toggle_class:hover { background: yellow; }
 
     .description {
 	font-size: 1.2em;
@@ -54,14 +71,6 @@
 	display: none;
     }
 
-    .toggle_class {
-	border: 1px solid;
-	border-radius: 10px;
-	padding: 2px 8px 2px 8px;
-	box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
-	background-color: rgba(0,0,0,0.1);
-    }
-
     .draft {
 	font-style: italic;
 	text-align: center;
@@ -69,7 +78,7 @@
     }
 
     .draft:before {
-    content: "DRAFT";
+	content: "DRAFT";
     }
 
     .checked {
@@ -87,6 +96,7 @@
     }
 
     table.a {
+	font-size: 1.2em;
 	border: 1px solid;
 	border-radius: 6%;
 	padding: 10px 10px 10px 10px;
@@ -126,9 +136,9 @@
     <h1><a href="https://github.com/kaltsi/Mass-and-Balance">Mass and Balance</a></h1>
 
     <div class="description">
-      Simple mass and balance sheets for airplanes
+      Simple mass and balance calculator for airplanes
     </div>
-    <p></p>
+
     <table class="a">
       <tr>
 	<th>Aircraft</th><th>M&amp;B Sheet</th><th>Notes</th>
@@ -245,7 +255,7 @@
 
       <div id="oldies_div" class="old_updates">
 	<h4>20.10.2013</h4>
-	<li>Retired OH-COX due to wreck caused by nose gear collapse earlier this year.</li>
+	<li>Retired OH-COX due to a wreck caused by nose gear collapse earlier this year.</li>
 
 	<h4>13.08.2013</h4>
 	<li>Make Firefox 23 input range sliders work interactively</li>
