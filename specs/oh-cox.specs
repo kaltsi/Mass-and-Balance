@@ -1,0 +1,43 @@
+# Aircraft spec file
+#
+# Enter each option without extra spaces between the name and '=' char
+# Put strings inside "quotes". Do not use the § character for anything.
+#
+
+# aircraft registration
+ACFT="OH-COX"
+
+# aircraft type and short description
+ACFT_TYPE="Cessna A152 Aerobat"
+
+# where the mass and balance numbers come from
+DATA_ORIGIN="Numbers: OH-COX w&b record 15.02.2010 + radio mod 19.06.2014"
+
+# 1 litre fuel weight in kilos
+LITRE2KILO=0.721
+
+# Measurements in metres and kilos
+MOMENT_ARMS=[0.787, 0.787, 0.821, 0.925, 0.925, 0.787]
+TOF_MASS_LIMITS=[450, 612, 757, 757, 450, 450]
+LND_MASS_LIMITS=[450, 612, 757, 757, 450, 450]
+
+# You may need to tweak these values for the mass and balance diagram
+# to fit nicely inside the bounding rectangle.
+MOM_DRAW_MAX=475
+MASS_DRAW_MAX=375
+
+# This moves the limits diagram horizontally by the given amount.
+TRANSLATE_X=50
+
+# load points
+
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 562.15 0 -1 0.773
+LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 85 25 -200 0.990
+LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 92.93 0 92.93 1.070 0.1
+LOAD_POINT=LP_I_BAGGAGE "Baggage" "Matkatavaratila" "kg" 15 0 54 1.630
+LOAD_POINT=LP_I_TAXI_FUEL "Taxi#fuel" "Rullauspolttoaine" "ltr" 5 0 -20 1.070 0.1
+LOAD_POINT=LP_N_TOW "Take-off#mass" "Lähtömassa" "kg" 0 0 757 1
+LOAD_POINT=LP_N_LNDW "Landing#mass" "Laskumassa" "kg" 0 0 757 1
+LOAD_POINT=LP_N_ENDURANCE "Endurance" "Toiminta-aika" "min" 0 1 -800 0
+LOAD_POINT=LP_F_FUEL_FLOW "Fuel#flow/h" "Kulutus/h" "ltr" 23 5 -50 1 0.1
+LOAD_POINT=LP_I_FLIGHT_TIME "Flight#time" "Lentoaika" "min" 60 1 -300 0
