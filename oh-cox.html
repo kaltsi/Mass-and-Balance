@@ -1161,13 +1161,15 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	var tx = new_mom(TOW.arm);
 	var ty = new_mass(TOW.vu.getmass());
 
-	var l = document.getElementById("landing_point");
-	l.setAttribute('cy', ly);
-	l.setAttribute('cx', lx);
-
 	var t = document.getElementById("takeoff_point");
 	t.setAttribute('cy', ty);
 	t.setAttribute('cx', tx);
+
+	var c = document.getElementById("cg_arrow");
+	c.setAttribute('x1', tx);
+	c.setAttribute('y1', ty);
+	c.setAttribute('x2', lx);
+	c.setAttribute('y2', ly);
 
 	var lang = {
 	    "nofuel" : ["NOT ENOUGH LANDING FUEL",
@@ -1415,6 +1417,10 @@ rows.push(new interactive_row(FLIGHT_TIME));
       <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
     </filter>
 
+    <defs>
+      <path id="markerPath" d="M1,1 L1,7 L7,4 z"/>
+    </defs>
+
     <g>
       <rect id="svg_border" x="5" y="10" width="1" height="1"
 	    rx="20" ry="20" fill="white"
@@ -1431,12 +1437,19 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	  <line id="landing_limit"
 		x1="1" y1="1" x2="1" y2="1"
 		style="fill:none;stroke:green;stroke-width:2" />
-	
+
+	  <marker id="markerArrow" markerWidth="8" markerHeight="8"
+		  refx="4" refy="4" orient="auto">
+	    <use xlink:href="#markerPath" style="fill: black;"/>
+	  </marker>
+
+	  <line id="cg_arrow" x1="3" y1="3" x2="4" y2="4"
+		marker-end="url(#markerArrow)"
+		style="stroke: black; stroke-width: 2px; stroke-dasharray: 6 3;"/>
+
 	  <circle id="takeoff_point" cx="1" cy="1" r="5"
 		  stroke="black" stroke-width="1" fill="red"/>
 	
-	  <circle id="landing_point" cx="2" cy="2" r="5"
-		  stroke="black" stroke-width="1" fill="green"/>
 	</g>
       </g>
 
@@ -1449,9 +1462,12 @@ rows.push(new interactive_row(FLIGHT_TIME));
       <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
       <text x="35" y="105" id="takeoff_text">- Take-off</text>
     
-      <circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"/>
+      <!--circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"-->
+
+      <g transform="translate(34,118) rotate(90) scale(2)">
+	<use xlink:href="#markerPath"/>
+      </g>
       <text x="35" y="130" id="landing_text">- Landing</text>
-    
     </g>
   </svg>
 
@@ -1460,7 +1476,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-06-27 22:40:21 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-09-25 01:08:17 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     
