@@ -103,7 +103,7 @@ input[type=number] {
     var g_defs = {
 	acft      : "OH-DDS",
 	acft_type : "Diamond DA-40 Star",
-	origin    : "Numbers: OH-DDS mass and balance excel PIK Rev 2.00 14.09.2011",
+	origin    : "Numbers: OH-DDS mass and balance excel PIK Rev 3.00 27.08.2014",
 	ltr2kg    : 0.840,
 	usg2lb    : 0, // will be computed at setup()
 	s : { // These are the default slider values for this plane
@@ -781,7 +781,7 @@ FLIGHT_TIME.vu.get_si(),
         */
 
 	rows = [ ];
-	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 809.5, 0, -1, 2.418);
+	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 814.1, 0, -1, 2.446);
 rows.push(new non_interactive_row(BASIC_WEIGHT, "reverse"));
 FRONT_SEAT=new l_point("FRONT_SEAT", ["Front seat", "Etupenkki"], "kg", g_defs.s.FRONT_SEAT, 25, -250, 2.300);
 rows.push(new interactive_row(FRONT_SEAT));
@@ -1496,7 +1496,7 @@ debug.textContent += (" " + FAIRINGS.moment.toFixed(3));
     
     <div id="extrainfo">
       <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-09-25 01:08:17 +0300</small></p>
+      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-09-25 09:41:40 +0300</small></p>
       <div style="clear:both;"></div>
     </div>
     
