@@ -11,7 +11,7 @@ ACFT="OH-DDS"
 ACFT_TYPE="Diamond DA-40 Star"
 
 # where the mass and balance numbers come from
-DATA_ORIGIN="Numbers: OH-DDS mass and balance excel PIK Rev 2.00 14.09.2011"
+DATA_ORIGIN="Numbers: OH-DDS mass and balance excel PIK Rev 3.00 27.08.2014"
 
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.840
@@ -57,7 +57,7 @@ LND_LIMIT_X2=2.55
 # The following names are fixed. You can't change these names, but you can rearrange them.
 # You can also remove the back seat row.
 
-LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 809.5 0 -1 2.418
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 814.1 0 -1 2.446
 LOAD_POINT=LP_I_FRONT_SEAT "Front#seat" "Etupenkki" "kg" 150 25 -250 2.300
 LOAD_POINT=LP_I_BACK_SEAT "Back#seat" "Takapenkki" "kg" 0 0 -250 3.250
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 70.0 0 148.0 2.630 0.1
