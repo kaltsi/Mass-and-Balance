@@ -59,6 +59,10 @@ table.a td {
     float: right;
 }
 
+.aligncenter {
+    text-align: center;
+}
+
 .number_class {
     position: absolute;
     border: 1px solid;
@@ -1506,6 +1510,12 @@ debug.textContent += (" " + BAGGAGE_A.moment.toFixed(3));
       <text id="ac_reg" x="50%" y="50%" font-size="80"
 	    style="opacity:0.15;text-anchor:middle;">NO-REG</text>
 
+      <g transform="translate(-50,325) rotate(-45)">
+      <text id="ac_invalid" x="50%" y="50%" font-size="110"
+	    style="opacity:0.5;text-anchor:middle;" fill="red"
+	    visibility="/*INVALID_DATA*/hidden/**/">INVALID</text>
+      </g>
+
       <text id="warning_text" x="20" y="50" font-size="20"
 	    fill="green" style="font-weight:bold;">Limits OK</text>
 
@@ -1525,9 +1535,8 @@ debug.textContent += (" " + BAGGAGE_A.moment.toFixed(3));
     <hr/>
     
     <div id="extrainfo">
-      <p class="alignleft" id="origin_text">No origin</p>
-      <p class="alignright"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2014-09-25 01:08:17 +0300</small></p>
-      <div style="clear:both;"></div>
+      <p class="aligncenter" id="origin_text">No origin</p>
+      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2016-03-01 00:42:27 +0200</small></p>
     </div>
     
   </footer>
