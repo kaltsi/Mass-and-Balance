@@ -81,6 +81,14 @@
 	content: "DRAFT";
     }
 
+    .invalid {
+	text-align: center;
+    }
+    .invalid:before {
+	content: "INVALID";
+	color: red;
+    }
+
     .checked {
 	text-align: center;
     }
@@ -204,7 +212,7 @@
 	<td class="tdlink">
 	  <a class="mblink" href="oh-stl.html">OH-STL</a>
 	</td>
-	<td class="checked"/>
+	<td class="invalid"/>
       </tr>
       <tr>
 	<td>
@@ -241,27 +249,28 @@
     <p>Have a safe flight!</p>
 
     <h2>Updates</h2>
-    <h4>25.09.2014</h4>
-    <li>Use an arrowhead to depict landing CG instead of a circle &amp; draw a line between take-off and landing CGs.</li>
-    <li>Retired OH-PYW since it has been sold to UK.</li>
-    <li>OH-DDS data updated.</li>
-
-    <h4>27.06.2014</h4>
-    <li>Bring OH-COX back with an updated basic weight.</li>
-
-    <h4>14.05.2014</h4>
-    <li>Enter numbers with keyboard by clicking on the yellow squares.</li>
-
-    <h4>13.05.2014</h4>
-    <li>Use 'oninput' for input type range sliders and remove Frank Yan's javascript range implementation.</li>
-
-    <h4>12.05.2014</h4>
-    <li>Added OH-IHQ first draft (old weighing report)</li>
+    <h4>01.03.2016</h4>
+    <li>Invalidate OH-STL data while it's waiting for Austro engine conversion.</li>
     <br>
     <div>
       <span class="toggle_class" onclick="toggle_oldies(this)">Show old updates</span>
 
       <div id="oldies_div" class="old_updates">
+	<h4>25.09.2014</h4>
+	<li>Use an arrowhead to depict landing CG instead of a circle &amp; draw a line between take-off and landing CGs.</li>
+	<li>Retired OH-PYW since it has been sold to UK.</li>
+	<li>OH-DDS data updated.</li>
+
+	<h4>27.06.2014</h4>
+	<li>Bring OH-COX back with an updated basic weight.</li>
+
+	<h4>14.05.2014</h4>
+	<li>Enter numbers with keyboard by clicking on the yellow squares.</li>
+
+	<h4>13.05.2014</h4>
+	<li>Use 'oninput' for input type range sliders and remove Frank Yan's javascript range implementation.</li>
+	<h4>12.05.2014</h4>
+	<li>Added OH-IHQ first draft (old weighing report)</li>
 	<h4>20.10.2013</h4>
 	<li>Retired OH-COX due to a wreck caused by nose gear collapse earlier this year.</li>
 

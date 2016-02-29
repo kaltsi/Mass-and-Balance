@@ -4,6 +4,9 @@
 # Put strings inside "quotes". Do not use the § character for anything.
 #
 
+# uncomment to invalidate data
+# INVALID_DATA=visible
+
 # aircraft registration
 ACFT="OH-EXMPL"
 
