@@ -20,10 +20,9 @@ DATA_ORIGIN="Numbers: OH-STL weighing report (07.04.2016) and AFM Rev5"
 LITRE2KILO=0.840
 
 # Measurements in metres and kilos
-MOMENT_ARMS=[2.4, 2.4, 2.46, 2.55, 2.55, 2.4]
-TOF_MASS_LIMITS=[780, 980, 1280, 1280, 780, 780]
-LND_MASS_LIMITS=[780, 980, 1280, 1280, 780, 780]
-#LND_MASS_LIMITS=[780, 980, 1092, 1092, 780, 780]
+MOMENT_ARMS=[2.4, 2.4, 2.46, 2.53, 2.53, 2.4]
+TOF_MASS_LIMITS=[940, 1080, 1280, 1280, 940, 940]
+LND_MASS_LIMITS=[940, 1080, 1280, 1280, 940, 940]
 
 # You may need to tweak these values for the mass and balance diagram
 # to fit nicely inside the bounding rectangle.
