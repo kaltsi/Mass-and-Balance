@@ -14,7 +14,7 @@ ACFT="OH-STL"
 ACFT_TYPE="Diamond DA 40 NG Star"
 
 # where the mass and balance numbers come from
-DATA_ORIGIN="Numbers: OH-STL weighing report (07.04.2016) and AFM Rev5"
+DATA_ORIGIN="Numbers: OH-STL weighing report (07.04.2016) and NG AFM Rev3"
 
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.840
