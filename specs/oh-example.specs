@@ -54,7 +54,7 @@ LND_LIMIT_X2=1.202
 # LP_N_xxx = non-interactive load point xxx
 # LP_R_xxx = non-interactive load point xxx, with reversed output cells
 # LP_I_xxx = interactive load point xxx, the default value will be saveable
-# LP_F_xxx = interactive fiel flow load point xxx, the default value will be saveable
+# LP_F_xxx = interactive fuel flow load point xxx, the default value will be saveable
 # LP_C_xxx = interactive checkbox row, saveable
 #
 # The checkbox state is ON if max value = default value.

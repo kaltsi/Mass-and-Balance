@@ -49,7 +49,6 @@ echo "Handling file: $SPECS_FILE_PATH"
 
 # External variables
 g_code_line=""
-g_code_line_name=""
 g_saveable=""
 g_saveable_group=""
 g_saveable_group_value=""
@@ -94,7 +93,7 @@ function create_lp()
     local unit_min=$6
     local unit_max=$7
     local mom=$8
-    local steps=""
+    local steps=
 
     if [ $# -eq 9 ]; then
 	steps=$9
@@ -109,31 +108,30 @@ function create_lp()
     local the_name="${lpname:5}"
 
     g_code_line=""
-    g_code_line_name="$lpname"
 
     g_code_line="${the_name}=new l_point(\"${the_name}\","
-    g_code_line="$g_code_line [$lang_en, $lang_fi],"
-    g_code_line="$g_code_line ${unit},"
+    g_code_line+=" [$lang_en, $lang_fi],"
+    g_code_line+=" ${unit},"
 
     # For non-interactive elements put the default value in place.
     # For interactive values put the saveable name in place.
     if [ "${lpname:0:5}" == "LP_N_" ] || [ "${lpname:0:5}" == "LP_R_" ]; then
-	g_code_line="$g_code_line ${unit_def},"
+	g_code_line+=" ${unit_def},"
     else
-	g_code_line="$g_code_line g_defs${save_item}.${the_name},"
+	g_code_line+=" g_defs${save_item}.${the_name},"
     fi
 
-    g_code_line="$g_code_line ${unit_min}, ${unit_max}, ${mom}"
+    g_code_line+=" ${unit_min}, ${unit_max}, ${mom}"
 
     if [ ! -z ${steps} ]; then
-	g_code_line="$g_code_line, $steps"
+	g_code_line+=", ${steps}"
     fi
 
-    g_code_line="$g_code_line);"
+    g_code_line+=");"
 
     if [ "${lpname:0:5}" == "LP_F_" ]; then
 	# fuel flow row
-	g_code_line="$g_code_line ${the_name}.fuel_flow = true;"
+	g_code_line+=" ${the_name}.fuel_flow = true;"
     fi
 
     g_name="$the_name"
@@ -222,21 +220,20 @@ while read i; do
 	    create_lp $value
 
 	    variable_names="$variable_names$g_name\n"
-	    code_output="$code_output"$(echo $g_code_line | sed -e "s/#/ /g")"\n"
+	    code_output+=$(echo $g_code_line | sed -e "s/#/ /g")"\n"
 
 	    if [ "${value:0:5}" == "LP_I_" ] || [ "${value:0:5}" == "LP_F_" ] || [ "${value:0:5}" == "LP_C_" ]; then
-		saveables_group="$saveables_group$g_saveable_group\n"
-		saveable_group_values="$saveable_group_values$g_saveable_group_value\n"
+		saveables_group+="$g_saveable_group\n"
+		saveable_group_values+="$g_saveable_group_value\n"
 	    fi
 	    create_row $value
-	    code_output="$code_output$g_code_line\n"
-	    if [ ! -z $g_extra_mass ]; then
-		extra_masses="$extra_masses $g_extra_mass"
+	    code_output+="$g_code_line\n"
+	    if [ -n $g_extra_mass ]; then
+		extra_masses+=" $g_extra_mass"
 	    fi
 	else
 	    simple_replace "$name" "$value"
 	fi
-
    fi
 done < $SPECS_FILE_PATH
 
@@ -257,14 +254,14 @@ extra_debug_lines=""
 create_extra_mass()
 {
     for i in $*; do
-	extra_calc_mass="$extra_calc_mass$i,\n"
-	extra_mass_calc_moments="${extra_mass_calc_moments}calc_moment($i);\n"
-	extra_mass_moments="$extra_mass_moments$i.moment +\n"
-	extra_debug_lines="${extra_debug_lines}debug.textContent += (\" \" + $i.moment.toFixed(3));\n"
+	extra_calc_mass+="$i,\n"
+	extra_mass_calc_moments+="calc_moment($i);\n"
+	extra_mass_moments+="$i.moment +\n"
+	extra_debug_lines+="debug.textContent += (\" \" + $i.moment.toFixed(3));\n"
     done
 }
 
-if [ "z" != z"$extra_masses" ]; then 
+if [ -n "$extra_masses" ]; then
     create_extra_mass "$extra_masses"
 else
     # create empty replace for the extra equipment
