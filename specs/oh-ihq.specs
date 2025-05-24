@@ -11,7 +11,7 @@ ACFT="OH-IHQ"
 ACFT_TYPE="Diamond DV 20 (Rotax 912S)"
 
 # where the mass and balance numbers come from
-DATA_ORIGIN="Numbers: DV 20 (S/N: 20205) Weighing report 14.10.2010"
+DATA_ORIGIN="Numbers: DV 20 (S/N: 20205) Weighing report 23.05.2025"
 
 # 1 litre fuel weight in kilos
 LITRE2KILO=0.75
@@ -31,7 +31,7 @@ TRANSLATE_X=50
 
 # load points
 
-LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 513.3 0 -1 0.310813
+LOAD_POINT=LP_R_BASIC_WEIGHT "Basic#weight" "Perusmassa" "kg" 515.2 0 -1 0.331
 LOAD_POINT=LP_I_FRONT_SEAT "Left#seat" "Vasen#istuin" "kg" 85 5 -110 0.143
 LOAD_POINT=LP_I_FRONT_RIGHT "Right#seat" "Oikea#istuin" "kg" 0 0 -110 0.143
 LOAD_POINT=LP_I_FUEL "Fuel" "Polttoaine" "ltr" 79.0 0 79.0 0.824 0.1
