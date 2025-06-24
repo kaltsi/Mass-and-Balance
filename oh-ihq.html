@@ -9,7 +9,7 @@
 
     https://github.com/kaltsi/Mass-and-Balance
 
-    Copyright (c) 2012 - 2014 Juha Kallioinen <kaltsi+github@gmail.com>
+    Copyright (c) 2012 - 2020 Juha Kallioinen <kaltsi+github@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ table.a td {
     padding-right: 10px;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
@@ -107,7 +107,7 @@ input[type=number] {
     var g_defs = {
 	acft      : "OH-IHQ",
 	acft_type : "Diamond DV 20 (Rotax 912S)",
-	origin    : "Numbers: DV 20 (S/N: 20205) Weighing report 14.10.2010",
+	origin    : "Numbers: DV 20 (S/N: 20205) Weighing report 23.05.2025",
 	ltr2kg    : 0.75,
 	usg2lb    : 0, // will be computed at setup()
 	s : { // These are the default slider values for this plane
@@ -126,7 +126,7 @@ FLIGHT_TIME : 60,
     };
 
     /* mass and balance envelope limits (metres and kilos) */
-    
+
     var g_lim = {
 	x          : [0.250, 0.250, 0.390, 0.390, 0.250],
 	y          : [560, 730, 730, 560, 560],
@@ -224,18 +224,18 @@ FLIGHT_TIME : 60,
 	function pad2(n) {
 	    return (n < 10?'0':'') + n;
 	}
-	
+
 	h = this.num / 60.0;
 	m = this.num % 60.0;
-	
+
 	return pad2(Math.floor(h)) + ":" + pad2(Math.floor(m)) + " h";
     }
 
-    /* 
+    /*
        display the value and unit
        n: num of decimals
     */
-       
+
     value_unit.prototype.display = function v_display(n)
     {
 	if (n) {
@@ -246,7 +246,7 @@ FLIGHT_TIME : 60,
 	}
     }
 
-    /* 
+    /*
        return the SI value (used for saving defaults)
     */
 
@@ -277,7 +277,7 @@ FLIGHT_TIME : 60,
 	return m;
     }
 
-    /* 
+    /*
        return the mass of value unit - calculates it for the volume units
        n: num of decimals
        u: also show unit
@@ -286,7 +286,7 @@ FLIGHT_TIME : 60,
     value_unit.prototype.getmass = function v_mass(n, u)
     {
 	var m = this.num;
-	
+
 	switch (this.unit) {
 	case "ltr":
 	    if (g_mass_unit == "kg")
@@ -306,7 +306,7 @@ FLIGHT_TIME : 60,
 	default:
 	    // fall through, display the raw value
 	}
-	
+
 	// if no unit is wanted, try to return a number
 	if (n) {
 	    if (u)
@@ -321,14 +321,14 @@ FLIGHT_TIME : 60,
 		return m;
 	}
     }
-    
+
     /* switch the unit and recalculate the value */
-    
+
     value_unit.prototype.unitchg = function v_unit_change()
     {
 	var that = this; // inner function trick
 	var update_min_max = function(m, a) {
- 	    if (that.lp) {
+	    if (that.lp) {
 		that.lp.min = (100000.0 * that.lp.min * m) / 100000.0;
 		that.lp.max = (100000.0 * that.lp.max * m) / 100000.0;
 		that.lp.arm = (100000.0 * that.lp.arm * a) / 100000.0;
@@ -394,7 +394,7 @@ FLIGHT_TIME : 60,
 	this.vu.lp   = this; // associate the mass object with this
     }
 
-    /* 
+    /*
       a table row with interactive elements
 
       lp:    load point object
@@ -408,14 +408,14 @@ FLIGHT_TIME : 60,
 	this.cellr = this.lp.id + "c2";  // result cell id
 	this.sldr  = this.lp.id + "s";   // slider element id
     }
-    
+
     /* return the descriptive name for the row (first cell) */
 
     interactive_row.prototype.description = function i_descr()
     {
 	var a = '<th>' + this.lp.descr[g_defs.s.lang];
 
-	if (this.lp.dispmax) 
+	if (this.lp.dispmax)
 	    a += ' (max ' + this.lp.max.toFixed() + ' ' + this.lp.vu.unit +')';
 
 	a += '</th>';
@@ -487,7 +487,7 @@ FLIGHT_TIME : 60,
 	a += 'oninput="user_input_range(this,\'' + this.lp.id + '\')" ';
 	a += 'onchange="user_input_range(this,\'' + this.lp.id + '\')"/></th>';
 	a += this.result();
-	
+
 	return a;
     }
 
@@ -506,7 +506,7 @@ FLIGHT_TIME : 60,
     }
 
 
-    /* 
+    /*
       a table row with interactive checkbox elements
 
       lp:    load point object
@@ -520,7 +520,7 @@ FLIGHT_TIME : 60,
 	this.cellr = this.lp.id + "c2";  // result cell id
 	this.cbox  = this.lp.id + "ck";  // checkbox element id
     }
-    
+
     /* return the descriptive name for the row (first cell) */
 
     cbox_interactive_row.prototype.description = function i_cdescr()
@@ -548,7 +548,7 @@ FLIGHT_TIME : 60,
 	var a = this.description();
 
 	a += '<td style="background-color:yellow;text-align:center;" id="' + this.celli + '">';
- 	a += '<input id="' + this.cbox + '" type="checkbox" ' + chk + ' ' +
+	a += '<input id="' + this.cbox + '" type="checkbox" ' + chk + ' ' +
 	    'onchange="user_checkbox(this, \'' + this.lp.id + '\', ' +
 	    this.lp.min + ', ' + this.lp.max + ')"/>';
 
@@ -557,7 +557,7 @@ FLIGHT_TIME : 60,
 	a += '<th style="font-weight:normal; text-align:center;">. . . . .</th>';
 
 	a += this.result();
-	
+
 	return a;
     }
 
@@ -569,7 +569,7 @@ FLIGHT_TIME : 60,
 	refresh(this);
     }
 
-    /* 
+    /*
        a table row with no interactive elements
 
        lp: the load point for this row
@@ -618,7 +618,7 @@ FLIGHT_TIME : 60,
 	a += '</td>';
 	return a;
     }
-    
+
     /* generate content for the whole row */
 
     non_interactive_row.prototype.content = function ni_content()
@@ -690,8 +690,8 @@ FLIGHT_TIME : 60,
 	if (typeof(Storage) !== "undefined") {
 	    /* The order of saveables is important!
 
-               Normalize the masses to kg before saving.
-             */
+	       Normalize the masses to kg before saving.
+	     */
 	    var savevalues = [
 		FRONT_SEAT.vu.get_si(),
 FRONT_RIGHT.vu.get_si(),
@@ -704,7 +704,7 @@ FLIGHT_TIME.vu.get_si(),
 		(g_mass_unit=="kg"?0:1),
 		g_defs.s.lang
 	    ];
-	    
+
 	    var i = 0;
 	    for (var n in g_defs.s) {
 		localStorage.setItem("kaltsi.mb." + g_defs.acft + "." + n, Number(savevalues[i]));
@@ -726,7 +726,7 @@ FLIGHT_TIME.vu.get_si(),
 	    for (var n in g_defs.s) {
 		localStorage.removeItem("kaltsi.mb." + g_defs.acft + "." + n);
 	    }
-	    
+
 	    document.getElementById("reminder_cell").
 	    textContent=(g_defs.s.lang == 0?
 			 "Cleared your default settings":
@@ -740,14 +740,14 @@ FLIGHT_TIME.vu.get_si(),
     function refresh_title_row()
     {
 	// correct language
- 	document.getElementById("input_cell").textContent = 
+	document.getElementById("input_cell").textContent =
 	    (g_defs.s.lang == 0?"Input":"Syöte");
-	
+
 	// set the unit name correctly
- 	document.getElementById("mass_title").textContent = 
+	document.getElementById("mass_title").textContent =
 	    (g_defs.s.lang == 0?
 	     "Mass":
-	     "Massa") + 
+	     "Massa") +
 	    " (" + g_mass_unit + ")";
     }
 
@@ -777,13 +777,13 @@ FLIGHT_TIME.vu.get_si(),
 	document.getElementById("translate_group").setAttribute('transform', 'translate(' + trs + ',-450)');
 
 	/*
-         All these are created global, since I'm not using 'var'.
-         The variable name must be the same as the id.
+	 All these are created global, since I'm not using 'var'.
+	 The variable name must be the same as the id.
 
-        */
+	*/
 
 	rows = [ ];
-	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 513.3, 0, -1, 0.310813);
+	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 515.2, 0, -1, 0.331);
 rows.push(new non_interactive_row(BASIC_WEIGHT, "reverse"));
 FRONT_SEAT=new l_point("FRONT_SEAT", ["Left seat", "Vasen istuin"], "kg", g_defs.s.FRONT_SEAT, 5, -110, 0.143);
 rows.push(new interactive_row(FRONT_SEAT));
@@ -851,7 +851,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
 	// minimum landing fuel (45 mins reserve)
 	g_lnd_fuel.min = (FUEL_FLOW.vu.num * 45.0) / 60.0;
-	
+
 	// landing weight
 	LNDW.vu.num = calc_mass(
 	    g_lnd_fuel,
@@ -867,7 +867,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	ENDURANCE.vu.num = ((FUEL.vu.num - TAXI_FUEL.vu.num) / FUEL_FLOW.vu.num) * 60.0; // minutes
 	if (ENDURANCE.vu.num < 0)
 	    ENDURANCE.vu.num = 0;
-	    
+
 
 	// compute the moment values for each load point
 	calc_moment(BASIC_WEIGHT);
@@ -879,22 +879,22 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
 
 	// take-off moment arm
-	TOW.moment = 
-	    BASIC_WEIGHT.moment + 
-	    FRONT_SEAT.moment + 
+	TOW.moment =
+	    BASIC_WEIGHT.moment +
+	    FRONT_SEAT.moment +
 	    BAGGAGE.moment +
 	    FRONT_RIGHT.moment +
 
-	    FUEL.moment - 
+	    FUEL.moment -
 	    TAXI_FUEL.moment;
 
 	TOW.arm = TOW.moment / TOW.vu.getmass();
 
 	// landing moment arm
-	LNDW.moment = 
-	    BASIC_WEIGHT.moment + 
-	    FRONT_SEAT.moment + 
-	    BAGGAGE.moment + 
+	LNDW.moment =
+	    BASIC_WEIGHT.moment +
+	    FRONT_SEAT.moment +
+	    BAGGAGE.moment +
 	    FRONT_RIGHT.moment +
 
 	    (g_lnd_fuel.vu.getmass() * FUEL.arm);
@@ -917,7 +917,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	else {
 	    debug.textContent = "";
 	}
-	
+
 	update_cells();
 	update_svg();
     }
@@ -930,12 +930,12 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	textContent=(g_defs.s.lang == 0?
 		     "Loaded default settings":
 		     "Asetukset ladattu");
-	
+
 	setTimeout("remove_reminder()", 5000);
     }
-    
+
     /* remove the settings reminder */
-    
+
     function remove_reminder()
     {
 	document.getElementById("reminder_cell").textContent="";
@@ -977,7 +977,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
     }
 
     /* change all the language strings */
-    
+
     function handle_lang_change(t)
     {
 	switch (t.value) {
@@ -1002,7 +1002,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
 	calculate();
     }
-    
+
     /* change all numbers and their units */
 
     function handle_unit_change(t)
@@ -1113,13 +1113,13 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	var j = g_lim.x.length - 1;
 	var in_envelope = 0;
 	var i, yi, xi, yj, xj;
-	
+
 	for (i=0; i < g_lim.x.length; j=i++) {
 	    xi = g_lim.x[i];
 	    xj = g_lim.x[j];
 	    yi = yarray[i];
 	    yj = yarray[j];
-	    
+
 	    if ( ((yi > y) != (yj > y)))  {
 		if (x < ((xj - xi) * (y - yi) / (yj - yi) + xi))
 		    in_envelope = (in_envelope==1?0:1);
@@ -1130,10 +1130,10 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    // we're outside the x-boundary
 	    in_envelope = -1;
 	}
-	
+
 	return in_envelope;
     }
-    
+
 
     /* draw the svg boxes and the line around the MnB envelope */
 
@@ -1144,7 +1144,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	var svg = document.getElementById("svg_main");
 	svg.setAttribute('width',  600);
 	svg.setAttribute('height', 480);
-	
+
 	var rct = document.getElementById("svg_border");
 	rct.setAttribute('width',  550);
 	rct.setAttribute('height', 450);
@@ -1152,7 +1152,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	for (var i = 0; i < g_lim.x.length; i++) {
 	    polygon += new_mom(g_lim.x[i]) + ',' + new_mass(g_lim.y[i]) + " ";
 	}
-	
+
 	document.getElementById("mb_limits").setAttribute('points', polygon);
 
 	if (LNDW.max < TOW.max) {
@@ -1380,9 +1380,9 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
 </head>
 <body>
-  
+
   <h1 id="ac_type_hdr">NO AIRCRAFT TYPE SET</h1>
-  
+
   <select id="settings_select" onchange="handle_settings_change(this)">
     <option id="select_settings_title" value="title" disabled>Settings</option>
     <option id="select_settings_save"  value="save" >Save</option>
@@ -1447,7 +1447,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 		   points="0,0 1,1"
 		   fill="white"
 		   style="stroke:black;stroke-width:2" />
-	
+
 	  <line id="landing_limit"
 		x1="1" y1="1" x2="1" y2="1"
 		style="fill:none;stroke:green;stroke-width:2" />
@@ -1463,7 +1463,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
 	  <circle id="takeoff_point" cx="1" cy="1" r="5"
 		  stroke="black" stroke-width="1" fill="red"/>
-	
+
 	</g>
       </g>
 
@@ -1481,7 +1481,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
       <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
       <text x="35" y="105" id="takeoff_text">- Take-off</text>
-    
+
       <!--circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"-->
 
       <g transform="translate(34,118) rotate(90) scale(2)">
@@ -1493,14 +1493,13 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
   <footer>
     <hr/>
-    
+
     <div id="extrainfo">
       <p class="aligncenter" id="origin_text">No origin</p>
-      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2016-04-14 15:18:42 +0300</small></p>
+      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2025-06-24 20:57:35 +0300</small></p>
     </div>
-    
+
   </footer>
-  
+
 </body>
 </html>
-
