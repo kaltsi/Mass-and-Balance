@@ -5,7 +5,6 @@ WORKDIR /app
 COPY pyproject.toml README ./
 COPY parse_template.py template.html.j2 ./
 COPY specs/ specs/
-COPY tools/ tools/
 
 RUN pip install --no-cache-dir jinja2
 
