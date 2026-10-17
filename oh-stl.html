@@ -108,17 +108,16 @@ input[type=number] {
 	acft      : "OH-STL",
 	acft_type : "Diamond DA 40 NG Star",
 	origin    : "Numbers: OH-STL weighing report (07.04.2016) and NG AFM Rev3",
-	ltr2kg    : 0.840,
+	ltr2kg    : 0.84,
 	usg2lb    : 0, // will be computed at setup()
 	s : { // These are the default slider values for this plane
 	    FRONT_SEAT : 150,
-BACK_SEAT : 0,
-FUEL : 70.0,
-BAGGAGE : 10,
-TAXI_FUEL : 5,
-FUEL_FLOW : 23.2,
-FLIGHT_TIME : 60,
-
+	    BACK_SEAT : 0,
+	    FUEL : 70,
+	    BAGGAGE : 10,
+	    TAXI_FUEL : 5,
+	    FUEL_FLOW : 23.2,
+	    FLIGHT_TIME : 60,
 	    mass  : 0,     // 0 = kg, 1 = lb
 	    lang  : 0      // 0 = English, 1 = Suomi
 	},
@@ -694,13 +693,12 @@ FLIGHT_TIME : 60,
 	     */
 	    var savevalues = [
 		FRONT_SEAT.vu.get_si(),
-BACK_SEAT.vu.get_si(),
-FUEL.vu.get_si(),
-BAGGAGE.vu.get_si(),
-TAXI_FUEL.vu.get_si(),
-FUEL_FLOW.vu.get_si(),
-FLIGHT_TIME.vu.get_si(),
-
+		BACK_SEAT.vu.get_si(),
+		FUEL.vu.get_si(),
+		BAGGAGE.vu.get_si(),
+		TAXI_FUEL.vu.get_si(),
+		FUEL_FLOW.vu.get_si(),
+		FLIGHT_TIME.vu.get_si(),
 		(g_mass_unit=="kg"?0:1),
 		g_defs.s.lang
 	    ];
@@ -760,7 +758,6 @@ FLIGHT_TIME.vu.get_si(),
 	// calculate the 1 usg fuel -> lb constant
 	g_defs.usg2lb = (1 / g_ltr_usg) * g_kg_lbs * g_defs.ltr2kg;
 
-	 
 
 	// then load the default values for the sliders
 	load_defaults();
@@ -783,29 +780,17 @@ FLIGHT_TIME.vu.get_si(),
 	*/
 
 	rows = [ ];
-	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 909.4, 0, -1, 2.43);
-rows.push(new non_interactive_row(BASIC_WEIGHT, "reverse"));
-FRONT_SEAT=new l_point("FRONT_SEAT", ["Front seat", "Etupenkki"], "kg", g_defs.s.FRONT_SEAT, 25, -250, 2.300);
-rows.push(new interactive_row(FRONT_SEAT));
-BACK_SEAT=new l_point("BACK_SEAT", ["Back seat", "Takapenkki"], "kg", g_defs.s.BACK_SEAT, 0, -250, 3.250);
-rows.push(new interactive_row(BACK_SEAT));
-FUEL=new l_point("FUEL", ["Fuel", "Polttoaine"], "ltr", g_defs.s.FUEL, 0, 148.0, 2.630, 0.1);
-rows.push(new interactive_row(FUEL));
-BAGGAGE=new l_point("BAGGAGE", ["Baggage", "Matkatavaratila"], "kg", g_defs.s.BAGGAGE, 0, 30, 3.650);
-rows.push(new interactive_row(BAGGAGE));
-TAXI_FUEL=new l_point("TAXI_FUEL", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.TAXI_FUEL, 0, -20, 2.630, 0.1);
-rows.push(new interactive_row(TAXI_FUEL));
-TOW=new l_point("TOW", ["Take-off mass", "Lähtömassa"], "kg", 0, 0, 1280, 1);
-rows.push(new non_interactive_row(TOW));
-LNDW=new l_point("LNDW", ["Landing mass", "Laskumassa"], "kg", 0, 0, 1280, 1);
-rows.push(new non_interactive_row(LNDW));
-ENDURANCE=new l_point("ENDURANCE", ["Endurance", "Toiminta-aika"], "min", 0, 1, -800, 0);
-rows.push(new non_interactive_row(ENDURANCE));
-FUEL_FLOW=new l_point("FUEL_FLOW", ["Fuel flow/h", "Kulutus/h"], "ltr", g_defs.s.FUEL_FLOW, 5, -50, 1, 0.1); FUEL_FLOW.fuel_flow = true;
-rows.push(new interactive_row(FUEL_FLOW));
-FLIGHT_TIME=new l_point("FLIGHT_TIME", ["Flight time", "Lentoaika"], "min", g_defs.s.FLIGHT_TIME, 1, -300, 0);
-rows.push(new interactive_row(FLIGHT_TIME));
-
+	BASIC_WEIGHT=new l_point("BASIC_WEIGHT", ["Basic weight", "Perusmassa"], "kg", 909.4, 0, -1, 2.43);	rows.push(new non_interactive_row(BASIC_WEIGHT, "reverse"));
+	FRONT_SEAT=new l_point("FRONT_SEAT", ["Front seat", "Etupenkki"], "kg", g_defs.s.FRONT_SEAT, 25, -250, 2.3);	rows.push(new interactive_row(FRONT_SEAT));
+	BACK_SEAT=new l_point("BACK_SEAT", ["Back seat", "Takapenkki"], "kg", g_defs.s.BACK_SEAT, 0, -250, 3.25);	rows.push(new interactive_row(BACK_SEAT));
+	FUEL=new l_point("FUEL", ["Fuel", "Polttoaine"], "ltr", g_defs.s.FUEL, 0, 148, 2.63, 0.1);	rows.push(new interactive_row(FUEL));
+	BAGGAGE=new l_point("BAGGAGE", ["Baggage", "Matkatavaratila"], "kg", g_defs.s.BAGGAGE, 0, 30, 3.65);	rows.push(new interactive_row(BAGGAGE));
+	TAXI_FUEL=new l_point("TAXI_FUEL", ["Taxi fuel", "Rullauspolttoaine"], "ltr", g_defs.s.TAXI_FUEL, 0, -20, 2.63, 0.1);	rows.push(new interactive_row(TAXI_FUEL));
+	TOW=new l_point("TOW", ["Take-off mass", "Lähtömassa"], "kg", 0, 0, 1280, 1);	rows.push(new non_interactive_row(TOW));
+	LNDW=new l_point("LNDW", ["Landing mass", "Laskumassa"], "kg", 0, 0, 1280, 1);	rows.push(new non_interactive_row(LNDW));
+	ENDURANCE=new l_point("ENDURANCE", ["Endurance", "Toiminta-aika"], "min", 0, 1, -800, 0);	rows.push(new non_interactive_row(ENDURANCE));
+	FUEL_FLOW=new l_point("FUEL_FLOW", ["Fuel flow/h", "Kulutus/h"], "ltr", g_defs.s.FUEL_FLOW, 5, -50, 1, 0.1); FUEL_FLOW.fuel_flow = true;	rows.push(new interactive_row(FUEL_FLOW));
+	FLIGHT_TIME=new l_point("FLIGHT_TIME", ["Flight time", "Lentoaika"], "min", g_defs.s.FLIGHT_TIME, 1, -300, 0);	rows.push(new interactive_row(FLIGHT_TIME));
 
 	// This does not necessarily get a row, but acts just as a calculation object.
 	g_lnd_fuel = new l_point("g_lnd_fuel", ["Landing fuel", "Laskupolttoaine"], "ltr", 0, 0, 0, 0);
@@ -841,7 +826,6 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    FUEL,
 	    BAGGAGE,
 	    BACK_SEAT,
-
 	    null
 	);
 	TOW.vu.num -= TAXI_FUEL.vu.getmass();
@@ -859,7 +843,6 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    BAGGAGE,
 	    BASIC_WEIGHT,
 	    BACK_SEAT,
-
 	    null
 	);
 
@@ -877,14 +860,12 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	calc_moment(FUEL);
 	calc_moment(BACK_SEAT);
 
-
 	// take-off moment arm
 	TOW.moment =
 	    BASIC_WEIGHT.moment +
 	    FRONT_SEAT.moment +
 	    BAGGAGE.moment +
 	    BACK_SEAT.moment +
-
 	    FUEL.moment -
 	    TAXI_FUEL.moment;
 
@@ -896,7 +877,6 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    FRONT_SEAT.moment +
 	    BAGGAGE.moment +
 	    BACK_SEAT.moment +
-
 	    (g_lnd_fuel.vu.getmass() * FUEL.arm);
 
 	LNDW.arm = LNDW.moment / LNDW.vu.getmass();
@@ -908,8 +888,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 	    debug.textContent += (" " + BAGGAGE.moment.toFixed(3));
 	    debug.textContent += (" " + TAXI_FUEL.moment.toFixed(3));
 	    debug.textContent += (" " + FUEL.moment.toFixed(3));
-	    debug.textContent += (" " + BACK_SEAT.moment.toFixed(3));
-
+debug.textContent += (" " + BACK_SEAT.moment.toFixed(3));
 	    debug.textContent += (" tow.arm=" + TOW.arm.toFixed(3));
 	    debug.textContent += (" lnd.arm=" + LNDW.arm.toFixed(3));
 	    debug.textContent += (" lnd fuel=" + g_lnd_fuel.vu.display(1));
@@ -1473,7 +1452,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
       <!--g transform="translate(-50,325) rotate(-45)">
       <text id="ac_invalid" x="50%" y="50%" font-size="110"
 	    style="opacity:0.5;text-anchor:middle;" fill="red"
-	    visibility="/*INVALID_DATA*/hidden/**/">INVALID</text>
+	    visibility="hidden">INVALID</text>
       </g-->
 
       <text id="warning_text" x="20" y="50" font-size="20"
@@ -1496,7 +1475,7 @@ rows.push(new interactive_row(FLIGHT_TIME));
 
     <div id="extrainfo">
       <p class="aligncenter" id="origin_text">No origin</p>
-      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a>  2025-06-24 20:57:35 +0300</small></p>
+      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> 2026-10-17 16:58:52 +0000</small></p>
     </div>
 
   </footer>
