@@ -41,4 +41,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./site
-          keep_files: true
+          # Clean deploy: the gh-pages branch is wiped before publishing,
+          # so it contains only the generated pages at the root.
+          keep_files: false
