@@ -26,8 +26,8 @@ import jinja2
 # Load points that the template already defines by hand. Anything else is
 # considered user-added equipment.
 KNOWN_LOAD_POINTS = {
-    # Same set as parse_template.sh: these have fixed positions in the
-    # calculation chains, everything else is handled by the extras loop.
+    # These have fixed positions in the calculation chains, everything else is
+    # handled by the extras loop.
     "BASIC_WEIGHT", "FRONT_SEAT", "FUEL", "BAGGAGE", "TAXI_FUEL",
     "TOW", "LNDW", "ENDURANCE", "FUEL_FLOW", "FLIGHT_TIME",
 }

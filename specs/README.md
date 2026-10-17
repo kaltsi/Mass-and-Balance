@@ -1,38 +1,8 @@
 # Spec files
 
-Every aircraft has two files in this directory:
-
-- `<registration>.specs` - the human editable source
-- `<registration>.json` - the form the generator reads
-
-The JSON is generated from the `.specs` file, so the JSON is what should be edited only
-if the `.specs` file is not kept. Keys are written in reading order: the aircraft
-identity, then the chart geometry (`envelope`), then the load points. A key that is not
-set falls back to the default written in the template.
-
-## Key names
-
-The `.specs` files use upper case names; the JSON uses readable lower case keys:
-
-| .specs | JSON |
-|---|---|
-| `ACFT` | `registration` |
-| `ACFT_TYPE` | `aircraft_type` |
-| `DATA_ORIGIN` | `data_source` |
-| `LITRE2KILO` | `fuel_density_kg_per_l` |
-| `MOMENT_ARMS` | `envelope.moment_arms` |
-| `TOF_MASS_LIMITS` | `envelope.takeoff_mass_limits` |
-| `LND_MASS_LIMITS` | `envelope.landing_mass_limits` |
-| `MOM_DRAW_MAX` | `envelope.moment_axis_max` |
-| `MASS_DRAW_MAX` | `envelope.mass_axis_max` |
-| `TRANSLATE_X` | `envelope.chart_x_offset` |
-| `LND_LIMIT_X1` | `envelope.landing_limit_arm_start` |
-| `LND_LIMIT_X2` | `envelope.landing_limit_arm_end` |
-| `INVALID_DATA` | `invalid_data` |
-| `LOAD_POINTS` | `load_points` |
-
-In a `.specs` file a load point line is `LP_<type>_<NAME> "English" "Finnish" "unit" default min max arm [step]`,
-where the type letter becomes `row_type` and the rest of the name becomes `name`.
+Every aircraft has one spec file, `<registration>.json`. Keys are written in reading
+order: the aircraft identity, then the chart geometry (`envelope`), then the load points.
+A key that is not set falls back to the default written in the template.
 
 ## Top level keys
 
@@ -87,11 +57,9 @@ Each load point is one row in the table.
 |---|---|---|
 | `interactive` | slider row, the user enters a value | yes |
 | `fuel_flow` | interactive row that also drives the endurance calculation | yes |
-| `checkbox` | interactive checkbox row | yes |
+| `checkbox` | interactive checkbox row, ON when max equals default | yes |
 | `computed` | non-interactive row, the value is calculated | no |
 | `computed_reversed` | non-interactive row with the result and the value cells swapped | no |
-
-In the `.specs` files the row type is the `LP_<letter>_` prefix: `I`, `F`, `C`, `N`, `R`.
 
 ## Fixed names
 
@@ -102,17 +70,19 @@ extras loop.
 
 ## Conventions
 
-- A negative max in a `.specs` file means "do not print the limit". In the JSON the max is
-  positive and `show_max` is false. The template re-encodes the sign when it calls
-  `l_point()`, because the page code tests `max > 0`.
+- `max` is always positive. `show_max` says whether the limit is printed in the row
+  description; the page code tests `max > 0`, so the template passes a negative max when
+  `show_max` is false.
 - Load point names stay upper case: they are JavaScript identifiers and the keys of the
   saved values.
-- `step` is omitted when the spec has no step, `invalid_data` only when it is uncommented
-  in the `.specs` file.
+- `step` is omitted when a row has no step.
+
+## Adding an aircraft
+
+Copy `oh-example.json`, edit the values and run the export script. `oh-example.json`
+exercises every row type, so it is the best starting point.
 
 ## Example
-
-`oh-example.specs` and `oh-example.json` exercise every row type:
 
 ```json
 {
