@@ -12,7 +12,8 @@ existing specification files under the specs subdirectory, then create a new
 JSON file there and run the export.sh script. The spec format is documented in
 specs/README.md.
 
-The generator is parse_template.py, which renders template.html.j2 with Jinja2:
+The generator is parse_template.py, which renders template.html.j2 with Jinja2
+(jinja2 >= 3.1, see pyproject.toml):
 
     ./parse_template.py template.html.j2 specs/oh-kas.json out
 
@@ -32,3 +33,18 @@ To run it in a container:
 
     docker build -t mass-and-balance .
     docker run --rm -v "$PWD/out:/app/out" mass-and-balance specs/oh-kas.json out
+
+Publishing
+
+The published page is the gh-pages branch, served by GitHub Pages as it is
+committed, without any build step. index.html is the hand written landing page
+and links to the sheets by relative path, so the generated files must sit next
+to it at the branch root.
+
+git archive expands the $Format: %ci$ placeholder in the *.html files marked
+export-subst in .gitattributes, which is how the footer date gets baked into the
+published copy. The generated sheets keep the placeholder, so the date only appears
+in the exported copy. export.sh only works inside a git clone for this reason.
+
+The debug section is hidden in generated sheets: build_context() sets hide_debug,
+which renders the debug button with display:none.
