@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html" charset="UTF-8">
-<meta name="viewport" content="width=device-width"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
 <!--
     Mass and balance calculator for {{ registration|js("OH-DEMO") }}
@@ -150,16 +150,24 @@ input[type=number] {
 	    }
 	}
 
+	function convert1(v, m) {
+	    return (100000.0 * v * m) / 100000.0;
+	}
+
 	switch (g_mass_unit) {
 	case "kg":
 	    convert(this.x, 1/g_m_inch);
 	    convert(this.y, 1/g_kg_lbs);
 	    convert(this.y_land, 1/g_kg_lbs);
+	    this.lim_lnd1 = convert1(this.lim_lnd1, 1/g_m_inch);
+	    this.lim_lnd2 = convert1(this.lim_lnd2, 1/g_m_inch);
 	    break;
 	case "lb":
 	    convert(this.x, g_m_inch);
 	    convert(this.y, g_kg_lbs);
 	    convert(this.y_land, g_kg_lbs);
+	    this.lim_lnd1 = convert1(this.lim_lnd1, g_m_inch);
+	    this.lim_lnd2 = convert1(this.lim_lnd2, g_m_inch);
 	    break;
 	default:
 	    alert("Invalid lim_unit_change: cannot happen!");
@@ -674,7 +682,6 @@ input[type=number] {
 	    refresh_svg_texts();
 	    document.getElementById("units_select").selectedIndex = g_defs.s.mass;
 	    document.getElementById("lang_select").selectedIndex = g_defs.s.lang;
-	    document.getElementById("settings_select").selectedIndex = g_defs.s.lang;
 	}
     }
 
@@ -751,7 +758,7 @@ input[type=number] {
 	g_defs.usg2lb = (1 / g_ltr_usg) * g_kg_lbs * g_defs.ltr2kg;
 
 	{% if not hide_debug %}document.getElementById("debug_button").
-	setAttribute('style', 'display');{% endif %}
+	setAttribute('style', 'display:inline-block');{% endif %}
 
 	// then load the default values for the sliders
 	load_defaults();
@@ -775,7 +782,7 @@ input[type=number] {
 
 	rows = [ ];
 	{% for lp in load_points %}
-	{{ lp.name }}=new l_point("{{ lp.name }}", ["{{ lp.label.en }}", "{{ lp.label.fi }}"], "{{ lp.unit }}", {{ lp.default_expr }}, {{ lp.min }}, {{ lp.max if lp.show_max else -lp.max }}, {{ lp.moment_arm }}{% if lp.step is defined %}, {{ lp.step }}{% endif %});{% if lp.row_type == 'fuel_flow' %} {{ lp.name }}.fuel_flow = true;{% endif %}
+	{{ lp.name }}=new l_point("{{ lp.name }}", [{{ lp.label.en|js }}, {{ lp.label.fi|js }}], "{{ lp.unit }}", {{ lp.default_expr }}, {{ lp.min }}, {{ lp.max if lp.show_max|default(true) else -lp.max }}, {{ lp.moment_arm }}{% if lp.step is defined %}, {{ lp.step }}{% endif %});{% if lp.row_type == 'fuel_flow' %} {{ lp.name }}.fuel_flow = true;{% endif %}
 	rows.push(new {{ lp.row_class }}interactive_row({{ lp.name }}{% if lp.reverse %}, "reverse"{% endif %}));
 	{% endfor %}
 
@@ -1010,6 +1017,10 @@ input[type=number] {
 	g_lim.unitchg();
 
 	calculate();
+
+	// the envelope polygon and the landing limit line are drawn in the
+	// current units, so they must be redrawn after g_lim.unitchg()
+	draw_limits_svg();
     }
 
     /*
@@ -1021,7 +1032,7 @@ input[type=number] {
 
     function user_input_range(ir, lp)
     {
-	eval(lp).vu.num = Number(ir.value);
+	window[lp].vu.num = Number(ir.value);
 	calculate();
     }
 
@@ -1031,18 +1042,14 @@ input[type=number] {
        lp:  global load point variable
        min: lp min value
        max: lp max value
-
-       Seems that I can't use eval twice in this function. First I tried
-       reading the min/max values using eval and then assigning them to
-       the vu.num, but that fails. TODO: find out why.
      */
 
      function user_checkbox(cb, lp, min, max)
     {
 	if (cb.checked == true)
-	    eval(lp).vu.num = max;
+	    window[lp].vu.num = max;
 	else
-	    eval(lp).vu.num = min;
+	    window[lp].vu.num = min;
 
 	calculate();
     }
@@ -1219,7 +1226,7 @@ input[type=number] {
 		setAttribute('style', 'color:white; background-color:red;');
 	    } else {
 		document.getElementById(lp.up.cellr).
-		setAttribute('style', 'background-color:none;');
+		setAttribute('style', 'background-color:transparent;');
 	    }
 	}
 
