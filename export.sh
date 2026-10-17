@@ -12,5 +12,9 @@ mkdir -p "$export_dir"
 git archive HEAD parse_template.py template.html.j2 README | tar -C "$export_dir" -x
 
 for spec in specs/*.json; do
+    if [ "$(python3 -c 'import json,sys; print("true" if json.load(open(sys.argv[1])).get("publish", False) else "false")' "$spec")" != "true" ]; then
+        echo "Skipping $spec (publish is not true)"
+        continue
+    fi
     python3 parse_template.py template.html.j2 "$spec" "$export_dir"
 done

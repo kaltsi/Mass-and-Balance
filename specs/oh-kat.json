@@ -3,6 +3,7 @@
   "aircraft_type": "Diamond DA20-C1 (800 kg MTOW)",
   "data_source": "OH-KAT w&b copied at EHFH 21.05.2012 and 800 kg gross weight increase (AFM)",
   "fuel_density_kg_per_l": 0.721,
+  "publish": true,
   "envelope": {
     "moment_arms": [
       0.202,

@@ -3,6 +3,7 @@
   "aircraft_type": "Diamond DV 20 (Rotax 912S)",
   "data_source": "Numbers: DV 20 (S/N: 20205) Weighing report 23.05.2025",
   "fuel_density_kg_per_l": 0.75,
+  "publish": true,
   "envelope": {
     "moment_arms": [
       0.25,

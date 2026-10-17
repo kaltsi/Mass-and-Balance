@@ -3,6 +3,7 @@
   "aircraft_type": "Cessna C172S Centurion 2.0",
   "data_source": "Numbers: OH-SRH mass and balance excel (MIK) 10.04.2009",
   "fuel_density_kg_per_l": 0.84,
+  "publish": true,
   "envelope": {
     "moment_arms": [
       0.889,

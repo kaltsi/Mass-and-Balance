@@ -3,6 +3,7 @@
   "aircraft_type": "Diamond DA40 G1000",
   "data_source": "Numbers: OH-KAS mass and balance sheet v.2",
   "fuel_density_kg_per_l": 0.721,
+  "publish": false,
   "envelope": {
     "moment_arms": [
       2.4,

@@ -14,6 +14,7 @@ A key that is not set falls back to the default written in the template.
 | `fuel_density_kg_per_l` | number | fuel mass per litre (Avgas 0.721) | `0.721` |
 | `envelope` | object | chart geometry, see below | |
 | `invalid_data` | string | CSS visibility for the INVALID text on the chart, `hidden` or `visible` | `hidden` |
+| `publish` | boolean | whether `export.sh` generates a sheet for this spec; `false` by default | `false` |
 | `load_points` | array | the table rows, in the order they are printed | |
 
 ## envelope
@@ -79,8 +80,10 @@ extras loop.
 
 ## Adding an aircraft
 
-Copy `oh-example.json`, edit the values and run the export script. `oh-example.json`
-exercises every row type, so it is the best starting point.
+Copy `oh-example.json`, edit the values, set `publish` to `true` and run the export
+script. `oh-example.json` exercises every row type, so it is the best starting point.
+Specs with `publish` false (or missing) are skipped by `export.sh`, so a spec can be
+kept in the repository without publishing its sheet.
 
 ## Example
 
@@ -90,6 +93,7 @@ exercises every row type, so it is the best starting point.
   "aircraft_type": "Cessna C172M",
   "data_source": "Numbers: Reliable source 01.01.1970",
   "fuel_density_kg_per_l": 0.721,
+  "publish": false,
   "envelope": {
     "moment_arms": [0.89, 0.89, 0.977, 1.202, 1.202, 0.89],
     "takeoff_mass_limits": [680, 885, 1156, 1156, 680, 680],

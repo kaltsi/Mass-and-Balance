@@ -3,6 +3,7 @@
   "aircraft_type": "Cessna A152 Aerobat",
   "data_source": "Numbers: OH-COX w&b record 15.02.2010 + radio mod 19.06.2014",
   "fuel_density_kg_per_l": 0.721,
+  "publish": true,
   "envelope": {
     "moment_arms": [
       0.787,

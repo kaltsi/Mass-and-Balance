@@ -3,6 +3,7 @@
   "aircraft_type": "Diamond DA-40D Star",
   "data_source": "Numbers: OH-STL (OE-DRS) mass and balance report (03.06.2013) and AFM Rev5",
   "fuel_density_kg_per_l": 0.84,
+  "publish": false,
   "envelope": {
     "moment_arms": [
       2.4,

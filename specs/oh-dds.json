@@ -3,6 +3,7 @@
   "aircraft_type": "Diamond DA-40 Star",
   "data_source": "Numbers: OH-DDS mass and balance excel PIK Rev 3.00 27.08.2014",
   "fuel_density_kg_per_l": 0.84,
+  "publish": true,
   "envelope": {
     "moment_arms": [
       2.4,

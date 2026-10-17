@@ -3,6 +3,7 @@
   "aircraft_type": "Cessna C172M",
   "data_source": "Numbers: Reliable source 01.01.1970",
   "fuel_density_kg_per_l": 0.721,
+  "publish": false,
   "envelope": {
     "moment_arms": [
       0.89,

@@ -3,6 +3,7 @@
   "aircraft_type": "Piper Archer PA28-181",
   "data_source": "Numbers: OH-PYW mass and balance excel (ESMO) 14.02.2006",
   "fuel_density_kg_per_l": 0.721,
+  "publish": false,
   "envelope": {
     "moment_arms": [
       2.083,

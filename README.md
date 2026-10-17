@@ -8,8 +8,9 @@ The published page is here: <http://kaltsi.github.io/Mass-and-Balance/>
 
 ## Making a sheet for your own aircraft
 
-Look at the existing specification files under `specs/`, copy one, edit it and run
-`export.sh`. The spec format is documented in [specs/README.md](specs/README.md).
+Look at the existing specification files under `specs/`, copy one, edit it, set
+`publish` to `true` and run `export.sh`. The spec format is documented in
+[specs/README.md](specs/README.md).
 
 ## Generator
 
@@ -20,14 +21,15 @@ Look at the existing specification files under `specs/`, copy one, edit it and r
 ./parse_template.py template.html.j2 specs/oh-kas.json out
 ```
 
-`export.sh` runs it for every spec file. A spec key that is not set falls back to
-the default written in the template.
+`export.sh` runs it for every spec file that has `publish` set to `true` (the key is
+`false` when it is not set); `publish` is passed to the template but not used by it. A
+spec key that is not set falls back to the default written in the template.
 
 ### Template variables
 
 The template variables are the JSON keys (`registration`, `aircraft_type`,
-`data_source`, `fuel_density_kg_per_l`, `envelope`, `invalid_data`) plus the load
-point lists: `load_points` (every load point, in spec order) and `extra` (the load
+`data_source`, `fuel_density_kg_per_l`, `publish`, `envelope`, `invalid_data`) plus the
+load point lists: `load_points` (every load point, in spec order) and `extra` (the load
 points that are not part of the fixed calculation chains). Values are formatted for
 JavaScript with the `js` filter.
 

@@ -3,6 +3,7 @@
   "aircraft_type": "Piper Cherokee Archer II PA-28-181",
   "data_source": "Numbers: SE-KSM POH and mass and balance report x.y.zzzz",
   "fuel_density_kg_per_l": 0.721,
+  "publish": false,
   "envelope": {
     "moment_arms": [
       2.083,
