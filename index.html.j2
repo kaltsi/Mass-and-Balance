@@ -147,6 +147,9 @@
     <h2>Updates</h2>
     {% for update in updates %}
     <h4>{{ update.date }}</h4>
+    {% for publish in update.publish %}
+    <li>{{ publish }}</li>
+    {% endfor %}
     {% for note in update.notes %}
     <li>{{ note }}</li>
     {% endfor %}

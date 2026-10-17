@@ -6,14 +6,16 @@ Usage: ./generate_index.py <index.html.j2> <specs_dir> [output_dir]
 Only the specs with `publish` true get a row in the aircraft table, listed in
 registration order. The Updates section shows the three latest commits that
 touched a published spec. A commit message line like `OH-STL: CG limits updated`
-is shown as the note for that aircraft, one note per line; aircraft without a note
-are listed together as one comma separated entry. The update dates come from git,
-so this only works inside a git clone.
+is shown as the note for that aircraft, one note per line; a line like
+`Publish: something` is shown as the first entry for that day; aircraft without a
+note are listed together as one comma separated entry. The update dates come from
+git, so this only works inside a git clone.
 
 Template variables:
   aircraft   the published specs, sorted by registration
-  updates    the three latest update dates, newest first, each with the notes of
-             that commit and the registrations that have no note
+  updates    the three latest update dates, newest first, each with the publish
+             entries of that commit, its notes and the registrations that have no
+             note
 """
 
 import json
@@ -28,6 +30,7 @@ import jinja2
 UPDATE_COUNT = 3
 DATE_FORMAT = "%d.%m.%Y"
 NOTE = re.compile(r"([A-Z]{2}-[A-Z]{3}):\s*(.+)")
+PUBLISH = re.compile(r"Publish:\s*(.+)", re.IGNORECASE)
 
 
 def last_commit(spec_path):
@@ -57,6 +60,7 @@ def build_context(specs_dir):
             if match.group(1) == spec["registration"]:
                 note = match.group(0).strip()
                 break
+        publish = PUBLISH.search(message)
 
         aircraft.append({
             "registration": spec["registration"],
@@ -65,6 +69,7 @@ def build_context(specs_dir):
             "updated": day,
             "date": day.strftime(DATE_FORMAT) if day else "",
             "note": note,
+            "publish": publish.group(1).strip() if publish else None,
         })
 
     by_date = {}
@@ -75,8 +80,14 @@ def build_context(specs_dir):
     updates = []
     for day in sorted(by_date, reverse=True)[:UPDATE_COUNT]:
         planes = by_date[day]
+        publish = []
+        for plane in planes:
+            if plane["publish"] and plane["publish"] not in publish:
+                publish.append(plane["publish"])
+
         updates.append({
             "date": day.strftime(DATE_FORMAT),
+            "publish": publish,
             "notes": [plane["note"] for plane in planes if plane["note"]],
             "plain": [plane["registration"] for plane in planes if not plane["note"]],
         })
