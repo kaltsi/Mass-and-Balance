@@ -7,13 +7,13 @@
 
   <style type="text/css">
     body {
-	margin: 1.0em 0px 0px 0px;
-	font-family: Helvetica, Arial, FreeSans, san-serif;
-	color: #000000;
+        margin: 1.0em 0px 0px 0px;
+        font-family: Helvetica, Arial, FreeSans, san-serif;
+        color: #000000;
     }
     #container {
-	margin: 0 auto;
-	width: 700px;
+        margin: 0 auto;
+        width: 700px;
     }
     h1 { font-size: 3.8em; color: #453b69; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
@@ -28,68 +28,68 @@
     li:before { content: '\2708'; margin: 0 0.5em; }
 
     .mblink {
-	font-size: 1.1em;
-	text-decoration: none;
-	font-family: serif;
-	border: 1px solid;
-	border-radius: 10px;
-	padding: 2px 8px 2px 8px;
-	background: none;
-	box-shadow: 2px 2px 3px rgba(0,0,0,0.4);
-	transition: background 0.2s linear 0s;
+        font-size: 1.1em;
+        text-decoration: none;
+        font-family: serif;
+        border: 1px solid;
+        border-radius: 10px;
+        padding: 2px 8px 2px 8px;
+        background: none;
+        box-shadow: 2px 2px 3px rgba(0,0,0,0.4);
+        transition: background 0.2s linear 0s;
     }
     .mblink:hover { background: yellow; }
 
     .description {
-	font-size: 1.2em;
-	margin-bottom: 30px;
-	margin-top: 30px;
-	font-style: italic;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+        margin-top: 30px;
+        font-style: italic;
     }
 
     .footer {
-	text-align:center;
-	padding-top:30px;
-	font-style: italic;
+        text-align:center;
+        padding-top:30px;
+        font-style: italic;
     }
 
     .tdlink {
-	text-align: center;
+        text-align: center;
     }
 
     .draft {
-	font-style: italic;
-	text-align: center;
-	opacity: 0.5;
+        font-style: italic;
+        text-align: center;
+        opacity: 0.5;
     }
 
     .draft:before {
-	content: "DRAFT";
+        content: "DRAFT";
     }
 
     .alignleft {
-	float: left;
+        float: left;
     }
     .alignright {
-	float: right;
+        float: right;
     }
 
     table.a {
-	font-size: 1.2em;
-	border: 1px solid;
-	border-radius: 6%;
-	padding: 10px 10px 10px 10px;
-	box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+        font-size: 1.2em;
+        border: 1px solid;
+        border-radius: 6%;
+        padding: 10px 10px 10px 10px;
+        box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
     }
 
     table.a th {
-	border-bottom: 1px dashed;
-	padding: 5px;
+        border-bottom: 1px dashed;
+        padding: 5px;
     }
 
     table.a td {
-	border: 0px;
-	padding: 7px;
+        border: 0px;
+        padding: 7px;
     }
 
   </style>
@@ -106,17 +106,17 @@
 
     <table class="a">
       <tr>
-	<th>Aircraft</th><th>M&amp;B Sheet</th><th>Notes</th>
+        <th>Aircraft</th><th>M&amp;B Sheet</th><th>Notes</th>
       </tr>
       {% for plane in aircraft %}
       <tr>
-	<td>
-	  {{ plane.aircraft_type }}
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="{{ plane.sheet }}">{{ plane.registration }}</a>
-	</td>
-	<td class="draft"/>
+        <td>
+          {{ plane.aircraft_type }}
+        </td>
+        <td class="tdlink">
+          <a class="mblink" href="{{ plane.sheet }}">{{ plane.registration }}</a>
+        </td>
+        <td class="draft"/>
       </tr>
       {% endfor %}
     </table>

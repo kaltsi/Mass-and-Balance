@@ -15,12 +15,16 @@ Look at the existing specification files under `specs/`, copy one, edit it, set
 
 ## Generator
 
-`parse_template.py` renders `template.html.j2` with Jinja2 (`jinja2 >= 3.1`, see
+`parse_template.py` renders `src/template.html.j2` with Jinja2 (`jinja2 >= 3.1`, see
 `pyproject.toml`):
 
 ```sh
-./parse_template.py template.html.j2 specs/oh-kas.json out
+./parse_template.py src/template.html.j2 specs/oh-kas.json out
 ```
+
+All templates live under `src/`. The template includes the css, javascript and svg
+parts (`style.css`, `script.js.j2`, `svg.j2`) which are read from `src/`, so the
+output is still one standalone HTML file.
 
 `export.sh` runs it for every spec file that has `publish` set to `true` (default: `false`).
 A spec key that is not set falls back to the default written in the template. After the
@@ -40,10 +44,10 @@ template (`g_lw`, `g_tow`, ...).
 
 ### Landing page
 
-`generate_index.py` renders `index.html.j2` into `index.html`:
+`generate_index.py` renders `src/index.html.j2` into `index.html`:
 
 ```sh
-./generate_index.py index.html.j2 specs out
+./generate_index.py src/index.html.j2 specs out
 ```
 
 The aircraft table gets one row per spec with `publish` true, in registration order, and
@@ -66,7 +70,7 @@ dates come from the history, so `--entrypoint` is needed and `.git` must be moun
 
 ```sh
 docker run --rm -v "$PWD/.git:/app/.git" --entrypoint python3 \
-  mass-and-balance generate_index.py index.html.j2 specs out
+  mass-and-balance generate_index.py src/index.html.j2 specs out
 ```
 
 Without a mounted history the aircraft table is still rendered, only the Updates
@@ -75,7 +79,7 @@ section stays empty.
 ## Publishing
 
 The published page is the `gh-pages` branch, served by GitHub Pages exactly as it is
-committed, without any build step. `index.html` is generated from `index.html.j2` and
+committed, without any build step. `index.html` is generated from `src/index.html.j2` and
 links to the sheets by relative path, so the generated files must sit next to it at
 the branch root.
 

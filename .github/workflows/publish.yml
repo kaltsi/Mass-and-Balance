@@ -4,8 +4,7 @@ on:
   push:
     branches: [master]
     paths:
-      - template.html.j2
-      - index.html.j2
+      - src/**
       - parse_template.py
       - generate_index.py
       - specs/**

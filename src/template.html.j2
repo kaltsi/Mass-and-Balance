@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html" charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<!--
+    Mass and balance calculator for {{ registration|js("OH-DEMO") }}
+
+    https://github.com/kaltsi/Mass-and-Balance
+
+    Copyright (c) 2012 - 2026 Juha Kallioinen <kaltsi+github@gmail.com>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+
+<style type="text/css">
+{% include "style.css" %}
+</style>
+
+<script type="text/javascript">
+{% include "script.js.j2" %}
+</script>
+
+<title id="doc_title">Page title</title>
+
+</head>
+<body>
+
+  <h1 id="ac_type_hdr">NO AIRCRAFT TYPE SET</h1>
+
+  <select id="settings_select" onchange="handle_settings_change(this)">
+    <option id="select_settings_title" value="title" disabled>Settings</option>
+    <option id="select_settings_save"  value="save" >Save</option>
+    <option id="select_settings_clear" value="clear">Clear</option>
+  </select>
+
+  <select id="lang_select" onchange="handle_lang_change(this)">
+    <option value="English">English</option>
+    <option value="Suomi">Suomi</option>
+  </select>
+
+  <button id="debug_button" type="button" title="Toggle debug info."
+  onclick="toggle_debug()" style="display:none;">Debug</button>
+
+  <p> </p>
+
+  <table border="1" class="a" id="table1">
+    <tbody>
+      <tr>
+	<th style="color:red;" id="reminder_cell"></th>
+	<th style="width:75px;text-align:center;" id="input_cell">Input</th>
+	<th style="text-align:center;width:175px;">
+	  <select id="units_select" onchange="handle_unit_change(this)">
+	    <option id="units_kg_litre" value="kg_litre" selected>kg & litre</option>
+	    <option id="units_lb_usg" value="lb_usg">lbs & usg</option>
+	  </select>
+	</th>
+	<th style="text-align:center;" id="mass_title">Mass</th>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- The number entry div -->
+  <div id="number" style="display:none;" class="number_class">
+    <input type="number" id="number_input" onchange="enter_number(this.name, this.value)" value="0">
+  </div>
+
+  <p id="debug"></p>
+
+  <!-- SVG stuff here -->
+
+  <svg id="svg_main" xmlns="http://www.w3.org/2000/svg" version="1.1" >
+{% include "svg.j2" %}
+  </svg>
+
+  <footer>
+    <hr/>
+
+    <div id="extrainfo">
+      <p class="aligncenter" id="origin_text">No origin</p>
+      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> $Format: %ci$</small></p>
+    </div>
+
+  </footer>
+
+</body>
+</html>

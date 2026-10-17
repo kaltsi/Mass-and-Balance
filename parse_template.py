@@ -15,6 +15,10 @@ Load point row types:
   computed_reversed   non-interactive row with result and value cells reversed
 Load points whose name is not one of the fixed ones below are "extra" equipment
 and are injected into the mass/moment calculation chains.
+
+The template includes the css, javascript and svg parts (style.css,
+script.js.j2, svg.j2) which are looked up next to the template, so
+the output is still one self-contained HTML file.
 """
 
 import json

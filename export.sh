@@ -9,14 +9,14 @@ if [ -z "${export_dir}" ]; then
 fi
 
 mkdir -p "${export_dir}"
-git archive HEAD parse_template.py generate_index.py template.html.j2 index.html.j2 README.md | tar -C "${export_dir}" -x
+git archive HEAD parse_template.py generate_index.py src README.md | tar -C "${export_dir}" -x
 
 for spec in specs/*.json; do
     if [ "$(python3 -c 'import json,sys; print("true" if json.load(open(sys.argv[1])).get("publish", False) else "false")' "${spec}")" != "true" ]; then
         echo "Skipping ${spec} (publish is not true)"
         continue
     fi
-    python3 parse_template.py template.html.j2 "${spec}" "${export_dir}"
+    python3 parse_template.py src/template.html.j2 "${spec}" "${export_dir}"
 done
 
-python3 generate_index.py index.html.j2 specs "${export_dir}"
+python3 generate_index.py src/index.html.j2 specs "${export_dir}"
