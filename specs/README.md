@@ -14,7 +14,7 @@ A key that is not set falls back to the default written in the template.
 | `fuel_density_kg_per_l` | number | fuel mass per litre (Avgas 0.721) | `0.721` |
 | `envelope` | object | chart geometry, see below | |
 | `invalid_data` | string | CSS visibility for the INVALID text on the chart, `hidden` or `visible` | `hidden` |
-| `publish` | boolean | whether `export.sh` generates a sheet for this spec; `false` by default | `false` |
+| `publish` | boolean | whether `build.sh` generates a sheet for this spec; `false` by default | `false` |
 | `load_points` | array | the table rows, in the order they are printed | |
 
 ## envelope
@@ -80,9 +80,9 @@ extras loop.
 
 ## Adding an aircraft
 
-Copy `oh-example.json`, edit the values, set `publish` to `true` and run the export
+Copy `oh-example.json`, edit the values, set `publish` to `true` and run the build
 script. `oh-example.json` exercises every row type, so it is the best starting point.
-Specs with `publish` false (or missing) are skipped by `export.sh`, so a spec can be
+Specs with `publish` false (or missing) are skipped by `build.sh`, so a spec can be
 kept in the repository without publishing its sheet.
 
 ## Example

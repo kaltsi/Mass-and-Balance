@@ -5,7 +5,7 @@ on:
     branches: [master]
     paths:
       - src/**
-      - parse_template.py
+      - generate_sheet.py
       - generate_index.py
       - specs/**
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
 
       - run: pip install jinja2
 
-      - run: ./export.sh build
+      - run: ./build.sh build
 
       - name: Build the site
         run: |

@@ -10,23 +10,23 @@ iPad).
 ## Making a sheet for your own aircraft
 
 Look at the existing specification files under `specs/`, copy one, edit it, set
-`publish` to `true` and run `export.sh`. The spec format is documented in
+`publish` to `true` and run `build.sh`. The spec format is documented in
 [specs/README.md](specs/README.md).
 
 ## Generator
 
-`parse_template.py` renders `src/template.html.j2` with Jinja2 (`jinja2 >= 3.1`, see
+`generate_sheet.py` renders `src/template.html.j2` with Jinja2 (`jinja2 >= 3.1`, see
 `pyproject.toml`):
 
 ```sh
-./parse_template.py src/template.html.j2 specs/oh-kas.json out
+./generate_sheet.py src/template.html.j2 specs/oh-kas.json out
 ```
 
 All templates live under `src/`. The template includes the css, javascript and svg
 parts (`style.css`, `script.js.j2`, `svg.j2`) which are read from `src/`, so the
 output is still one standalone HTML file.
 
-`export.sh` runs it for every spec file that has `publish` set to `true` (default: `false`).
+`build.sh` runs it for every spec file that has `publish` set to `true` (default: `false`).
 A spec key that is not set falls back to the default written in the template. After the
 sheets it regenerates the landing page, see below.
 

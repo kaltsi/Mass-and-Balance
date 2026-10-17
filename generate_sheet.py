@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate a standalone mass & balance HTML sheet from a JSON aircraft spec.
 
-Usage: ./parse_template.py <template.html.j2> <spec.json> [output_dir]
+Usage: ./generate_sheet.py <template.html.j2> <spec.json> [output_dir]
 
 The template is a Jinja2 template. Every key in the spec JSON is available as a
 template variable and the load_points list is exposed as `load_points` (and
