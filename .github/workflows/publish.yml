@@ -1,8 +1,8 @@
-name: Publish test build
+name: Publish site
 
 on:
   push:
-    branches: [python]
+    branches: [master]
     paths:
       - template.html.j2
       - index.html.j2
@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 jobs:
-  testing:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,18 +28,17 @@ jobs:
 
       - run: ./export.sh build
 
-      - name: Build the test site
+      - name: Build the site
         run: |
           date="$(git log -1 --format=%ci)"
-          mkdir -p testing
+          mkdir -p site
           for f in build/*.html; do
-            sed 's/\$Format: %ci\$/'"$date"'/' "$f" > "testing/$(basename "$f")"
+            sed 's/\$Format: %ci\$/'"$date"'/' "$f" > "site/$(basename "$f")"
           done
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./testing
-          destination_dir: testing
+          publish_dir: ./site
           keep_files: true
