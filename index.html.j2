@@ -93,7 +93,6 @@
     }
 
   </style>
-
 </head>
 
 <body>
@@ -109,78 +108,17 @@
       <tr>
 	<th>Aircraft</th><th>M&amp;B Sheet</th><th>Notes</th>
       </tr>
+      {% for plane in aircraft %}
       <tr>
 	<td>
-	  Cessna A152 Aerobat
+	  {{ plane.aircraft_type }}
 	</td>
 	<td class="tdlink">
-	  <a class="mblink" href="oh-cox.html">OH-COX</a>
+	  <a class="mblink" href="{{ plane.sheet }}">{{ plane.registration }}</a>
 	</td>
 	<td class="draft"/>
       </tr>
-      <tr>
-	<td>
-	  Diamond DA-40D Star
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-dds.html">OH-DDS</a>
-	</td>
-	<td class="draft"/>
-      </tr>
-      <tr>
-	<td>
-	  Cirrus SR20
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-esr.html">OH-ESR</a>
-	</td>
-	<td class="draft"/>
-      </tr>
-      <tr>
-	<td>
-	  Diamond DV20E
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-ihq.html">OH-IHQ</a>
-	</td>
-	<td class="draft"/>
-      </tr>
-      <tr>
-	<td>
-	  Diamond DA20-C1 (800 kg)
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-kat.html">OH-KAT</a>
-	</td>
-	<td class="draft"/>
-      </tr>
-      <tr>
-	<td>
-	  Cessna 172S Diesel
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-srh.html">OH-SRH</a>
-	</td>
-	<td class="draft"/>
-      </tr>
-      <tr>
-	<td>
-	  Diamond DA 40 NG Star
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-stl.html">OH-STL</a>
-	</td>
-	<td class="draft"/>
-      </tr>
-      <tr>
-	<td>
-	  Piper Warrior II PA28-161
-	</td>
-	<td class="tdlink">
-	  <a class="mblink" href="oh-til.html">OH-TIL</a>
-	</td>
-	<td class="draft"/>
-      </tr>
+      {% endfor %}
     </table>
 
     <p>
@@ -207,13 +145,14 @@
     <p>Have a safe flight!</p>
 
     <h2>Updates</h2>
-    <h4>24.06.2025</h4>
-    <li>OH-IHQ data updated.</li>
-    <h4>02.08.2020</h4>
-    <li>Update OH-STL default fuel flow value.</li>
-    <h4>08.07.2020</h4>
-    <li>Update OH-ESR weight.</li>
+    {% for update in updates %}
+    <h4>{{ update.date }}</h4>
+    {% for registration in update.registrations %}
+    <li>{{ registration }} updated.</li>
+    {% endfor %}
+    {% endfor %}
     <br>
+
     <div class="footer">
       <p class="alignleft"><small>get the source code on GitHub : <a href="https://github.com/kaltsi/Mass-and-Balance">kaltsi/Mass-and-Balance</a></small></p>
       <p class="alignright"><small><small> <a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> $Format: %ci$</small></small></p>

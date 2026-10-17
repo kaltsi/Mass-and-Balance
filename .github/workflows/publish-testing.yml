@@ -5,9 +5,10 @@ on:
     branches: [python]
     paths:
       - template.html.j2
+      - index.html.j2
       - parse_template.py
+      - generate_index.py
       - specs/**
-      - index.html
   workflow_dispatch:
 
 permissions:
@@ -31,7 +32,7 @@ jobs:
         run: |
           date="$(git log -1 --format=%ci)"
           mkdir -p testing
-          for f in build/*.html index.html; do
+          for f in build/*.html; do
             sed 's/\$Format: %ci\$/'"$date"'/' "$f" > "testing/$(basename "$f")"
           done
 
