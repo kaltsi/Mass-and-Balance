@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Generate a standalone mass & balance HTML sheet from a JSON aircraft spec.
 
-Usage: ./generate_sheet.py <template.html.j2> <spec.json> [output_dir]
+Usage: ./generate_sheet.py src/template.html.j2 specs/oh-kas.json out
 
 The template is a Jinja2 template. Every key in the spec JSON is available as a
 template variable and the load_points list is exposed as `load_points` (and
 `extra`, the load points that are not part of the fixed rows).
+
+The output file is named after the spec, so specs/oh-kas.json becomes
+out/oh-kas.html. The output directory is created if it does not exist.
 
 Load point row types:
   interactive         slider row, declares a saveable variable
@@ -95,7 +98,7 @@ def render(spec, template):
 
 def main(argv):
     if len(argv) < 3:
-        print(f"Usage: {argv[0]} template.html.j2 spec.json [output_dir]")
+        print(f"Usage: {argv[0]} src/template.html.j2 specs/oh-kas.json out")
         return 1
 
     template_path, spec_path = Path(argv[1]), Path(argv[2])

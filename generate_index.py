@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Generate the landing page from the published aircraft specs.
 
-Usage: ./generate_index.py <index.html.j2> <specs_dir> [output_dir]
+Usage: ./generate_index.py src/index.html.j2 specs out
 
 Only the specs with `publish` true get a row in the aircraft table, listed in
-registration order. The Updates section shows the three latest commits that
+registration order. The output is out/index.html, the output directory is created
+if it does not exist. The Updates section shows the three latest commits that
 touched a published spec. A commit message line like `OH-STL: CG limits updated`
 is shown as the note for that aircraft, one note per line; a line like
 `Publish: something` is shown as the first entry for that day; aircraft without a
@@ -97,7 +98,7 @@ def build_context(specs_dir):
 
 def main(argv):
     if len(argv) < 3:
-        print(f"Usage: {argv[0]} index.html.j2 specs [output_dir]")
+        print(f"Usage: {argv[0]} src/index.html.j2 specs out")
         return 1
 
     template_path, specs_dir = Path(argv[1]), Path(argv[2])
