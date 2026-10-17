@@ -40,16 +40,6 @@
     }
     .mblink:hover { background: yellow; }
 
-    .toggle_class {
-	border: 1px solid;
-	border-top-right-radius: 10px;
-	border-bottom-right-radius: 10px;
-	padding: 2px 8px 2px 8px;
-	box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
-	transition: background 0.2s linear 0s;
-    }
-    .toggle_class:hover { background: yellow; }
-
     .description {
 	font-size: 1.2em;
 	margin-bottom: 30px;
@@ -65,10 +55,6 @@
 
     .tdlink {
 	text-align: center;
-    }
-
-    .old_updates {
-	display: none;
     }
 
     .draft {
@@ -123,19 +109,6 @@
 
   </style>
 
-  <script>
-    function toggle_oldies(elem) {
-	var old = document.getElementById("oldies_div");
-	if (old.style.display != 'block') {
-	    old.style.display = 'block';
-	    elem.textContent="Hide old updates";
-	}
-	else {
-	    old.style.display = 'none';
-	    elem.textContent="Show old updates";
-	}
-    }
-  </script>
 </head>
 
 <body>
@@ -256,69 +229,6 @@
     <h4>08.07.2020</h4>
     <li>Update OH-ESR weight.</li>
     <br>
-    <div>
-      <span class="toggle_class" onclick="toggle_oldies(this)">Show old updates</span>
-
-      <div id="oldies_div" class="old_updates">
-	<h4>14.08.2016</h4>
-	<li>Updated OH-STL CG limits graph.</li>
-	<h4>13.04.2016</h4>
-	<li>First draft for OH-STL after NG conversion!</li>
-	<h4>01.03.2016</h4>
-	<li>Invalidate OH-STL data while it's waiting for Austro engine conversion.</li>
-	<h4>25.09.2014</h4>
-	<li>Use an arrowhead to depict landing CG instead of a circle &amp; draw a line between take-off and landing CGs.</li>
-	<li>Retired OH-PYW since it has been sold to UK.</li>
-	<li>OH-DDS data updated.</li>
-
-	<h4>27.06.2014</h4>
-	<li>Bring OH-COX back with an updated basic weight.</li>
-
-	<h4>14.05.2014</h4>
-	<li>Enter numbers with keyboard by clicking on the yellow squares.</li>
-
-	<h4>13.05.2014</h4>
-	<li>Use 'oninput' for input type range sliders and remove Frank Yan's javascript range implementation.</li>
-	<h4>12.05.2014</h4>
-	<li>Added OH-IHQ first draft (old weighing report)</li>
-	<h4>20.10.2013</h4>
-	<li>Retired OH-COX due to a wreck caused by nose gear collapse earlier this year.</li>
-
-	<h4>13.08.2013</h4>
-	<li>Make Firefox 23 input range sliders work interactively</li>
-
-	<h4>12.08.2013</h4>
-	<li>Added OH-TIL first draft</li>
-
-	<h4>17.06.2013</h4>
-	<li>OH-STL status from draft to checked</li>
-
-	<h4>12.06.2013</h4>
-	<li>Added OH-STL first official draft</li>
-
-	<h4>04.06.2013</h4>
-	<li>Removed link to OH-CTL, which has been converted to a float plane</li>
-
-	<h4>21.05.2012</h4>
-	<li>Added OH-KAT first draft</li>
-
-	<h4>08.04.2012</h4>
-	<li>Added support for checkbox rows for equipment like wheel fairings</li>
-
-	<h4>07.04.2012</h4>
-	<li>Improved warning text</li>
-
-	<h4>06.04.2012</h4>
-	<li>Fixed center of gravity limit checks</li>
-	<li>Works in Firefox</li>
-
-	<h4>04.04.2012</h4>
-	<li>Template redone to be more finger friendly</li>
-	<li>Language support - Suomi and English</li>
-	<li>Save your own preferred settings (to your browser)</li>
-      </div>
-    </div>
-
     <div class="footer">
       <p class="alignleft"><small>get the source code on GitHub : <a href="https://github.com/kaltsi/Mass-and-Balance">kaltsi/Mass-and-Balance</a></small></p>
       <p class="alignright"><small><small> <a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> $Format: %ci$</small></small></p>
