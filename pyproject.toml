@@ -1,0 +1,18 @@
+[project]
+name = "mass-and-balance"
+version = "1.0.0"
+description = "Generate standalone HTML mass and balance calculators from aircraft specs"
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2>=3.1",
+]
+
+[project.scripts]
+parse-template = "parse_template:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["parse_template"]

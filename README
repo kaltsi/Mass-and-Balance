@@ -18,15 +18,55 @@ what the generator reads. The JSON is generated from the .specs files with:
 
     python3 tools/specs_to_json.py specs/
 
-Key names in the JSON are the same as in the .specs files, so they map one-to-one
-to the /*NAME*/ placeholders in template.html. Load points are stored as a list of
-objects (name, type, translations, unit, default/min/max, moment arm, step).
+The .specs files use upper-case names; the converter maps them to readable lower-case
+keys in the JSON:
 
-The generator is parse_template.py:
+    ACFT            -> registration                 MOM_DRAW_MAX   -> envelope.moment_axis_max
+    ACFT_TYPE       -> aircraft_type                MASS_DRAW_MAX  -> envelope.mass_axis_max
+    DATA_ORIGIN     -> data_source                  TRANSLATE_X    -> envelope.chart_x_offset
+    LITRE2KILO      -> fuel_density_kg_per_l        LND_LIMIT_X1   -> envelope.landing_limit_arm_start
+    MOMENT_ARMS     -> envelope.moment_arms         LND_LIMIT_X2   -> envelope.landing_limit_arm_end
+    TOF_MASS_LIMITS -> envelope.takeoff_mass_limits INVALID_DATA   -> invalid_data
+    LND_MASS_LIMITS -> envelope.landing_mass_limits LOAD_POINTS    -> load_points
 
-    ./parse_template.py template.html specs/oh-kas.json out
+Load points are a list of objects with the keys: name, row_type, label_en, label_fi,
+unit, default, min, max, show_max, moment_arm, step, save.
 
-export.sh runs it for every spec file. parse_template.sh is the original shell
-implementation, kept for comparison. The Python version writes the same file apart
-from number formatting (2.300 becomes 2.3) and quoting, which now comes from the
-JSON instead of the spec text.
+Two conventions of the .specs format become explicit fields:
+
+  - a negative max in a .specs file means "do not print the limit". In the JSON the max
+    is positive and show_max is false. The template re-encodes the sign when it calls
+    l_point(), because the page code tests max > 0.
+  - the LP_<type>_ prefix becomes row_type: interactive, fuel_flow, checkbox, computed,
+    computed_reversed.
+
+Load point names stay upper-case: they are JavaScript variable names and the keys of the
+saved values in the sheet. step is omitted when the spec has no step.
+
+The generator is parse_template.py, which renders template.html.j2 with Jinja2:
+
+    ./parse_template.py template.html.j2 specs/oh-kas.json out
+
+export.sh runs it for every spec file. parse_template.sh (with template.html) is the
+original shell implementation, kept for comparison. The Python version writes the same
+file apart from number formatting (2.300 becomes 2.3) and quoting, which now comes from
+the JSON instead of the spec text. A spec key that is not set falls back to the default
+written in the template.
+
+The template variables are the JSON keys (registration, aircraft_type, data_source,
+fuel_density_kg_per_l, envelope, invalid_data) plus the load point lists: load_points
+(every load point, in spec order) and extra (the load points that are not part of the
+fixed calculation chains). Values are formatted for JavaScript with the js filter.
+
+The load point name placeholders (lndw, tow, fuel, ...) resolve to the load point name
+when the spec has that row, otherwise to the variable name written in the template
+(g_lw, g_tow, ...).
+
+To run it in a container:
+
+    docker build -t mass-and-balance .
+    docker run --rm -v "$PWD/out:/app/out" mass-and-balance specs/oh-kas.json out
+
+Generated output can be checked against the reference sheets in ref2/ with:
+
+    python3 tools/compare.py out ref2

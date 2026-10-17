@@ -2,7 +2,7 @@
 """Convert aircraft .specs files to JSON.
 
 The JSON files are the machine-readable form of the spec files; they are
-consumed by the (future) Python version of parse_template.sh.
+consumed by parse_template.py.
 
 Usage:
     tools/specs_to_json.py specs/oh-stl.specs [output_dir]
@@ -11,59 +11,93 @@ Usage:
 Schema (one object per aircraft):
 
     {
-      "ACFT": "OH-STL",                  # registration
-      "ACFT_TYPE": "Diamond DA 40 NG Star",
-      "DATA_ORIGIN": "Numbers: ...",
-      "LITRE2KILO": 0.84,
-      "MOMENT_ARMS": [2.4, ...],         # x-coordinates of the envelope
-      "TOF_MASS_LIMITS": [940, ...],     # y-coordinates, take-off
-      "LND_MASS_LIMITS": [940, ...],     # y-coordinates, landing
-      "MOM_DRAW_MAX": 475,
-      "MASS_DRAW_MAX": 390,
-      "TRANSLATE_X": 50,
-      "LND_LIMIT_X1": 2.44,
-      "LND_LIMIT_X2": 2.55,
-      "INVALID_DATA": null,              # "visible" if uncommented in the spec
-      "LOAD_POINTS": [
+      "registration": "OH-STL",
+      "aircraft_type": "Diamond DA 40 NG Star",
+      "data_source": "Numbers: ...",
+      "fuel_density_kg_per_l": 0.84,
+      "envelope": {                         # the drawn limit polygon
+        "moment_arms": [2.4, ...],          # x-coordinates
+        "takeoff_mass_limits": [940, ...],  # y-coordinates, take-off
+        "landing_mass_limits": [940, ...],  # y-coordinates, landing
+        "landing_limit_arm_start": 2.44,
+        "landing_limit_arm_end": 2.55,
+        "moment_axis_max": 475,
+        "mass_axis_max": 390,
+        "chart_x_offset": 50
+      },
+      "invalid_data": "visible",            # only if uncommented in the spec
+      "load_points": [
         {
-          "LP": "LP_R_BASIC_WEIGHT",     # original spec token, kept for reference
-          "NAME": "BASIC_WEIGHT",        # JS variable name / saveable key
-          "TYPE": "R",                   # N, R, I, F or C
-          "EN": "Basic weight",          # '#' in the spec means space
-          "FI": "Perusmassa",
-          "UNIT": "kg",
-          "DEFAULT": 909.4,
-          "MIN": 0,
-          "MAX": -1,
-          "MOMENT_ARM": 2.43,
-          "STEP": null,                  # optional slider step
-          "SAVEABLE": false              # true for LP_I_ / LP_F_ / LP_C_
+          "name": "BASIC_WEIGHT",           # JS variable name / saveable key
+          "row_type": "computed_reversed",
+          "label_en": "Basic weight",       # '#' in the spec means space
+          "label_fi": "Perusmassa",
+          "unit": "kg",
+          "default": 909.4,
+          "min": 0,
+          "max": 1,
+          "show_max": false,                # negative max in the spec
+          "moment_arm": 2.43,
+          "step": 0.1,                      # omitted when the spec has no step
+          "save": true
         }
       ]
     }
 
-Key names are kept identical to the spec file names so that they map one-to-one
-to the /*NAME*/ placeholders in template.html.
+The .specs files use the old upper-case names; the mapping below is what turns
+them into the readable keys above.
 """
 
 import json
 import os
-import re
 import sys
 
-KNOWN_LOAD_POINTS = [
-    "BASIC_WEIGHT", "FRONT_SEAT", "FUEL", "BAGGAGE", "TAXI_FUEL",
-    "TOW", "LNDW", "ENDURANCE", "FUEL_FLOW", "FLIGHT_TIME",
-]
+# .specs key -> JSON key
+KEY_MAP = {
+    "ACFT": "registration",
+    "ACFT_TYPE": "aircraft_type",
+    "DATA_ORIGIN": "data_source",
+    "LITRE2KILO": "fuel_density_kg_per_l",
+    "MOMENT_ARMS": "moment_arms",
+    "TOF_MASS_LIMITS": "takeoff_mass_limits",
+    "LND_MASS_LIMITS": "landing_mass_limits",
+    "MOM_DRAW_MAX": "moment_axis_max",
+    "MASS_DRAW_MAX": "mass_axis_max",
+    "TRANSLATE_X": "chart_x_offset",
+    "LND_LIMIT_X1": "landing_limit_arm_start",
+    "LND_LIMIT_X2": "landing_limit_arm_end",
+    "INVALID_DATA": "invalid_data",
+}
 
-# Load point types: interactive (saveable), non-interactive, fuel flow, checkbox
-LP_TYPES = ("N", "R", "I", "F", "C")
-SAVEABLE_TYPES = ("I", "F", "C")
+ENVELOPE_KEYS = {
+    "moment_arms",
+    "takeoff_mass_limits",
+    "landing_mass_limits",
+    "landing_limit_arm_start",
+    "landing_limit_arm_end",
+    "moment_axis_max",
+    "mass_axis_max",
+    "chart_x_offset",
+}
+
+# .specs key -> value type
+LIST_KEYS = ("MOMENT_ARMS", "TOF_MASS_LIMITS", "LND_MASS_LIMITS")
+INT_KEYS = ("MOM_DRAW_MAX", "MASS_DRAW_MAX", "TRANSLATE_X")
+FLOAT_KEYS = ("LITRE2KILO", "LND_LIMIT_X1", "LND_LIMIT_X2")
 
 LIST_KEYS = ("MOMENT_ARMS", "TOF_MASS_LIMITS", "LND_MASS_LIMITS")
 INT_KEYS = ("MOM_DRAW_MAX", "MASS_DRAW_MAX", "TRANSLATE_X")
 FLOAT_KEYS = ("LITRE2KILO", "LND_LIMIT_X1", "LND_LIMIT_X2")
-STRING_KEYS = ("ACFT", "ACFT_TYPE", "DATA_ORIGIN", "INVALID_DATA")
+
+# LP_<type>_ letter -> readable row type
+ROW_TYPES = {
+    "N": "computed",
+    "R": "computed_reversed",
+    "I": "interactive",
+    "F": "fuel_flow",
+    "C": "checkbox",
+}
+SAVEABLE_TYPES = ("interactive", "fuel_flow", "checkbox")
 
 
 def num(s):
@@ -79,31 +113,33 @@ def parse_load_point(value):
         raise ValueError("bad load point: %s" % value)
 
     lp = parts[0]
-    if not lp.startswith("LP_") or lp[3] not in LP_TYPES:
+    if not lp.startswith("LP_") or lp[3] not in ROW_TYPES:
         raise ValueError("unknown load point type: %s" % lp)
 
-    lp_type = lp[3]
-    name = lp[5:]
+    row_type = ROW_TYPES[lp[3]]
+    max_value = num(parts[6])
 
     point = {
-        "LP": lp,
-        "NAME": name,
-        "TYPE": lp_type,
-        "EN": parts[1].strip('"').replace("#", " "),
-        "FI": parts[2].strip('"').replace("#", " "),
-        "UNIT": parts[3].strip('"'),
-        "DEFAULT": num(parts[4]),
-        "MIN": num(parts[5]),
-        "MAX": num(parts[6]),
-        "MOMENT_ARM": num(parts[7]),
-        "STEP": num(parts[8]) if len(parts) > 8 else None,
-        "SAVEABLE": lp_type in SAVEABLE_TYPES,
+        "name": lp[5:],
+        "row_type": row_type,
+        "label_en": parts[1].strip('"').replace("#", " "),
+        "label_fi": parts[2].strip('"').replace("#", " "),
+        "unit": parts[3].strip('"'),
+        "default": num(parts[4]),
+        "min": num(parts[5]),
+        "max": abs(max_value),
+        "show_max": max_value > 0,
+        "moment_arm": num(parts[7]),
+        "save": row_type in SAVEABLE_TYPES,
     }
+    if len(parts) > 8:
+        point["step"] = num(parts[8])
     return point
 
 
 def parse_specs(path):
     data = {}
+    envelope = {}
     load_points = []
 
     with open(path, encoding="utf-8") as fh:
@@ -116,25 +152,30 @@ def parse_specs(path):
 
             key, value = line.split("=", 1)
             value = value.strip()
+            name = KEY_MAP.get(key, key)
 
             if key == "LOAD_POINT":
                 load_points.append(parse_load_point(value))
-            elif key in LIST_KEYS:
-                data[key] = [num(x) for x in value.strip("[]").split(",")]
-            elif key in INT_KEYS:
-                data[key] = int(float(value))
-            elif key in FLOAT_KEYS:
-                data[key] = float(value)
             else:
-                data[key] = value.strip('"')
+                if key in LIST_KEYS:
+                    parsed = [num(x) for x in value.strip("[]").split(",")]
+                elif key in INT_KEYS:
+                    parsed = int(float(value))
+                elif key in FLOAT_KEYS:
+                    parsed = float(value)
+                else:
+                    parsed = value.strip('"')
+                target = envelope if name in ENVELOPE_KEYS else data
+                target[name] = parsed
 
-    data["LOAD_POINTS"] = load_points
+    if envelope:
+        data["envelope"] = envelope
+    data["load_points"] = load_points
     return data
 
 
 def convert(path, out_dir=None):
-    base = os.path.basename(path)
-    name = os.path.splitext(base)[0]
+    name = os.path.splitext(os.path.basename(path))[0]
     data = parse_specs(path)
 
     if out_dir:

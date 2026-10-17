@@ -1,20 +1,16 @@
-#!/bin/bash
-#
-# Script for exporting files to gh-pages
-#
-export LC_CTYPE=C
+#!/bin/sh
 
-export_dir=$PWD/gh
+set -e
 
-files="index.html template.html"
+export_dir="$1"
+if [ -z "$export_dir" ]; then
+    echo "Usage: $0 <export directory>"
+    exit 1
+fi
 
-mkdir -p $export_dir
-
-# Expand the gitvariables
-git archive --format=tar HEAD $files | tar xf - -C $export_dir
-
-echo Exported $files to $export_dir
+mkdir -p "$export_dir"
+git archive HEAD parse_template.py template.html.j2 README | tar -C "$export_dir" -x
 
 for spec in specs/*.json; do
-    ./parse_template.py $export_dir/template.html $spec $export_dir
+    python3 parse_template.py template.html.j2 "$spec" "$export_dir"
 done
