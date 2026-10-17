@@ -1,64 +1,64 @@
-    <filter id = "my_shadow_filter" width = "150%" height = "150%">
-      <feOffset result = "offOut" in = "SourceAlpha" dx = "2" dy = "2"/>
-      <feGaussianBlur result = "blurOut" in = "offOut" stdDeviation = "3"/>
-      <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
-    </filter>
+<filter id = "my_shadow_filter" width = "150%" height = "150%">
+  <feOffset result = "offOut" in = "SourceAlpha" dx = "2" dy = "2"/>
+  <feGaussianBlur result = "blurOut" in = "offOut" stdDeviation = "3"/>
+  <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
+</filter>
 
-    <defs>
-      <path id="markerPath" d="M1,1 L1,7 L7,4 z"/>
-    </defs>
+<defs>
+  <path id="markerPath" d="M1,1 L1,7 L7,4 z"/>
+</defs>
 
-    <g>
-      <rect id="svg_border" x="5" y="10" width="1" height="1"
-	    rx="20" ry="20" fill="white"
-	    style="stroke:black;stroke-width:3;opacity:0.6;"
-	    filter = "url(#my_shadow_filter)" />
+<g>
+  <rect id="svg_border" x="5" y="10" width="1" height="1"
+       rx="20" ry="20" fill="white"
+       style="stroke:black;stroke-width:3;opacity:0.6;"
+       filter = "url(#my_shadow_filter)" />
 
-      <g transform="scale(1,-1)">
-	<g id="translate_group" >
-	  <polygon id="mb_limits"
-		   points="0,0 1,1"
-		   fill="white"
-		   style="stroke:black;stroke-width:2" />
+  <g transform="scale(1,-1)">
+    <g id="translate_group" >
+      <polygon id="mb_limits"
+              points="0,0 1,1"
+              fill="white"
+              style="stroke:black;stroke-width:2" />
 
-	  <line id="landing_limit"
-		x1="1" y1="1" x2="1" y2="1"
-		style="fill:none;stroke:green;stroke-width:2" />
+      <line id="landing_limit"
+           x1="1" y1="1" x2="1" y2="1"
+           style="fill:none;stroke:green;stroke-width:2" />
 
-	  <marker id="markerArrow" markerWidth="8" markerHeight="8"
-		  refx="4" refy="4" orient="auto">
-	    <use xlink:href="#markerPath" style="fill: black;"/>
-	  </marker>
+      <marker id="markerArrow" markerWidth="8" markerHeight="8"
+             refx="4" refy="4" orient="auto">
+        <use xlink:href="#markerPath" style="fill: black;"/>
+      </marker>
 
-	  <line id="cg_arrow" x1="3" y1="3" x2="4" y2="4"
-		marker-end="url(#markerArrow)"
-		style="stroke: black; stroke-width: 2px; stroke-dasharray: 6 3;"/>
+      <line id="cg_arrow" x1="3" y1="3" x2="4" y2="4"
+           marker-end="url(#markerArrow)"
+           style="stroke: black; stroke-width: 2px; stroke-dasharray: 6 3;"/>
 
-	  <circle id="takeoff_point" cx="1" cy="1" r="5"
-		  stroke="black" stroke-width="1" fill="red"/>
+      <circle id="takeoff_point" cx="1" cy="1" r="5"
+             stroke="black" stroke-width="1" fill="red"/>
 
-	</g>
-      </g>
-
-      <text id="ac_reg" x="50%" y="50%" font-size="80"
-	    style="opacity:0.15;text-anchor:middle;">NO-REG</text>
-
-      <!--g transform="translate(-50,325) rotate(-45)">
-      <text id="ac_invalid" x="50%" y="50%" font-size="110"
-	    style="opacity:0.5;text-anchor:middle;" fill="red"
-	    visibility="{{ invalid_data|default("hidden", true) }}">INVALID</text>
-      </g-->
-
-      <text id="warning_text" x="20" y="50" font-size="20"
-	    fill="green" style="font-weight:bold;">Limits OK</text>
-
-      <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
-      <text x="35" y="105" id="takeoff_text">- Take-off</text>
-
-      <!--circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"-->
-
-      <g transform="translate(34,118) rotate(90) scale(2)">
-	<use xlink:href="#markerPath"/>
-      </g>
-      <text x="35" y="130" id="landing_text">- Landing</text>
     </g>
+  </g>
+
+  <text id="ac_reg" x="50%" y="50%" font-size="80"
+       style="opacity:0.15;text-anchor:middle;">NO-REG</text>
+
+  <!--g transform="translate(-50,325) rotate(-45)">
+  <text id="ac_invalid" x="50%" y="50%" font-size="110"
+       style="opacity:0.5;text-anchor:middle;" fill="red"
+       visibility="{{ invalid_data|default("hidden", true) }}">INVALID</text>
+  </g-->
+
+  <text id="warning_text" x="20" y="50" font-size="20"
+       fill="green" style="font-weight:bold;">Limits OK</text>
+
+  <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
+  <text x="35" y="105" id="takeoff_text">- Take-off</text>
+
+  <!--circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"-->
+
+  <g transform="translate(34,118) rotate(90) scale(2)">
+    <use xlink:href="#markerPath"/>
+  </g>
+  <text x="35" y="130" id="landing_text">- Landing</text>
+</g>
