@@ -1,10 +1,11 @@
 # Mass and Balance
 
-Mass and balance calculation sheets for specific aircraft. Each sheet is a
-standalone HTML file, so it stays usable without an internet connection once it
-has been downloaded to a local computer (iPad etc.).
+Mass and balance calculation sheets for specific aircraft. Each sheet
+is a standalone HTML file, so it stays usable without an internet
+connection once it has been downloaded to a local device (e.g. an
+iPad).
 
-The published page is here: <http://kaltsi.github.io/Mass-and-Balance/>
+<http://kaltsi.github.io/Mass-and-Balance/>
 
 ## Making a sheet for your own aircraft
 
@@ -21,9 +22,8 @@ Look at the existing specification files under `specs/`, copy one, edit it, set
 ./parse_template.py template.html.j2 specs/oh-kas.json out
 ```
 
-`export.sh` runs it for every spec file that has `publish` set to `true` (the key is
-`false` when it is not set); `publish` is passed to the template but not used by it. A
-spec key that is not set falls back to the default written in the template. After the
+`export.sh` runs it for every spec file that has `publish` set to `true` (default: `false`).
+A spec key that is not set falls back to the default written in the template. After the
 sheets it regenerates the landing page, see below.
 
 ### Template variables
@@ -79,11 +79,9 @@ committed, without any build step. `index.html` is generated from `index.html.j2
 links to the sheets by relative path, so the generated files must sit next to it at
 the branch root.
 
-`git archive` expands the `$Format: %ci$` placeholder in the `*.html` files marked
-`export-subst` in `.gitattributes`, which is how the footer date gets baked into the
-published copy. The generated sheets and the generated landing page keep the placeholder, so the date only appears in
-the exported copy — `export.sh` only works inside a git clone for this reason, and
-`generate_index.py` needs one as well for the update dates.
+`git archive` expands the `$Format: %ci$` placeholder in the `*.html`
+files marked `export-subst` in `.gitattributes`, which is how the
+footer date gets baked into the published copy.
 
-The debug section is hidden in generated sheets: `build_context()` sets `hide_debug`,
-which renders the debug button with `display:none`.
+The debug section is hidden in generated sheets: `build_context()`
+sets `hide_debug`, which renders the debug button with `display:none`.
