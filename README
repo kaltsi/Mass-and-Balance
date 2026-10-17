@@ -13,5 +13,14 @@ create a new file there and run the export.sh script. The script will
 apply the specs to the template.html file and create the plane
 specific m&b sheets.
 
+The spec files also exist in JSON form (specs/<registration>.json), which is
+what the generator reads. The JSON is generated from the .specs files with:
+
+    python3 tools/specs_to_json.py specs/
+
+Key names in the JSON are the same as in the .specs files, so they map one-to-one
+to the /*NAME*/ placeholders in template.html. Load points are stored as a list of
+objects (name, type, translations, unit, default/min/max, moment arm, step).
+
 Juha Kallioinen
 
