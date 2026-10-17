@@ -1,6 +1,4 @@
 .git
 .venv
-ref2
 out
-gen
 __pycache__
