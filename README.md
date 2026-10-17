@@ -47,9 +47,11 @@ template (`g_lw`, `g_tow`, ...).
 ```
 
 The aircraft table gets one row per spec with `publish` true, in registration order, and
-the Updates section lists the three latest commits that touched a published spec, each
-entry naming the registration that was updated. The update dates come from `git log`, so
-the page is regenerated whenever a published spec changes.
+the Updates section lists the three latest commits that touched a published spec. A commit
+message line like `OH-STL: CG limits updated` is shown as the note for that aircraft, one
+note per line, and the aircraft without a note are listed as one comma separated entry.
+The update dates come from `git log`, so the page is regenerated whenever a published spec
+changes.
 
 ### Running it in a container
 

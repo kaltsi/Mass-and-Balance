@@ -147,9 +147,12 @@
     <h2>Updates</h2>
     {% for update in updates %}
     <h4>{{ update.date }}</h4>
-    {% for registration in update.registrations %}
-    <li>{{ registration }} updated.</li>
+    {% for note in update.notes %}
+    <li>{{ note }}</li>
     {% endfor %}
+    {% if update.plain %}
+    <li>{{ update.plain | join(', ') }} updated.</li>
+    {% endif %}
     {% endfor %}
     <br>
 

@@ -5,16 +5,19 @@ Usage: ./generate_index.py <index.html.j2> <specs_dir> [output_dir]
 
 Only the specs with `publish` true get a row in the aircraft table, listed in
 registration order. The Updates section shows the three latest commits that
-touched a published spec, each one mentioning the registration whose data was
-updated. The update dates come from git, so this only works inside a git clone.
+touched a published spec. A commit message line like `OH-STL: CG limits updated`
+is shown as the note for that aircraft, one note per line; aircraft without a note
+are listed together as one comma separated entry. The update dates come from git,
+so this only works inside a git clone.
 
 Template variables:
   aircraft   the published specs, sorted by registration
-  updates    the three latest update dates, newest first, with the registrations
-             updated on each of those dates
+  updates    the three latest update dates, newest first, each with the notes of
+             that commit and the registrations that have no note
 """
 
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -24,19 +27,20 @@ import jinja2
 
 UPDATE_COUNT = 3
 DATE_FORMAT = "%d.%m.%Y"
+NOTE = re.compile(r"([A-Z]{2}-[A-Z]{3}):\s*(.+)")
 
 
-def last_update(spec_path):
-    """Latest commit date that touched spec_path, or None if git has no history."""
+def last_commit(spec_path):
+    """Latest commit that touched spec_path as (date, message), or (None, "")."""
     result = subprocess.run(
-        ["git", "log", "-1", "--format=%ci", "--", str(spec_path)],
+        ["git", "log", "-1", "--format=%ci%n%B", "--", str(spec_path)],
         capture_output=True,
         text=True,
     )
-    stamp = result.stdout.strip()
-    if not stamp:
-        return None
-    return datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S %z")
+    lines = result.stdout.strip().split("\n")
+    if not lines[0]:
+        return None, ""
+    return datetime.strptime(lines[0], "%Y-%m-%d %H:%M:%S %z"), "\n".join(lines[1:])
 
 
 def build_context(specs_dir):
@@ -46,24 +50,36 @@ def build_context(specs_dir):
         spec = json.loads(spec_path.read_text(encoding="utf-8"))
         if not spec.get("publish", False):
             continue
-        updated = last_update(spec_path)
+
+        day, message = last_commit(spec_path)
+        note = None
+        for match in NOTE.finditer(message):
+            if match.group(1) == spec["registration"]:
+                note = match.group(0).strip()
+                break
+
         aircraft.append({
             "registration": spec["registration"],
             "aircraft_type": spec["aircraft_type"],
             "sheet": spec_path.stem + ".html",
-            "updated": updated,
-            "date": updated.strftime(DATE_FORMAT) if updated else "",
+            "updated": day,
+            "date": day.strftime(DATE_FORMAT) if day else "",
+            "note": note,
         })
 
-    updates = [plane for plane in aircraft if plane["updated"]]
     by_date = {}
-    for plane in updates:
-        by_date.setdefault(plane["updated"], []).append(plane["registration"])
+    for plane in aircraft:
+        if plane["updated"]:
+            by_date.setdefault(plane["updated"], []).append(plane)
 
-    updates = [
-        {"date": day.strftime(DATE_FORMAT), "registrations": by_date[day]}
-        for day in sorted(by_date, reverse=True)[:UPDATE_COUNT]
-    ]
+    updates = []
+    for day in sorted(by_date, reverse=True)[:UPDATE_COUNT]:
+        planes = by_date[day]
+        updates.append({
+            "date": day.strftime(DATE_FORMAT),
+            "notes": [plane["note"] for plane in planes if plane["note"]],
+            "plain": [plane["registration"] for plane in planes if not plane["note"]],
+        })
 
     return {"aircraft": aircraft, "updates": updates}
 
