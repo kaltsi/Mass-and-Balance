@@ -775,7 +775,7 @@ input[type=number] {
 
 	rows = [ ];
 	{% for lp in load_points %}
-	{{ lp.name }}=new l_point("{{ lp.name }}", ["{{ lp.label_en }}", "{{ lp.label_fi }}"], "{{ lp.unit }}", {{ lp.default_expr }}, {{ lp.min }}, {{ lp.max if lp.show_max else -lp.max }}, {{ lp.moment_arm }}{% if lp.step is defined %}, {{ lp.step }}{% endif %});{% if lp.row_type == 'fuel_flow' %} {{ lp.name }}.fuel_flow = true;{% endif %}
+	{{ lp.name }}=new l_point("{{ lp.name }}", ["{{ lp.label.en }}", "{{ lp.label.fi }}"], "{{ lp.unit }}", {{ lp.default_expr }}, {{ lp.min }}, {{ lp.max if lp.show_max else -lp.max }}, {{ lp.moment_arm }}{% if lp.step is defined %}, {{ lp.step }}{% endif %});{% if lp.row_type == 'fuel_flow' %} {{ lp.name }}.fuel_flow = true;{% endif %}
 	rows.push(new {{ lp.row_class }}interactive_row({{ lp.name }}{% if lp.reverse %}, "reverse"{% endif %}));
 	{% endfor %}
 

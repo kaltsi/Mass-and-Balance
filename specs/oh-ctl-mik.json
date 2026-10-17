@@ -1,17 +1,9 @@
 {
+  "registration": "OH-CTL",
   "aircraft_type": "Cessna C172M (180 hp)",
   "data_source": "Numbers: OH-CTL mass and balance excel (MIK) 29.07.2010",
+  "fuel_density_kg_per_l": 0.721,
   "envelope": {
-    "chart_x_offset": 50,
-    "landing_mass_limits": [
-      680,
-      885,
-      1156,
-      1156,
-      680,
-      680
-    ],
-    "mass_axis_max": 375,
     "moment_arms": [
       0.89,
       0.89,
@@ -20,7 +12,6 @@
       1.202,
       0.89
     ],
-    "moment_axis_max": 475,
     "takeoff_mass_limits": [
       680,
       885,
@@ -28,156 +19,187 @@
       1156,
       680,
       680
-    ]
+    ],
+    "landing_mass_limits": [
+      680,
+      885,
+      1156,
+      1156,
+      680,
+      680
+    ],
+    "moment_axis_max": 475,
+    "mass_axis_max": 375,
+    "chart_x_offset": 50
   },
-  "fuel_density_kg_per_l": 0.721,
   "load_points": [
     {
-      "default": 697.5,
-      "label_en": "Basic weight",
-      "label_fi": "Perusmassa",
-      "max": 1,
-      "min": 0,
-      "moment_arm": 0.97,
       "name": "BASIC_WEIGHT",
       "row_type": "computed_reversed",
-      "save": false,
+      "label": {
+        "en": "Basic weight",
+        "fi": "Perusmassa"
+      },
+      "unit": "kg",
+      "default": 697.5,
+      "min": 0,
+      "max": 1,
       "show_max": false,
-      "unit": "kg"
+      "moment_arm": 0.97,
+      "save": false
     },
     {
-      "default": 150,
-      "label_en": "Front seat",
-      "label_fi": "Etupenkki",
-      "max": 250,
-      "min": 25,
-      "moment_arm": 0.94,
       "name": "FRONT_SEAT",
       "row_type": "interactive",
-      "save": true,
+      "label": {
+        "en": "Front seat",
+        "fi": "Etupenkki"
+      },
+      "unit": "kg",
+      "default": 150,
+      "min": 25,
+      "max": 250,
       "show_max": false,
-      "unit": "kg"
+      "moment_arm": 0.94,
+      "save": true
     },
     {
-      "default": 75,
-      "label_en": "Back seat",
-      "label_fi": "Takapenkki",
-      "max": 250,
-      "min": 0,
-      "moment_arm": 1.85,
       "name": "BACK_SEAT",
       "row_type": "interactive",
-      "save": true,
+      "label": {
+        "en": "Back seat",
+        "fi": "Takapenkki"
+      },
+      "unit": "kg",
+      "default": 75,
+      "min": 0,
+      "max": 250,
       "show_max": false,
-      "unit": "kg"
+      "moment_arm": 1.85,
+      "save": true
     },
     {
-      "default": 143,
-      "label_en": "Fuel",
-      "label_fi": "Polttoaine",
-      "max": 143,
-      "min": 0,
-      "moment_arm": 1.17,
       "name": "FUEL",
       "row_type": "interactive",
-      "save": true,
+      "label": {
+        "en": "Fuel",
+        "fi": "Polttoaine"
+      },
+      "unit": "ltr",
+      "default": 143,
+      "min": 0,
+      "max": 143,
       "show_max": true,
+      "moment_arm": 1.17,
       "step": 0.1,
-      "unit": "ltr"
+      "save": true
     },
     {
-      "default": 20,
-      "label_en": "Baggage",
-      "label_fi": "Matkatavaratila",
-      "max": 54,
-      "min": 0,
-      "moment_arm": 2.44,
       "name": "BAGGAGE",
       "row_type": "interactive",
-      "save": true,
+      "label": {
+        "en": "Baggage",
+        "fi": "Matkatavaratila"
+      },
+      "unit": "kg",
+      "default": 20,
+      "min": 0,
+      "max": 54,
       "show_max": true,
-      "unit": "kg"
+      "moment_arm": 2.44,
+      "save": true
     },
     {
-      "default": 5,
-      "label_en": "Taxi fuel",
-      "label_fi": "Rullauspolttoaine",
-      "max": 20,
-      "min": 0,
-      "moment_arm": 1.17,
       "name": "TAXI_FUEL",
       "row_type": "interactive",
-      "save": true,
+      "label": {
+        "en": "Taxi fuel",
+        "fi": "Rullauspolttoaine"
+      },
+      "unit": "ltr",
+      "default": 5,
+      "min": 0,
+      "max": 20,
       "show_max": false,
+      "moment_arm": 1.17,
       "step": 0.1,
-      "unit": "ltr"
+      "save": true
     },
     {
-      "default": 0,
-      "label_en": "Take-off mass",
-      "label_fi": "Lähtömassa",
-      "max": 1156,
-      "min": 0,
-      "moment_arm": 1,
       "name": "TOW",
       "row_type": "computed",
-      "save": false,
+      "label": {
+        "en": "Take-off mass",
+        "fi": "Lähtömassa"
+      },
+      "unit": "kg",
+      "default": 0,
+      "min": 0,
+      "max": 1156,
       "show_max": true,
-      "unit": "kg"
+      "moment_arm": 1,
+      "save": false
     },
     {
-      "default": 0,
-      "label_en": "Landing mass",
-      "label_fi": "Laskumassa",
-      "max": 1156,
-      "min": 0,
-      "moment_arm": 1,
       "name": "LNDW",
       "row_type": "computed",
-      "save": false,
+      "label": {
+        "en": "Landing mass",
+        "fi": "Laskumassa"
+      },
+      "unit": "kg",
+      "default": 0,
+      "min": 0,
+      "max": 1156,
       "show_max": true,
-      "unit": "kg"
+      "moment_arm": 1,
+      "save": false
     },
     {
-      "default": 0,
-      "label_en": "Endurance",
-      "label_fi": "Toiminta-aika",
-      "max": 800,
-      "min": 1,
-      "moment_arm": 0,
       "name": "ENDURANCE",
       "row_type": "computed",
-      "save": false,
+      "label": {
+        "en": "Endurance",
+        "fi": "Toiminta-aika"
+      },
+      "unit": "min",
+      "default": 0,
+      "min": 1,
+      "max": 800,
       "show_max": false,
-      "unit": "min"
+      "moment_arm": 0,
+      "save": false
     },
     {
-      "default": 38,
-      "label_en": "Fuel flow/h",
-      "label_fi": "Kulutus/h",
-      "max": 50,
-      "min": 5,
-      "moment_arm": 1,
       "name": "FUEL_FLOW",
       "row_type": "fuel_flow",
-      "save": true,
+      "label": {
+        "en": "Fuel flow/h",
+        "fi": "Kulutus/h"
+      },
+      "unit": "ltr",
+      "default": 38,
+      "min": 5,
+      "max": 50,
       "show_max": false,
+      "moment_arm": 1,
       "step": 0.1,
-      "unit": "ltr"
+      "save": true
     },
     {
-      "default": 60,
-      "label_en": "Flight time",
-      "label_fi": "Lentoaika",
-      "max": 300,
-      "min": 1,
-      "moment_arm": 0,
       "name": "FLIGHT_TIME",
       "row_type": "interactive",
-      "save": true,
+      "label": {
+        "en": "Flight time",
+        "fi": "Lentoaika"
+      },
+      "unit": "min",
+      "default": 60,
+      "min": 1,
+      "max": 300,
       "show_max": false,
-      "unit": "min"
+      "moment_arm": 0,
+      "save": true
     }
-  ],
-  "registration": "OH-CTL"
+  ]
 }

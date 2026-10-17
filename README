@@ -29,8 +29,12 @@ keys in the JSON:
     TOF_MASS_LIMITS -> envelope.takeoff_mass_limits INVALID_DATA   -> invalid_data
     LND_MASS_LIMITS -> envelope.landing_mass_limits LOAD_POINTS    -> load_points
 
-Load points are a list of objects with the keys: name, row_type, label_en, label_fi,
-unit, default, min, max, show_max, moment_arm, step, save.
+Load points are a list of objects with the keys: name, row_type, label (en/fi), unit,
+default, min, max, show_max, moment_arm, step, save.
+
+The keys are written in reading order rather than alphabetically: the aircraft identity,
+then the chart geometry under envelope (polygon arms and mass limits, the landing limit
+arms, the axis maxima, the x offset), then the load points.
 
 Two conventions of the .specs format become explicit fields:
 

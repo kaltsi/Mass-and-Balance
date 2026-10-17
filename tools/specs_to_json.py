@@ -30,8 +30,7 @@ Schema (one object per aircraft):
         {
           "name": "BASIC_WEIGHT",           # JS variable name / saveable key
           "row_type": "computed_reversed",
-          "label_en": "Basic weight",       # '#' in the spec means space
-          "label_fi": "Perusmassa",
+          "label": {"en": "Basic weight", "fi": "Perusmassa"},   # '#' in the spec means space
           "unit": "kg",
           "default": 909.4,
           "min": 0,
@@ -99,6 +98,53 @@ ROW_TYPES = {
 }
 SAVEABLE_TYPES = ("interactive", "fuel_flow", "checkbox")
 
+# Key order in the JSON files: identity, then the chart, then the load points.
+TOP_ORDER = [
+    "registration",
+    "aircraft_type",
+    "data_source",
+    "fuel_density_kg_per_l",
+    "envelope",
+    "invalid_data",
+    "load_points",
+]
+
+ENVELOPE_ORDER = [
+    "moment_arms",
+    "takeoff_mass_limits",
+    "landing_mass_limits",
+    "landing_limit_arm_start",
+    "landing_limit_arm_end",
+    "moment_axis_max",
+    "mass_axis_max",
+    "chart_x_offset",
+]
+
+LP_ORDER = [
+    "name",
+    "row_type",
+    "label",
+    "unit",
+    "default",
+    "min",
+    "max",
+    "show_max",
+    "moment_arm",
+    "step",
+    "save",
+]
+
+LABEL_ORDER = ["en", "fi"]
+
+
+def order(data, keys):
+    """Return the dict with the keys in the given order (unknown keys last)."""
+    out = {key: data[key] for key in keys if key in data}
+    for key in data:
+        if key not in out:
+            out[key] = data[key]
+    return out
+
 
 def num(s):
     """Return an int when possible, otherwise a float."""
@@ -122,8 +168,10 @@ def parse_load_point(value):
     point = {
         "name": lp[5:],
         "row_type": row_type,
-        "label_en": parts[1].strip('"').replace("#", " "),
-        "label_fi": parts[2].strip('"').replace("#", " "),
+        "label": {
+            "en": parts[1].strip('"').replace("#", " "),
+            "fi": parts[2].strip('"').replace("#", " "),
+        },
         "unit": parts[3].strip('"'),
         "default": num(parts[4]),
         "min": num(parts[5]),
@@ -134,6 +182,7 @@ def parse_load_point(value):
     }
     if len(parts) > 8:
         point["step"] = num(parts[8])
+    point = order(point, LP_ORDER)
     return point
 
 
@@ -169,9 +218,9 @@ def parse_specs(path):
                 target[name] = parsed
 
     if envelope:
-        data["envelope"] = envelope
+        data["envelope"] = order(envelope, ENVELOPE_ORDER)
     data["load_points"] = load_points
-    return data
+    return order(data, TOP_ORDER)
 
 
 def convert(path, out_dir=None):
@@ -185,7 +234,7 @@ def convert(path, out_dir=None):
         out_path = name + ".json"
 
     with open(out_path, "w", encoding="utf-8") as fh:
-        json.dump(data, fh, indent=2, ensure_ascii=False, sort_keys=True)
+        json.dump(data, fh, indent=2, ensure_ascii=False)
         fh.write("\n")
 
     return out_path
