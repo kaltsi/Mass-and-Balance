@@ -1,8 +1,7 @@
 # Spec files
 
-Every aircraft has one spec file, `<registration>.json`. Keys are written in reading
-order: the aircraft identity, then the chart geometry (`envelope`), then the load points.
-A key that is not set falls back to the default written in the template.
+Every aircraft has one spec file, `<registration>.json`.
+A key that is not set in a spec file uses the default value in the template.
 
 ## Top level keys
 
@@ -19,17 +18,17 @@ A key that is not set falls back to the default written in the template.
 
 ## envelope
 
-The chart is drawn from six polygon points: moment arms on the x axis, mass on the y
+The chart is drawn from polygon points: moment arms on the x axis, mass on the y
 axis. The takeoff polygon uses `takeoff_mass_limits`, the landing polygon uses
 `landing_mass_limits`.
 
 | key | meaning | template default |
 |---|---|---|
-| `moment_arms` | x of the six polygon points, m from the datum | `0.787, 0.787, 0.821, 0.925, 0.925, 0.787` |
+| `moment_arms` | x of the polygon points, meters from the datum | `0.787, 0.787, 0.821, 0.925, 0.925, 0.787` |
 | `takeoff_mass_limits` | y of the polygon points, kg | `450, 612, 757, 757, 450, 450` |
 | `landing_mass_limits` | y of the landing polygon, kg | `450, 612, 700, 700, 450, 450` |
-| `landing_limit_arm_start` | x where the landing limit line starts, m | `0.8075` |
-| `landing_limit_arm_end` | x where the landing limit line ends, m | `0.925` |
+| `landing_limit_arm_start` | x where the landing limit line starts, meters | `0.8075` |
+| `landing_limit_arm_end` | x where the landing limit line ends, meters | `0.925` |
 | `moment_axis_max` | x axis maximum, kg*m | `475` |
 | `mass_axis_max` | y axis maximum, kg | `375` |
 | `chart_x_offset` | x offset of the chart drawing, px | `50` |

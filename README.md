@@ -38,14 +38,6 @@ work tree, the output directory and `.git` mounted.
 
 ## Publishing
 
-The published page is the `gh-pages` branch, served by GitHub Pages exactly as
-it is committed, without any build step, so the generated files must sit at the
-branch root next to `index.html`.
-
-`git archive` expands the `$Format: %ci$` placeholder in the `*.html` files
-marked `export-subst` in `.gitattributes`, which is how the footer date gets
-baked into the published copy.
-
 Commit messages that touch a published spec show up in the landing page Updates
 section. A line like `OH-STL: CG limits updated` becomes the note for that
-aircraft and a line like `Publish: something` becomes the entry for that day.
+aircraft and a line like `Publish: something` is added as an entry for that day.
