@@ -5,21 +5,18 @@ Usage: ./generate_index.py src/index.html.j2 specs out
 
 Only the specs with `publish` true get a row in the aircraft table, listed in
 registration order. The output is out/index.html, the output directory is created
-if it does not exist. The Updates section shows the three latest commits that
-touched a published spec, newest first, grouped by date, one block per date. A
-commit message line like `OH-STL: CG limits updated` is shown as the note for
-that aircraft, one note per line; a line like `Publish: something` is shown as
-the first entry for that day; aircraft without a note are listed together as one
-comma separated entry. Commits that touch no published spec are skipped, so the
-page always gets three blocks when three such commits exist. The update dates
-come from git, so this only works inside a git clone with the history fetched
-(the GitHub Actions checkout needs fetch-depth: 0).
+if it does not exist. The Updates section shows the three latest dates with a
+qualifying commit, newest first, one block per date, commits of the same date
+merged. A commit that touches no published spec counts only when its message has
+a `Publish:` line. A line like `OH-STL: CG limits updated` is the note for that
+aircraft, a `Publish: something` line is the first entry of the day, and aircraft
+without a note are listed together. The dates come from git, so the clone needs
+the full history.
 
 Template variables:
   aircraft   the published specs, sorted by registration
-  updates    the three latest commits touching a published spec, newest first,
-             grouped by date, each block with the publish entries of that day, its
-             notes and the registrations that have no note
+  updates    the three latest dates, each with its publish entries, notes and the
+             registrations that have no note
 """
 
 import json
@@ -32,10 +29,6 @@ from pathlib import Path
 import jinja2
 
 UPDATE_COUNT = 3
-# Commits fetched before filtering out the ones that touch no published spec,
-# so there are still UPDATE_COUNT blocks left when some commits only change the
-# spec documentation.
-FETCH_COUNT = UPDATE_COUNT * 10
 DATE_FORMAT = "%d.%m.%Y"
 RECORD = "\x1e"  # commit record separator
 FILES = "\x1f"   # commit message / changed file list separator
@@ -53,11 +46,10 @@ def published_specs(specs_dir):
     return dict(sorted(specs.items(), key=lambda item: item[1]["registration"]))
 
 
-def spec_commits(specs_dir, limit):
-    """Latest commits touching specs_dir as (date, message, files), newest first."""
+def all_commits():
+    """Every commit as (date, message, files), newest first."""
     result = subprocess.run(
-        ["git", "log", f"-n{limit}", f"--format={RECORD}%ci%n%B{FILES}", "--name-only",
-         "--", str(specs_dir)],
+        ["git", "log", f"--format={RECORD}%ci%n%B{FILES}", "--name-only"],
         capture_output=True,
         text=True,
     )
@@ -87,23 +79,17 @@ def build_context(specs_dir):
         for path, spec in published.items()
     ]
 
-    updates = []
     by_date = {}
-    taken = 0
-    for day, message, files in spec_commits(specs_dir, FETCH_COUNT):
-        if taken >= UPDATE_COUNT:
-            break
-
+    for day, message, files in all_commits():
         planes = [by_name[Path(f).name] for f in files if Path(f).name in by_name]
-        if not planes:
+        publish = [m.group(1).strip() for m in PUBLISH.finditer(message)]
+        if not planes and not publish:
             continue
-        taken += 1
 
-        registrations = [plane["registration"] for plane in planes]
         block = by_date.setdefault(day.date(), {"publish": [], "notes": [], "plain": []})
+        registrations = [plane["registration"] for plane in planes]
 
-        for match in PUBLISH.finditer(message):
-            entry = match.group(1).strip()
+        for entry in publish:
             if entry not in block["publish"]:
                 block["publish"].append(entry)
 
@@ -120,7 +106,8 @@ def build_context(specs_dir):
 
     updates = [
         {"date": day.strftime(DATE_FORMAT), **block}
-        for day, block in sorted(by_date.items(), reverse=True)
+        for day, block in sorted(by_date.items(), key=lambda item: item[0],
+                                 reverse=True)[:UPDATE_COUNT]
     ]
 
     return {"aircraft": aircraft, "updates": updates}
