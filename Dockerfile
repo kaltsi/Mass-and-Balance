@@ -13,6 +13,4 @@ COPY generate_sheet.py generate_index.py ./
 COPY src/ src/
 COPY specs/ specs/
 
-# docker run --rm -v "$PWD/out:/app/out" mass-and-balance specs/oh-kas.json out
-# docker run --rm -v "$PWD/.git:/app/.git" --entrypoint python3 mass-and-balance generate_index.py src/index.html.j2 specs out
 ENTRYPOINT ["python3", "generate_sheet.py", "src/template.html.j2"]

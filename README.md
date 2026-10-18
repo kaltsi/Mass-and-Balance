@@ -60,21 +60,13 @@ published spec changes.
 
 ### Running it in a container
 
-```sh
-docker build -t mass-and-balance .
-docker run --rm -v "$PWD/out:/app/out" mass-and-balance specs/oh-kas.json out
-```
-
-The image has git, so the landing page can be generated in it as well (the update
-dates come from the history, so `--entrypoint` is needed and `.git` must be mounted):
-
-```sh
-docker run --rm -v "$PWD/.git:/app/.git" --entrypoint python3 \
-  mass-and-balance generate_index.py src/index.html.j2 specs out
-```
-
-Without a mounted history the aircraft table is still rendered, only the Updates
-section stays empty.
+The build can run through the image built from the Dockerfile with
+`./build.sh --docker out`: the image is built
+once, the tracked files are exported with `git archive` (so the export-subst
+footer dates are still expanded) and every python call runs in the container,
+as the current user's uid and gid, with the work tree, the output directory and
+`.git` mounted (without a mounted history the aircraft table is still rendered,
+only the Updates section stays empty).
 
 ## Publishing
 
