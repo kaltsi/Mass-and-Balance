@@ -957,7 +957,7 @@ function user_input_range(ir, lp)
 
 function user_checkbox(cb, lp, min, max)
 {
-    if (cb.checked == true) [
+    if (cb.checked == true) {
         window[lp].vu.num = max;
     } else {
         window[lp].vu.num = min;
