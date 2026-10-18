@@ -25,7 +25,8 @@ landing page:
 ```
 
 The landing page lists one row per published spec and the three latest commits
-that touched one.
+that touched one, newest first, grouped by date. The dates come from git, so the
+checkout needs the full history (`fetch-depth: 0`).
 
 ### Running it in a container
 
