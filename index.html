@@ -6,23 +6,115 @@
   <title>Mass-and-Balance</title>
 
   <style type="text/css">
+/* Shared colours for the landing page and the sheets.
+
+   The theme is a data-theme attribute on the html element, set by theme.js from
+   localStorage or the system preference.
+*/
+
+:root {
+    --bg:        #ffffff;
+    --fg:        #000000;
+    --accent:    #453b69;
+    --panel:     #ffffff;   /* envelope background in the sheet */
+    --field:     #83ffff;   /* number entry background */
+    --highlight: #ffe900;   /* entered value cell */
+    --highlight_fg: #000000;
+    --alert:     #ff0000;   /* overweight cell background */
+    --alert_fg:  #ffffff;
+    --line:      #aaaaaa;
+    --shadow:    rgba(0, 0, 0, 0.4);
+    --ok:        green;
+    --bad:       red;
+    --toggle_scale: 1.3;
+}
+
+:root[data-theme="dark"] {
+    --bg:        #16181d;
+    --fg:        #dfe3e8;
+    --accent:    #b4a6d6;
+    --panel:     #232830;
+    --field:     #223a3f;
+    --highlight: #6b5320;
+    --highlight_fg: #f0d9a0;
+    --alert:     #8e2f2f;
+    --alert_fg:  #ffffff;
+    --line:      #4a5058;
+    --shadow:    rgba(255, 255, 255, 0.08);
+    --ok:        #3ddc84;
+    --bad:       #ff6161;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+}
+
+.theme_toggle {
+    display: inline-flex;
+    align-items: center;
+    font: inherit;
+    font-size: calc(1em * var(--toggle_scale));
+    color: var(--accent);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: calc(2px * var(--toggle_scale)) calc(8px * var(--toggle_scale));
+    cursor: pointer;
+    box-shadow: 2px 2px 3px var(--shadow);
+}
+
+.theme_icon {
+    width: calc(16px * var(--toggle_scale));
+    height: calc(16px * var(--toggle_scale));
+    fill: currentColor;
+}
+
+/* The moon is shown in the dark theme, the sun in the light one. */
+.theme_icon.moon {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme_icon.sun {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme_icon.moon {
+    display: inline;
+}
+
+/* The selects keep the browser default in light mode. */
+:root[data-theme="dark"] select {
+    color: var(--fg);
+    background-color: var(--panel);
+    border: 1px solid var(--line);
+}
     body {
         margin: 1.0em 0px 0px 0px;
         font-family: Helvetica, Arial, FreeSans, san-serif;
-        color: #000000;
+        color: var(--fg);
     }
     #container {
         margin: 0 auto;
         width: 700px;
     }
-    h1 { font-size: 3.8em; color: #453b69; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: var(--accent); margin-bottom: 3px; display: flex; align-items: baseline; gap: 0.2em; }
     h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #453b69; }
-    h3 { color: #453b69; }
+    h1 a { text-decoration: none; white-space: nowrap; }
+    /* The button is aligned with the bottom of the text: the h1 baseline is the
+       bottom of the letters, so the button bottom padding is taken off. */
+    h1 .theme_toggle { font-size: calc(0.4em * var(--toggle_scale)); flex: none; align-self: baseline; padding-bottom: 0; }
+    h1 .theme_icon { width: calc(0.4em * var(--toggle_scale)); height: calc(0.4em * var(--toggle_scale)); }
+
+    /* The title does not wrap, so on a narrow screen it gets smaller instead. */
+    @media (max-width: 480px) {
+        h1 { font-size: 2.4em; }
+    }
+    h2 { font-size: 1.5em; color: var(--accent); }
+    h3 { color: var(--accent); }
     h4 { font-weight: 300;}
-    hr { border: 0; width: 100%; border-bottom: 1px solid #aaa}
-    a { color: #453b69; }
+    hr { border: 0; width: 100%; border-bottom: 1px solid var(--line) }
+    a { color: var(--accent); }
 
     li { list-style: none; padding: 0px; }
     li:before { content: '\2708'; margin: 0 0.5em; }
@@ -35,10 +127,10 @@
         border-radius: 10px;
         padding: 2px 8px 2px 8px;
         background: none;
-        box-shadow: 2px 2px 3px rgba(0,0,0,0.4);
+        box-shadow: 2px 2px 3px var(--shadow);
         transition: background 0.2s linear 0s;
     }
-    .mblink:hover { background: yellow; }
+    .mblink:hover { background: var(--highlight); }
 
     .description {
         font-size: 1.2em;
@@ -79,7 +171,7 @@
         border: 1px solid;
         border-radius: 6%;
         padding: 10px 10px 10px 10px;
-        box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+        box-shadow: 3px 3px 5px var(--shadow);
     }
 
     table.a th {
@@ -98,7 +190,28 @@
 <body>
 
   <div id="container">
-    <h1><a href="https://github.com/kaltsi/Mass-and-Balance">Mass and Balance</a></h1>
+    <h1>
+      <a href="https://github.com/kaltsi/Mass-and-Balance">Mass and Balance</a>
+<button id="theme_toggle" class="theme_toggle" type="button" title="Toggle dark mode."
+aria-label="Toggle dark mode" onclick="toggle_theme()">
+  <svg class="theme_icon sun" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="5"/>
+    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="12" y1="2"    x2="12" y2="4.5"/>
+      <line x1="12" y1="19.5" x2="12" y2="22"/>
+      <line x1="2"    y1="12" x2="4.5" y2="12"/>
+      <line x1="19.5" y1="12" x2="22"  y2="12"/>
+      <line x1="4.9"  y1="4.9"  x2="6.7" y2="6.7"/>
+      <line x1="17.3" y1="17.3" x2="19.1" y2="19.1"/>
+      <line x1="4.9"  y1="19.1" x2="6.7" y2="17.3"/>
+      <line x1="17.3" y1="6.7"  x2="19.1" y2="4.9"/>
+    </g>
+  </svg>
+  <svg class="theme_icon moon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 3a9 9 0 1 0 9 9 7 7 0 1 1-9-9z"/>
+  </svg>
+</button>
+    </h1>
 
     <div class="description">
       Simple mass and balance calculator for airplanes
@@ -207,16 +320,79 @@
 
     <h2>Updates</h2>
     <h4>18.10.2026</h4>
+    <li>line. The</li>
+    <li>added a quick dark mode support</li>
+    <h4>17.10.2026</h4>
+    <li>Project converted to python</li>
+    <li>Testing automatic publishing</li>
     <li>OH-COX, OH-DDS, OH-ESR, OH-IHQ, OH-KAT, OH-SRH, OH-STL, OH-TIL updated.</li>
     <br>
 
     <div class="footer">
       <p class="alignleft"><small>get the source code on GitHub : <a href="https://github.com/kaltsi/Mass-and-Balance">kaltsi/Mass-and-Balance</a></small></p>
-      <p class="alignright"><small><small> <a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 2026-10-18 18:45:34 +0300</small></small></p>
+      <p class="alignright"><small><small> <a href="mailto:kaltsi+github@gmail.com">Juha Kallioinen</a> 2026-10-18 19:51:31 +0300</small></small></p>
       <div style="clear:both;"></div>
     </div>
 
   </div>
+
+  <script type="text/javascript">
+/* Dark mode toggle, shared by the landing page and the sheets. */
+
+var g_theme_key = "kaltsi.mb.theme";
+
+/* The entry says what selecting it does, in the sheet language. */
+function theme_labels() {
+    return (document.documentElement.getAttribute("data-theme") == "dark")
+        ? ["Light mode", "Vaalea tila"]
+        : ["Dark mode", "Tumma tila"];
+}
+
+function saved_theme() {
+    if (typeof(Storage) !== "undefined") {
+        var t = localStorage.getItem(g_theme_key);
+        if (t == "light" || t == "dark") {
+            return t;
+        }
+    }
+
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+    }
+    return "light";
+}
+
+function paint_theme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+
+    var button = document.getElementById("theme_toggle");
+    if (button !== null) {
+        button.title = (theme == "dark") ? "Switch to light mode" : "Switch to dark mode";
+    }
+
+    /* In the sheet the theme is an entry in the Settings dropdown. */
+    var option = document.getElementById("select_settings_theme");
+    if (option !== null) {
+        var lang = (typeof(g_defs) != "undefined") ? g_defs.s.lang : 0;
+        option.textContent = theme_labels()[lang];
+    }
+}
+
+function toggle_theme() {
+    var theme = (document.documentElement.getAttribute("data-theme") == "dark") ? "light" : "dark";
+
+    if (typeof(Storage) !== "undefined") {
+        localStorage.setItem(g_theme_key, theme);
+    }
+
+    paint_theme(theme);
+}
+
+function setup_theme() {
+    paint_theme(saved_theme());
+}
+    setup_theme();
+  </script>
 
 </body>
 </html>

@@ -32,10 +32,93 @@
 -->
 
 <style type="text/css">
+/* Shared colours for the landing page and the sheets.
+
+   The theme is a data-theme attribute on the html element, set by theme.js from
+   localStorage or the system preference.
+*/
+
+:root {
+    --bg:        #ffffff;
+    --fg:        #000000;
+    --accent:    #453b69;
+    --panel:     #ffffff;   /* envelope background in the sheet */
+    --field:     #83ffff;   /* number entry background */
+    --highlight: #ffe900;   /* entered value cell */
+    --highlight_fg: #000000;
+    --alert:     #ff0000;   /* overweight cell background */
+    --alert_fg:  #ffffff;
+    --line:      #aaaaaa;
+    --shadow:    rgba(0, 0, 0, 0.4);
+    --ok:        green;
+    --bad:       red;
+    --toggle_scale: 1.3;
+}
+
+:root[data-theme="dark"] {
+    --bg:        #16181d;
+    --fg:        #dfe3e8;
+    --accent:    #b4a6d6;
+    --panel:     #232830;
+    --field:     #223a3f;
+    --highlight: #6b5320;
+    --highlight_fg: #f0d9a0;
+    --alert:     #8e2f2f;
+    --alert_fg:  #ffffff;
+    --line:      #4a5058;
+    --shadow:    rgba(255, 255, 255, 0.08);
+    --ok:        #3ddc84;
+    --bad:       #ff6161;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+}
+
+.theme_toggle {
+    display: inline-flex;
+    align-items: center;
+    font: inherit;
+    font-size: calc(1em * var(--toggle_scale));
+    color: var(--accent);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: calc(2px * var(--toggle_scale)) calc(8px * var(--toggle_scale));
+    cursor: pointer;
+    box-shadow: 2px 2px 3px var(--shadow);
+}
+
+.theme_icon {
+    width: calc(16px * var(--toggle_scale));
+    height: calc(16px * var(--toggle_scale));
+    fill: currentColor;
+}
+
+/* The moon is shown in the dark theme, the sun in the light one. */
+.theme_icon.moon {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme_icon.sun {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme_icon.moon {
+    display: inline;
+}
+
+/* The selects keep the browser default in light mode. */
+:root[data-theme="dark"] select {
+    color: var(--fg);
+    background-color: var(--panel);
+    border: 1px solid var(--line);
+}
 table.a {
     border-radius: 4%;
     padding: 10px 10px 10px 10px;
-    box-shadow: 3px 3px 5px gray;
+    box-shadow: 3px 3px 5px var(--shadow);
     border-spacing:4px;
 }
 
@@ -48,7 +131,7 @@ table.a th {
 table.a td {
     text-align: right;
     padding: 3px;
-    box-shadow: 2px 2px 3px gray;
+    box-shadow: 2px 2px 3px var(--shadow);
 }
 
 .alignleft {
@@ -67,8 +150,8 @@ table.a td {
     position: absolute;
     border: 1px solid;
     border-radius: 15px;
-    box-shadow: 3px 3px 2px rgba(0,0,0,0.4);
-    background-color: #83ffff;
+    box-shadow: 3px 3px 2px var(--shadow);
+    background-color: var(--field);
     padding: 4px;
     width: 3em;
     text-align: right;
@@ -85,13 +168,75 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
     border: 0px;
-    background-color: #83ffff;
+    background-color: var(--field);
     width: 2em;
     text-align: right;
     font-size: 1.2em;
     font-family: serif;
 }
+
+/* The svg texts that are not painted by the script follow the theme. */
+#svg_main text {
+    fill: var(--fg);
+}
 </style>
+
+<script type="text/javascript">
+/* Dark mode toggle, shared by the landing page and the sheets. */
+
+var g_theme_key = "kaltsi.mb.theme";
+
+/* The entry says what selecting it does, in the sheet language. */
+function theme_labels() {
+    return (document.documentElement.getAttribute("data-theme") == "dark")
+        ? ["Light mode", "Vaalea tila"]
+        : ["Dark mode", "Tumma tila"];
+}
+
+function saved_theme() {
+    if (typeof(Storage) !== "undefined") {
+        var t = localStorage.getItem(g_theme_key);
+        if (t == "light" || t == "dark") {
+            return t;
+        }
+    }
+
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+    }
+    return "light";
+}
+
+function paint_theme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+
+    var button = document.getElementById("theme_toggle");
+    if (button !== null) {
+        button.title = (theme == "dark") ? "Switch to light mode" : "Switch to dark mode";
+    }
+
+    /* In the sheet the theme is an entry in the Settings dropdown. */
+    var option = document.getElementById("select_settings_theme");
+    if (option !== null) {
+        var lang = (typeof(g_defs) != "undefined") ? g_defs.s.lang : 0;
+        option.textContent = theme_labels()[lang];
+    }
+}
+
+function toggle_theme() {
+    var theme = (document.documentElement.getAttribute("data-theme") == "dark") ? "light" : "dark";
+
+    if (typeof(Storage) !== "undefined") {
+        localStorage.setItem(g_theme_key, theme);
+    }
+
+    paint_theme(theme);
+}
+
+function setup_theme() {
+    paint_theme(saved_theme());
+}
+</script>
 
 <script type="text/javascript">
 
@@ -438,7 +583,7 @@ interactive_row.prototype.description = function i_descr()
 
 interactive_row.prototype.iresult = function i_iresult()
 {
-    var a = '<td style="background-color:yellow;" id="' + this.celli + '" ' +
+    var a = '<td style="background-color:var(--highlight);color:var(--highlight_fg);" id="' + this.celli + '" ' +
     'onclick="show_number_entry(\'' + this.celli + '\', \'' + this.sldr + '\')">';
 
     switch (this.lp.vu.unit) {
@@ -560,7 +705,7 @@ cbox_interactive_row.prototype.content = function ic_content()
 
     var a = this.description();
 
-    a += '<td style="background-color:yellow;text-align:center;" id="' + this.celli + '">';
+    a += '<td style="background-color:var(--highlight);color:var(--highlight_fg);text-align:center;" id="' + this.celli + '">';
     a += '<input id="' + this.cbox + '" type="checkbox" ' + chk + ' ' +
     'onchange="user_checkbox(this, \'' + this.lp.id + '\', ' +
     this.lp.min + ', ' + this.lp.max + ')"/>';
@@ -776,6 +921,8 @@ function setup()
         // then load the default values for the sliders
         load_defaults();
 
+        setup_theme();
+
         refresh_title_row();
 
         // update some static elements
@@ -952,6 +1099,7 @@ function refresh_selectors()
                                    "Tallenna" ],
         "select_settings_clear" : ["Clear",
                                    "Poista" ],
+        "select_settings_theme" : theme_labels(),
         "units_kg_litre"        : ["kg & litre",
                                    "kg & litra"]
     };
@@ -1063,7 +1211,7 @@ function user_input_range(ir, lp)
 
 function user_checkbox(cb, lp, min, max)
 {
-    if (cb.checked == true) [
+    if (cb.checked == true) {
         window[lp].vu.num = max;
     } else {
         window[lp].vu.num = min;
@@ -1205,36 +1353,36 @@ function update_svg()
     var warning = 1;
     var w = document.getElementById("warning_text");
     if (g_lnd_fuel.vu.num < g_lnd_fuel.min) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["nofuel"][g_defs.s.lang] + "! " +
             (g_lnd_fuel.vu.num < 0?"0":g_lnd_fuel.vu.display(1)) + " " +
             lang["remain"][g_defs.s.lang] + "!";
     }
     else if (warn_limits(TOW.arm, TOW.vu.getmass(), g_lim.y) == 0) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["mtow"][g_defs.s.lang] + " " +
             (TOW.vu.getmass() - TOW.max).toFixed(1) +
             " " + g_mass_unit + "!!";
     }
     else if (warn_limits(LNDW.arm, LNDW.vu.getmass(), g_lim.y_land) == 0) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["mlm"][g_defs.s.lang] + " " +
             (LNDW.vu.getmass() - LNDW.max).toFixed(1) + " " +
             g_mass_unit + "!!";
     }
     else if (warn_limits(TOW.arm, TOW.vu.getmass(), g_lim.y) < 0) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
     }
     else if (warn_limits(LNDW.arm, LNDW.vu.getmass(), g_lim.y) < 0) {
         // This landing CG check uses the take-off weight limits
         // (y-coords) because the MnB envelope is drawn according
         // to the take-off values.
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
     }
     else {
-        w.setAttribute('fill', "green");
+        w.style.fill = "var(--ok)";
         w.textContent = lang["ok"][g_defs.s.lang];
 
         warning = 0;
@@ -1243,7 +1391,7 @@ function update_svg()
     function check_alert_cell(lp) {
         if (lp.vu.getmass() > lp.max) {
             document.getElementById(lp.up.cellr).
-                setAttribute('style', 'color:white; background-color:red;');
+                setAttribute('style', 'color:var(--alert_fg); background-color:var(--alert);');
         } else {
             document.getElementById(lp.up.cellr).
                 setAttribute('style', 'background-color:transparent;');
@@ -1252,9 +1400,9 @@ function update_svg()
 
     if (warning == 1) {
         document.getElementById("ac_reg").
-            setAttribute('style', 'opacity:0.25;fill:red;text-anchor:middle;');
+            setAttribute('style', 'opacity:0.25;fill:var(--bad);text-anchor:middle;');
 
-        document.getElementById("mb_limits").setAttribute('fill', 'yellow');
+        document.getElementById("mb_limits").style.fill = 'var(--highlight)';
 
         // recheck tow and lw here so that we can paint both cells
         // if necessary
@@ -1266,8 +1414,8 @@ function update_svg()
         check_alert_cell(LNDW);
 
         document.getElementById("ac_reg").
-            setAttribute('style', 'opacity:0.15;fill:black;text-anchor:middle;');
-        document.getElementById("mb_limits").setAttribute('fill', 'white');
+            setAttribute('style', 'opacity:0.15;fill:var(--fg);text-anchor:middle;');
+        document.getElementById("mb_limits").style.fill = 'var(--panel)';
     }
 }
 
@@ -1289,6 +1437,9 @@ function handle_settings_change(t)
         break;
     case "clear":
         clear_settings();
+        break;
+    case "theme":
+        toggle_theme();
         break;
     default:
         return;
@@ -1390,6 +1541,7 @@ window.onload = setup;
 
   <select id="settings_select" onchange="handle_settings_change(this)">
     <option id="select_settings_title" value="title" disabled>Settings</option>
+    <option id="select_settings_theme" value="theme">Dark mode</option>
     <option id="select_settings_save"  value="save" >Save</option>
     <option id="select_settings_clear" value="clear">Clear</option>
   </select>
@@ -1442,49 +1594,48 @@ window.onload = setup;
 
 <g>
   <rect id="svg_border" x="5" y="10" width="1" height="1"
-       rx="20" ry="20" fill="white"
-       style="stroke:black;stroke-width:3;opacity:0.6;"
+       rx="20" ry="20"
+       style="fill:var(--panel);stroke:var(--fg);stroke-width:3;opacity:0.6;"
        filter = "url(#my_shadow_filter)" />
 
   <g transform="scale(1,-1)">
     <g id="translate_group" >
       <polygon id="mb_limits"
               points="0,0 1,1"
-              fill="white"
-              style="stroke:black;stroke-width:2" />
+              style="fill:var(--panel);stroke:var(--fg);stroke-width:2" />
 
       <line id="landing_limit"
            x1="1" y1="1" x2="1" y2="1"
-           style="fill:none;stroke:green;stroke-width:2" />
+           style="fill:none;stroke:var(--ok);stroke-width:2" />
 
       <marker id="markerArrow" markerWidth="8" markerHeight="8"
              refx="4" refy="4" orient="auto">
-        <use xlink:href="#markerPath" style="fill: black;"/>
+        <use xlink:href="#markerPath" style="fill: var(--fg);"/>
       </marker>
 
       <line id="cg_arrow" x1="3" y1="3" x2="4" y2="4"
            marker-end="url(#markerArrow)"
-           style="stroke: black; stroke-width: 2px; stroke-dasharray: 6 3;"/>
+           style="stroke: var(--fg); stroke-width: 2px; stroke-dasharray: 6 3;"/>
 
       <circle id="takeoff_point" cx="1" cy="1" r="5"
-             stroke="black" stroke-width="1" fill="red"/>
+             style="stroke:var(--fg);stroke-width:1;fill:var(--bad)"/>
 
     </g>
   </g>
 
   <text id="ac_reg" x="50%" y="50%" font-size="80"
-       style="opacity:0.15;text-anchor:middle;">NO-REG</text>
+       style="opacity:0.15;fill:var(--fg);text-anchor:middle;">NO-REG</text>
 
   <!--g transform="translate(-50,325) rotate(-45)">
   <text id="ac_invalid" x="50%" y="50%" font-size="110"
-       style="opacity:0.5;text-anchor:middle;" fill="red"
+       style="opacity:0.5;fill:var(--bad);text-anchor:middle;"
        visibility="hidden">INVALID</text>
   </g-->
 
   <text id="warning_text" x="20" y="50" font-size="20"
-       fill="green" style="font-weight:bold;">Limits OK</text>
+       style="fill:var(--ok);font-weight:bold;">Limits OK</text>
 
-  <circle cx="25" cy="100" r="5" stroke="black" stroke-width="1" fill="red"/>
+  <circle cx="25" cy="100" r="5" style="stroke:var(--fg);stroke-width:1;fill:var(--bad)"/>
   <text x="35" y="105" id="takeoff_text">- Take-off</text>
 
   <!--circle cx="25" cy="125" r="5" stroke="black" stroke-width="1" fill="green"-->
@@ -1501,7 +1652,7 @@ window.onload = setup;
 
     <div id="extrainfo">
       <p class="aligncenter" id="origin_text">No origin</p>
-      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> 2026-10-18 18:45:34 +0300</small></p>
+      <p class="aligncenter"><small><a href="http://kaltsi.github.com/Mass-and-Balance/">m&amp;b sheets</a> 2026-10-18 19:51:31 +0300</small></p>
     </div>
 
   </footer>
