@@ -42,3 +42,9 @@ work tree, the output directory and `.git` mounted.
 Commit messages that touch a published spec show up in the landing page Updates
 section. A line like `OH-STL: CG limits updated` becomes the note for that
 aircraft and a line like `Publish: something` is added as an entry for that day.
+
+Both the landing page and the sheets have a sun/moon button that switches between
+the light and the dark colour scheme. In the sheets the theme is an entry in the
+Settings dropdown instead. The choice is saved in `localStorage` under
+`kaltsi.mb.theme`, so the landing page and all the sheets use the same theme, and
+without a saved choice the system preference is used.

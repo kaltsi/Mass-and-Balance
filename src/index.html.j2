@@ -6,23 +6,33 @@
   <title>Mass-and-Balance</title>
 
   <style type="text/css">
+{% include "theme.css" %}
     body {
         margin: 1.0em 0px 0px 0px;
         font-family: Helvetica, Arial, FreeSans, san-serif;
-        color: #000000;
+        color: var(--fg);
     }
     #container {
         margin: 0 auto;
         width: 700px;
     }
-    h1 { font-size: 3.8em; color: #453b69; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: var(--accent); margin-bottom: 3px; display: flex; align-items: baseline; gap: 0.5em; }
     h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #453b69; }
-    h3 { color: #453b69; }
+    h1 a { text-decoration: none; white-space: nowrap; }
+    /* The button is aligned with the bottom of the text: the h1 baseline is the
+       bottom of the letters, so the button bottom padding is taken off. */
+    h1 .theme_toggle { font-size: calc(0.4em * var(--toggle_scale)); flex: none; align-self: baseline; padding-bottom: 0; }
+    h1 .theme_icon { width: calc(0.4em * var(--toggle_scale)); height: calc(0.4em * var(--toggle_scale)); }
+
+    /* The title does not wrap, so on a narrow screen it gets smaller instead. */
+    @media (max-width: 480px) {
+        h1 { font-size: 2.4em; }
+    }
+    h2 { font-size: 1.5em; color: var(--accent); }
+    h3 { color: var(--accent); }
     h4 { font-weight: 300;}
-    hr { border: 0; width: 100%; border-bottom: 1px solid #aaa}
-    a { color: #453b69; }
+    hr { border: 0; width: 100%; border-bottom: 1px solid var(--line) }
+    a { color: var(--accent); }
 
     li { list-style: none; padding: 0px; }
     li:before { content: '\2708'; margin: 0 0.5em; }
@@ -35,10 +45,10 @@
         border-radius: 10px;
         padding: 2px 8px 2px 8px;
         background: none;
-        box-shadow: 2px 2px 3px rgba(0,0,0,0.4);
+        box-shadow: 2px 2px 3px var(--shadow);
         transition: background 0.2s linear 0s;
     }
-    .mblink:hover { background: yellow; }
+    .mblink:hover { background: var(--highlight); }
 
     .description {
         font-size: 1.2em;
@@ -79,7 +89,7 @@
         border: 1px solid;
         border-radius: 6%;
         padding: 10px 10px 10px 10px;
-        box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+        box-shadow: 3px 3px 5px var(--shadow);
     }
 
     table.a th {
@@ -98,7 +108,10 @@
 <body>
 
   <div id="container">
-    <h1><a href="https://github.com/kaltsi/Mass-and-Balance">Mass and Balance</a></h1>
+    <h1>
+      <a href="https://github.com/kaltsi/Mass-and-Balance">Mass and Balance</a>
+      {% include "theme_toggle.j2" %}
+    </h1>
 
     <div class="description">
       Simple mass and balance calculator for airplanes
@@ -166,6 +179,11 @@
     </div>
 
   </div>
+
+  <script type="text/javascript">
+{% include "theme.js" %}
+    setup_theme();
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,88 @@
+/* Shared colours for the landing page and the sheets.
+
+   The theme is a data-theme attribute on the html element. The sun/moon button
+   (theme_toggle.j2) sets it, theme.js remembers the choice in localStorage and
+   falls back to the system preference. CSS shows the moon in the dark theme and
+   the sun in the light one.
+
+   The dark values are chosen so that the cells the script paints (the entered
+   values and the overweight alerts) still have readable text on them.
+*/
+
+:root {
+    --bg:        #ffffff;
+    --fg:        #000000;
+    --accent:    #453b69;
+    --panel:     #ffffff;   /* envelope background in the sheet */
+    --field:     #83ffff;   /* number entry background */
+    --highlight: #ffe900;   /* entered value cell */
+    --highlight_fg: #000000;
+    --alert:     #ff0000;   /* overweight cell background */
+    --alert_fg:  #ffffff;
+    --line:      #aaaaaa;
+    --shadow:    rgba(0, 0, 0, 0.4);
+    --ok:        green;
+    --bad:       red;
+    --toggle_scale: 1.3;
+}
+
+:root[data-theme="dark"] {
+    --bg:        #16181d;
+    --fg:        #dfe3e8;
+    --accent:    #b4a6d6;
+    --panel:     #232830;   /* lighter than the page, so the envelope reads */
+    --field:     #223a3f;
+    --highlight: #6b5320;   /* muted amber instead of the glaring light-theme yellow */
+    --highlight_fg: #f0d9a0;
+    --alert:     #8e2f2f;
+    --alert_fg:  #ffffff;
+    --line:      #4a5058;
+    --shadow:    rgba(255, 255, 255, 0.08);
+    --ok:        #3ddc84;
+    --bad:       #ff6161;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+}
+
+.theme_toggle {
+    display: inline-flex;
+    align-items: center;
+    font: inherit;
+    font-size: calc(1em * var(--toggle_scale));
+    color: var(--accent);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: calc(2px * var(--toggle_scale)) calc(8px * var(--toggle_scale));
+    cursor: pointer;
+    box-shadow: 2px 2px 3px var(--shadow);
+}
+
+.theme_icon {
+    width: calc(16px * var(--toggle_scale));
+    height: calc(16px * var(--toggle_scale));
+    fill: currentColor;
+}
+
+/* The moon is shown in the dark theme, the sun in the light one. */
+.theme_icon.moon {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme_icon.sun {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme_icon.moon {
+    display: inline;
+}
+
+/* The selects keep the browser default in light mode. */
+:root[data-theme="dark"] select {
+    color: var(--fg);
+    background-color: var(--panel);
+    border: 1px solid var(--line);
+}

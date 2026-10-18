@@ -32,8 +32,13 @@
 -->
 
 <style type="text/css">
+{% include "theme.css" %}
 {% include "style.css" %}
 </style>
+
+<script type="text/javascript">
+{% include "theme.js" %}
+</script>
 
 <script type="text/javascript">
 {% include "script.js.j2" %}
@@ -48,6 +53,7 @@
 
   <select id="settings_select" onchange="handle_settings_change(this)">
     <option id="select_settings_title" value="title" disabled>Settings</option>
+    <option id="select_settings_theme" value="theme">Dark mode</option>
     <option id="select_settings_save"  value="save" >Save</option>
     <option id="select_settings_clear" value="clear">Clear</option>
   </select>

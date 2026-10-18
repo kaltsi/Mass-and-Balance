@@ -338,7 +338,7 @@ interactive_row.prototype.description = function i_descr()
 
 interactive_row.prototype.iresult = function i_iresult()
 {
-    var a = '<td style="background-color:yellow;" id="' + this.celli + '" ' +
+    var a = '<td style="background-color:var(--highlight);color:var(--highlight_fg);" id="' + this.celli + '" ' +
     'onclick="show_number_entry(\'' + this.celli + '\', \'' + this.sldr + '\')">';
 
     switch (this.lp.vu.unit) {
@@ -460,7 +460,7 @@ cbox_interactive_row.prototype.content = function ic_content()
 
     var a = this.description();
 
-    a += '<td style="background-color:yellow;text-align:center;" id="' + this.celli + '">';
+    a += '<td style="background-color:var(--highlight);color:var(--highlight_fg);text-align:center;" id="' + this.celli + '">';
     a += '<input id="' + this.cbox + '" type="checkbox" ' + chk + ' ' +
     'onchange="user_checkbox(this, \'' + this.lp.id + '\', ' +
     this.lp.min + ', ' + this.lp.max + ')"/>';
@@ -673,6 +673,8 @@ function setup()
         // then load the default values for the sliders
         load_defaults();
 
+        setup_theme();
+
         refresh_title_row();
 
         // update some static elements
@@ -846,6 +848,7 @@ function refresh_selectors()
                                    "Tallenna" ],
         "select_settings_clear" : ["Clear",
                                    "Poista" ],
+        "select_settings_theme" : theme_labels(),
         "units_kg_litre"        : ["kg & litre",
                                    "kg & litra"]
     };
@@ -1099,36 +1102,36 @@ function update_svg()
     var warning = 1;
     var w = document.getElementById("warning_text");
     if (g_lnd_fuel.vu.num < g_lnd_fuel.min) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["nofuel"][g_defs.s.lang] + "! " +
             (g_lnd_fuel.vu.num < 0?"0":g_lnd_fuel.vu.display(1)) + " " +
             lang["remain"][g_defs.s.lang] + "!";
     }
     else if (warn_limits({{ tow|default("g_tow") }}.arm, {{ tow|default("g_tow") }}.vu.getmass(), g_lim.y) == 0) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["mtow"][g_defs.s.lang] + " " +
             ({{ tow|default("g_tow") }}.vu.getmass() - {{ tow|default("g_tow") }}.max).toFixed(1) +
             " " + g_mass_unit + "!!";
     }
     else if (warn_limits({{ lndw|default("g_lw") }}.arm, {{ lndw|default("g_lw") }}.vu.getmass(), g_lim.y_land) == 0) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["mlm"][g_defs.s.lang] + " " +
             ({{ lndw|default("g_lw") }}.vu.getmass() - {{ lndw|default("g_lw") }}.max).toFixed(1) + " " +
             g_mass_unit + "!!";
     }
     else if (warn_limits({{ tow|default("g_tow") }}.arm, {{ tow|default("g_tow") }}.vu.getmass(), g_lim.y) < 0) {
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
     }
     else if (warn_limits({{ lndw|default("g_lw") }}.arm, {{ lndw|default("g_lw") }}.vu.getmass(), g_lim.y) < 0) {
         // This landing CG check uses the take-off weight limits
         // (y-coords) because the MnB envelope is drawn according
         // to the take-off values.
-        w.setAttribute('fill', "red");
+        w.style.fill = "var(--bad)";
         w.textContent = lang["cgbust"][g_defs.s.lang] + "!!";
     }
     else {
-        w.setAttribute('fill', "green");
+        w.style.fill = "var(--ok)";
         w.textContent = lang["ok"][g_defs.s.lang];
 
         warning = 0;
@@ -1137,7 +1140,7 @@ function update_svg()
     function check_alert_cell(lp) {
         if (lp.vu.getmass() > lp.max) {
             document.getElementById(lp.up.cellr).
-                setAttribute('style', 'color:white; background-color:red;');
+                setAttribute('style', 'color:var(--alert_fg); background-color:var(--alert);');
         } else {
             document.getElementById(lp.up.cellr).
                 setAttribute('style', 'background-color:transparent;');
@@ -1146,9 +1149,9 @@ function update_svg()
 
     if (warning == 1) {
         document.getElementById("ac_reg").
-            setAttribute('style', 'opacity:0.25;fill:red;text-anchor:middle;');
+            setAttribute('style', 'opacity:0.25;fill:var(--bad);text-anchor:middle;');
 
-        document.getElementById("mb_limits").setAttribute('fill', 'yellow');
+        document.getElementById("mb_limits").style.fill = 'var(--highlight)';
 
         // recheck tow and lw here so that we can paint both cells
         // if necessary
@@ -1160,8 +1163,8 @@ function update_svg()
         check_alert_cell({{ lndw|default("g_lw") }});
 
         document.getElementById("ac_reg").
-            setAttribute('style', 'opacity:0.15;fill:black;text-anchor:middle;');
-        document.getElementById("mb_limits").setAttribute('fill', 'white');
+            setAttribute('style', 'opacity:0.15;fill:var(--fg);text-anchor:middle;');
+        document.getElementById("mb_limits").style.fill = 'var(--panel)';
     }
 }
 
@@ -1183,6 +1186,9 @@ function handle_settings_change(t)
         break;
     case "clear":
         clear_settings();
+        break;
+    case "theme":
+        toggle_theme();
         break;
     default:
         return;
