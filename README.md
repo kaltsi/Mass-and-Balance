@@ -41,6 +41,6 @@ work tree, the output directory and `.git` mounted.
 
 Commit messages that touch a published spec show up in the landing page Updates
 section. A line like `OH-STL: CG limits updated` becomes the note for that
-aircraft and a line like `Publish: something` is added as an entry for that day.
-A commit that touches no published spec is only shown when its message has a
-`Publish:` line.
+aircraft and a `Publish: something` line, only when it starts a line, is added as
+an entry for that day. A commit that touches no published spec is only shown when
+its message has such a line.

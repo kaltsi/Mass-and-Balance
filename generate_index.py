@@ -7,11 +7,11 @@ Only the specs with `publish` true get a row in the aircraft table, listed in
 registration order. The output is out/index.html, the output directory is created
 if it does not exist. The Updates section shows the three latest dates with a
 qualifying commit, newest first, one block per date, commits of the same date
-merged. A commit that touches no published spec counts only when its message has
-a `Publish:` line. A line like `OH-STL: CG limits updated` is the note for that
-aircraft, a `Publish: something` line is the first entry of the day, and aircraft
-without a note are listed together. The dates come from git, so the clone needs
-the full history.
+merged. A commit that touches no published spec counts only when a line in its
+message starts with a `Publish:`. A line like `OH-STL: CG limits updated` is the
+note for that aircraft, a `Publish: something` line is the first entry of the day,
+and aircraft without a note are listed together. The dates come from git, so the
+clone needs the full history.
 
 Template variables:
   aircraft   the published specs, sorted by registration
@@ -33,7 +33,7 @@ DATE_FORMAT = "%d.%m.%Y"
 RECORD = "\x1e"  # commit record separator
 FILES = "\x1f"   # commit message / changed file list separator
 NOTE = re.compile(r"([A-Z]{2}-[A-Z]{3}):\s*(.+)")
-PUBLISH = re.compile(r"Publish:\s*(.+)", re.IGNORECASE)
+PUBLISH = re.compile(r"^Publish:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 
 
 def published_specs(specs_dir):
