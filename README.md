@@ -24,9 +24,9 @@ landing page:
 ./generate_index.py src/index.html.j2 specs out
 ```
 
-The landing page lists one row per published spec and the three latest commits
-that touched one, newest first, grouped by date. The dates come from git, so the
-checkout needs the full history (`fetch-depth: 0`).
+The landing page lists one row per published spec and the three latest dates with
+a qualifying commit, newest first, one block per date, commits of the same date
+merged. The dates come from git, so the checkout needs the full history.
 
 ### Running it in a container
 
@@ -42,9 +42,5 @@ work tree, the output directory and `.git` mounted.
 Commit messages that touch a published spec show up in the landing page Updates
 section. A line like `OH-STL: CG limits updated` becomes the note for that
 aircraft and a line like `Publish: something` is added as an entry for that day.
-
-Both the landing page and the sheets have a sun/moon button that switches between
-the light and the dark colour scheme. In the sheets the theme is an entry in the
-Settings dropdown instead. The choice is saved in `localStorage` under
-`kaltsi.mb.theme`, so the landing page and all the sheets use the same theme, and
-without a saved choice the system preference is used.
+A commit that touches no published spec is only shown when its message has a
+`Publish:` line.

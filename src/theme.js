@@ -1,8 +1,4 @@
-/* Dark mode toggle, shared by the landing page and the sheets.
-
-   The choice is stored under one key, so every sheet and the landing page use
-   the same theme. Without a stored choice the system preference decides.
-*/
+/* Dark mode toggle, shared by the landing page and the sheets. */
 
 var g_theme_key = "kaltsi.mb.theme";
 

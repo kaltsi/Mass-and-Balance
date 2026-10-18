@@ -1,12 +1,7 @@
 /* Shared colours for the landing page and the sheets.
 
-   The theme is a data-theme attribute on the html element. The sun/moon button
-   (theme_toggle.j2) sets it, theme.js remembers the choice in localStorage and
-   falls back to the system preference. CSS shows the moon in the dark theme and
-   the sun in the light one.
-
-   The dark values are chosen so that the cells the script paints (the entered
-   values and the overweight alerts) still have readable text on them.
+   The theme is a data-theme attribute on the html element, set by theme.js from
+   localStorage or the system preference.
 */
 
 :root {
@@ -30,9 +25,9 @@
     --bg:        #16181d;
     --fg:        #dfe3e8;
     --accent:    #b4a6d6;
-    --panel:     #232830;   /* lighter than the page, so the envelope reads */
+    --panel:     #232830;
     --field:     #223a3f;
-    --highlight: #6b5320;   /* muted amber instead of the glaring light-theme yellow */
+    --highlight: #6b5320;
     --highlight_fg: #f0d9a0;
     --alert:     #8e2f2f;
     --alert_fg:  #ffffff;
